@@ -258,6 +258,20 @@ export function Latihan() {
 
               <div style={{ background: '#fff', borderRadius: 16, padding: 32, boxShadow: '0 8px 28px rgba(15,44,89,0.08)' }}>
                 <p style={{ fontSize: 16, lineHeight: 1.6, margin: '0 0 22px' }}>{currentQ.pertanyaan}</p>
+                {currentQ.imageUrl && (
+                  <div style={{ marginBottom: 22 }}>
+                    <img
+                      src={currentQ.imageUrl}
+                      alt="Ilustrasi kasus"
+                      style={{ maxWidth: '100%', borderRadius: 10, border: '1px solid rgba(15,44,89,0.12)' }}
+                    />
+                    {currentQ.imageAttribution && (
+                      <p style={{ fontSize: 11, color: 'rgba(15,44,89,0.45)', margin: '6px 0 0' }}>
+                        {currentQ.imageAttribution}
+                      </p>
+                    )}
+                  </div>
+                )}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {currentQ.opsi.map((opt) => {
                     const selected = answeredLetter === opt.letter;

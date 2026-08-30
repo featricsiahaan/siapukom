@@ -61,6 +61,8 @@ model Question {
   pembahasan String
   status     QuestionStatus @default(ACTIVE)
   sourceFile String?
+  imageUrl         String?
+  imageAttribution String?
   createdAt  DateTime       @default(now())
 
   answers SessionAnswer[]

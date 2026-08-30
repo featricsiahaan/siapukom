@@ -71,6 +71,8 @@ router.post(
         kategori: q.category.name,
         pertanyaan: q.pertanyaan,
         opsi: q.opsi as Opsi[],
+        imageUrl: q.imageUrl,
+        imageAttribution: q.imageAttribution,
       })),
     });
   })

@@ -21,6 +21,8 @@ export interface SessionQuestion {
   kategori: string;
   pertanyaan: string;
   opsi: Opsi[];
+  imageUrl?: string | null;
+  imageAttribution?: string | null;
 }
 
 export interface StartSessionResponse {

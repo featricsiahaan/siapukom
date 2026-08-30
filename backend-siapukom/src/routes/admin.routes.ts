@@ -115,6 +115,8 @@ router.get(
         pembahasan: q.pembahasan,
         status: q.status,
         sourceFile: q.sourceFile,
+        imageUrl: q.imageUrl,
+        imageAttribution: q.imageAttribution,
         createdAt: q.createdAt,
       })),
     });
@@ -128,6 +130,8 @@ const updateSchema = z.object({
   kunci: z.string().trim().min(1).optional(),
   pembahasan: z.string().optional(),
   status: z.enum(['DRAFT', 'ACTIVE']).optional(),
+  imageUrl: z.string().trim().url().nullable().optional(),
+  imageAttribution: z.string().trim().nullable().optional(),
 });
 
 router.patch(
@@ -158,6 +162,8 @@ router.patch(
         kunci: body.kunci,
         pembahasan: body.pembahasan,
         status: body.status,
+        imageUrl: body.imageUrl,
+        imageAttribution: body.imageAttribution,
       },
       include: { category: true },
     });
@@ -170,6 +176,8 @@ router.patch(
       kunci: updated.kunci,
       pembahasan: updated.pembahasan,
       status: updated.status,
+      imageUrl: updated.imageUrl,
+      imageAttribution: updated.imageAttribution,
     });
   })
 );

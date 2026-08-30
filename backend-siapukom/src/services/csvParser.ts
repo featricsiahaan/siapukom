@@ -88,7 +88,7 @@ export function parseQuestionsFromCsv(text: string): CsvParseResult {
 
   const kategoriIdx = findColumn(headers, ['materi', 'kategori']);
   const pertanyaanIdx = findColumn(headers, ['pertanyaan', 'soal', 'vignette']);
-  const kunciIdx = findColumn(headers, ['kunci', 'jawaban', 'kunci_jawaban']);
+  const kunciIdx = findColumn(headers, ['kunci', 'jawaban', 'kunci_jawaban', 'jawaban_benar']);
   const pembahasanIdx = findColumn(headers, ['pembahasan', 'penjelasan']);
   const optionIdx = OPTION_LETTERS.map((letter) =>
     findColumn(headers, [`opsi_${letter.toLowerCase()}`, `opsi ${letter.toLowerCase()}`, letter.toLowerCase()])
