@@ -17,6 +17,11 @@ enum SessionStatus {
   FINISHED
 }
 
+enum QuestionStatus {
+  DRAFT
+  ACTIVE
+}
+
 model User {
   id        String   @id @default(cuid())
   nama      String
@@ -47,16 +52,20 @@ model Category {
 }
 
 model Question {
-  id         String   @id @default(cuid())
+  id         String         @id @default(cuid())
   categoryId String
-  category   Category @relation(fields: [categoryId], references: [id])
+  category   Category       @relation(fields: [categoryId], references: [id])
   pertanyaan String
   opsi       Json
   kunci      String
   pembahasan String
-  createdAt  DateTime @default(now())
+  status     QuestionStatus @default(ACTIVE)
+  sourceFile String?
+  createdAt  DateTime       @default(now())
 
   answers SessionAnswer[]
+
+  @@index([status])
 }
 
 model PracticeSession {

@@ -37,11 +37,12 @@ router.post(
     const { categoryId, jumlah } = startSessionSchema.parse(req.body);
 
     const pool = await prisma.question.findMany({
-      where: categoryId ? { categoryId } : undefined,
+      where: categoryId ? { categoryId, status: 'ACTIVE' } : { status: 'ACTIVE' },
       include: { category: true },
     });
 
-    const source = pool.length > 0 ? pool : await prisma.question.findMany({ include: { category: true } });
+    const source =
+      pool.length > 0 ? pool : await prisma.question.findMany({ where: { status: 'ACTIVE' }, include: { category: true } });
     if (source.length === 0) {
       throw new HttpError(503, 'Bank soal belum tersedia');
     }

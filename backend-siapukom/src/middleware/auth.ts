@@ -36,6 +36,13 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+export function requireAdmin(req: Request, res: Response, next: NextFunction) {
+  if (req.user?.role !== 'ADMIN') {
+    return next(new HttpError(403, 'Hanya admin yang boleh mengakses endpoint ini'));
+  }
+  next();
+}
+
 // Melekatkan user jika token valid, tapi tidak menolak request tanpa token —
 // dipakai untuk sesi latihan gratis yang boleh diakses tanpa login.
 export function attachUserIfPresent(req: Request, _res: Response, next: NextFunction) {

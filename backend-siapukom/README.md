@@ -82,6 +82,58 @@ Semua response JSON. Endpoint yang butuh login mengharapkan header `Authorizatio
 | `POST /api/practice/sessions/:id/answer` | opsional | `{order, answerLetter}` → cek jawaban di server, balikan kunci + pembahasan |
 | `POST /api/practice/sessions/:id/finish` | opsional | Menutup sesi, balikan skor total & per kategori |
 | `GET /api/dashboard` | wajib | Skor kesiapan, breakdown kategori, status membership (dihitung dari 5 sesi selesai terakhir) |
+| `POST /api/admin/import` | admin | Upload file `.pdf`/`.docx` (multipart, field `file`) → parsing otomatis → soal masuk sebagai draft |
+| `GET /api/admin/questions?status=DRAFT\|ACTIVE` | admin | Daftar soal berdasarkan status |
+| `PATCH /api/admin/questions/:id` | admin | Edit field soal (kategori/pertanyaan/opsi/kunci/pembahasan/status) |
+| `POST /api/admin/questions/approve-batch` | admin | `{ids: string[]}` → set beberapa soal draft jadi ACTIVE sekaligus |
+| `DELETE /api/admin/questions/:id` | admin | Hapus soal (dipakai untuk menolak draft yang salah) |
+
+## Import Bank Soal dari PDF/Word
+
+Endpoint `POST /api/admin/import` memakai **parser berbasis format tetap** (bukan AI, jadi gratis tanpa API eksternal) — dokumen sumber **wajib** mengikuti pola penulisan berikut persis (spasi/kapitalisasi kata kunci boleh bervariasi, tapi strukturnya harus konsisten):
+
+```
+Kategori: Kardiovaskular
+
+1. Laki-laki 50 tahun datang dengan nyeri dada khas iskemik selama 2 jam.
+Boleh lanjut ke baris berikutnya untuk vignette panjang.
+A. Angina stabil
+B. STEMI inferior
+C. Perikarditis
+D. Diseksi aorta
+E. Emboli paru
+Kunci: B
+Pembahasan: Elevasi ST di sadapan inferior menunjukkan STEMI inferior.
+
+2. Soal berikutnya di kategori yang sama...
+A. ...
+B. ...
+Kunci: A
+Pembahasan: ...
+
+Kategori: Respirasi
+
+3. Soal pertama di kategori baru...
+```
+
+Aturan parsing:
+- Baris `Kategori: <nama>` menentukan kategori untuk semua soal setelahnya, sampai muncul baris `Kategori:` berikutnya.
+- Setiap soal **wajib** diawali baris bernomor (`1.`, `2.`, dst — boleh pakai `)` juga, misal `1)`).
+- Baris opsi wajib diawali huruf + titik/kurung tutup, misal `A.` atau `A)`.
+- Baris kunci jawaban wajib diawali `Kunci:` atau `Jawaban:` diikuti satu huruf.
+- Baris pembahasan wajib diawali `Pembahasan:` atau `Penjelasan:`.
+- Soal yang tidak lengkap (opsi kurang dari 2, kunci tidak ditemukan/tidak cocok dengan opsi) otomatis dilewati dan dilaporkan lewat field `warnings` di response — bukan bikin seluruh import gagal.
+- Kategori yang belum ada di database akan **dibuat otomatis** (dilaporkan lewat `categoriesCreated`).
+
+Semua soal hasil import masuk dengan `status: DRAFT` — **tidak akan muncul di sesi latihan peserta** sampai di-approve lewat `POST /api/admin/questions/approve-batch` (atau `PATCH .../status=ACTIVE` satu-satu).
+
+### Mengakses endpoint admin
+
+Endpoint `/api/admin/*` butuh user dengan `role: ADMIN`. Role ini tidak bisa didapat lewat registrasi biasa (selalu `PESERTA`) — harus diubah manual lewat database, misal via Neon Console SQL Editor:
+```sql
+UPDATE "User" SET role = 'ADMIN' WHERE email = 'email-akun-anda';
+```
+Setelah itu, login seperti biasa lewat `POST /api/auth/login` — token JWT yang didapat akan punya klaim `role: ADMIN` dan bisa dipakai untuk semua endpoint admin.
 
 ### Catatan integrasi ke frontend
 
