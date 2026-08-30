@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  PESERTA
+  ADMIN
+}
+
+enum SessionStatus {
+  IN_PROGRESS
+  FINISHED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  nama      String
+  email     String   @unique
+  password  String
+  role      Role     @default(PESERTA)
+  createdAt DateTime @default(now())
+
+  membership Membership?
+  sessions   PracticeSession[]
+}
+
+model Membership {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan          String    @default("Gratis")
+  expiryDate    DateTime?
+  sessionsUsed  Int       @default(0)
+  sessionsTotal Int       @default(0)
+  updatedAt     DateTime  @updatedAt
+}
+
+model Category {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  questions Question[]
+}
+
+model Question {
+  id         String   @id @default(cuid())
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+  pertanyaan String
+  opsi       Json
+  kunci      String
+  pembahasan String
+  createdAt  DateTime @default(now())
+
+  answers SessionAnswer[]
+}
+
+model PracticeSession {
+  id             String        @id @default(cuid())
+  userId         String?
+  user           User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryFilter String?
+  totalQuestions Int
+  correctCount   Int           @default(0)
+  status         SessionStatus @default(IN_PROGRESS)
+  createdAt      DateTime      @default(now())
+  finishedAt     DateTime?
+
+  answers SessionAnswer[]
+
+  @@index([userId, status, finishedAt])
+}
+
+model SessionAnswer {
+  id           String          @id @default(cuid())
+  sessionId    String
+  session      PracticeSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  questionId   String
+  question     Question        @relation(fields: [questionId], references: [id])
+  order        Int
+  answerLetter String?
+  isCorrect    Boolean?
+  answeredAt   DateTime?
+
+  @@unique([sessionId, order])
+}

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <style>
+    body{margin:0}
+    a{color:#0F2C59;text-decoration:none}
+    a:hover{color:#C9962E}
+  </style>
+</helmet>
+
+<div style="min-height:100vh;background:#F6F8FC;color:#0F2C59;font-family:'Plus Jakarta Sans',system-ui,sans-serif">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 64px;background:#fff;border-bottom:1px solid rgba(15,44,89,0.08)">
+    <div style="display:flex;align-items:center;gap:32px">
+      <div style="font-size:18px;font-weight:800"><span style="color:#0F2C59">Siap</span><span style="color:#C9962E">UKOM</span></div>
+      <div style="display:flex;gap:28px;font-size:14px;font-weight:600">
+        <a href="SiapUKOM.dc.html" style="color:#0F2C59">Dashboard</a>
+        <a href="SiapUKOM Latihan.dc.html" style-hover="color:#C9962E">Latihan</a>
+        <a href="#simulasi" style-hover="color:#C9962E">Simulasi</a>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:36px;height:36px;border-radius:50%;background:#0F2C59;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700">{{ initial }}</div>
+        <div style="font-size:13.5px;font-weight:700">{{ nama }}</div>
+      </div>
+      <a href="SiapUKOM Masuk.dc.html" style="font-size:13px;font-weight:600;color:rgba(15,44,89,0.5)" style-hover="color:#C9962E">Keluar</a>
+    </div>
+  </div>
+
+  <div style="max-width:1180px;margin:0 auto;padding:44px 24px 72px">
+
+    <h1 style="font-size:26px;font-weight:800;letter-spacing:-0.01em;margin:0 0 6px">Halo, {{ nama }} 👋</h1>
+    <p style="font-size:14.5px;color:rgba(15,44,89,0.6);margin:0 0 32px">Berikut ringkasan kesiapan dan status membermu.</p>
+
+    <div style="display:grid;grid-template-columns:1.1fr 1.4fr;gap:24px;margin-bottom:36px">
+
+      <div style="background:#0F2C59;border-radius:18px;padding:30px;color:#fff;display:flex;flex-direction:column;gap:18px;box-shadow:0 10px 28px rgba(15,44,89,0.18)">
+        <div style="font-size:13px;font-weight:700;color:#E5BA73;letter-spacing:0.02em;text-transform:uppercase">Status Membership</div>
+        <div>
+          <div style="font-size:22px;font-weight:800">{{ membershipPlan }}</div>
+          <div style="font-size:13px;opacity:0.75;margin-top:4px">Berlaku hingga {{ membershipExpiry }}</div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;opacity:0.8;margin-bottom:6px">
+            <span>Sisa sesi latihan</span><span>{{ sesiTerpakai }}/{{ sesiTotal }}</span>
+          </div>
+          <div style="height:8px;background:rgba(255,255,255,0.18);border-radius:99px;overflow:hidden">
+            <div style="height:100%;background:#E5BA73;border-radius:99px;width:{{ sesiPercent }}"></div>
+          </div>
+        </div>
+        <a href="SiapUKOM Latihan.dc.html" style="margin-top:auto;text-align:center;background:#E5BA73;color:#0F2C59;font-size:13.5px;font-weight:700;padding:11px 18px;border-radius:10px">Perpanjang / Tambah Sesi</a>
+      </div>
+
+      <div style="background:#fff;border-radius:18px;padding:30px;display:flex;gap:32px;align-items:center;box-shadow:0 6px 20px rgba(15,44,89,0.06)">
+        <div style="position:relative;width:140px;height:140px;flex-shrink:0">
+          <svg width="140" height="140" viewBox="0 0 140 140" style="transform:rotate(-90deg)">
+            <circle cx="70" cy="70" r="60" fill="none" stroke="#EEF1F7" stroke-width="14"></circle>
+            <circle cx="70" cy="70" r="60" fill="none" stroke="{{ readinessColor }}" stroke-width="14" stroke-linecap="round" stroke-dasharray="{{ readinessDasharray }}"></circle>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <div style="font-size:30px;font-weight:800">{{ readinessScore }}</div>
+            <div style="font-size:11px;color:rgba(15,44,89,0.5);font-weight:600">/ 100</div>
+          </div>
+        </div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;color:rgba(15,44,89,0.5);letter-spacing:0.02em;text-transform:uppercase;margin-bottom:6px">Skor Kesiapan</div>
+          <div style="font-size:18px;font-weight:800;color:{{ readinessColor }};margin-bottom:6px">{{ readinessLabel }}</div>
+          <p style="font-size:13px;line-height:1.6;color:rgba(15,44,89,0.6);margin:0">Skor gabungan dari latihan dan simulasi terakhir. Perkuat kategori yang masih merah untuk menaikkan skor.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px">
+      <h2 style="font-size:19px;font-weight:800;margin:0">Evaluasi Kesiapan per Kategori</h2>
+      <span style="font-size:12.5px;color:rgba(15,44,89,0.45)">Berdasarkan hasil latihan &amp; simulasi terakhir</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px">
+      <sc-for list="{{ categories }}" as="cat" hint-placeholder-count="6">
+        <div style="background:#fff;border-radius:14px;padding:22px;box-shadow:0 4px 14px rgba(15,44,89,0.05);display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+            <div style="font-size:14.5px;font-weight:700">{{ cat.name }}</div>
+            <div style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:{{ cat.badgeBg }};color:{{ cat.badgeText }};white-space:nowrap">{{ cat.level }}</div>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:4px">
+            <span style="font-size:22px;font-weight:800">{{ cat.score }}</span>
+            <span style="font-size:12px;color:rgba(15,44,89,0.45)">/100</span>
+          </div>
+          <div style="height:7px;background:#EEF1F7;border-radius:99px;overflow:hidden">
+            <div style="height:100%;border-radius:99px;background:{{ cat.badgeText }};width:{{ cat.scorePercent }}"></div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <p style="font-size:11.5px;color:rgba(15,44,89,0.4);margin:28px 0 0">Prototipe — data nama, membership, dan skor di atas adalah data contoh (dummy), belum tersambung ke sistem sungguhan.</p>
+
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:1000},&quot;nama&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Peserta&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+
+class Component extends DCLogic {
+  categories = [
+    {name: 'Kegawatdaruratan Medis', score: 82},
+    {name: 'Anatomi & Fisiologi', score: 74},
+    {name: 'Farmakologi', score: 58},
+    {name: 'Etika & Hukum Kesehatan', score: 91},
+    {name: 'Keperawatan Dasar', score: 66},
+    {name: 'Sistem Muskuloskeletal', score: 45},
+  ];
+
+  levelFor(score) {
+    if (score >= 80) return {level: 'Siap', badgeBg: 'rgba(46,139,87,0.12)', badgeText: '#2E8B57'};
+    if (score >= 60) return {level: 'Cukup', badgeBg: 'rgba(229,186,115,0.22)', badgeText: '#B8860B'};
+    return {level: 'Perlu Latihan', badgeBg: 'rgba(192,57,43,0.1)', badgeText: '#C0392B'};
+  }
+
+  renderVals() {
+    const nama = (typeof localStorage !== 'undefined' && localStorage.getItem('siapukom_nama')) || this.props.nama || 'Peserta';
+    const overall = Math.round(this.categories.reduce((a, c) => a + c.score, 0) / this.categories.length);
+    const overallInfo = this.levelFor(overall);
+    const circumference = 2 * Math.PI * 60;
+    const cats = this.categories.map((c) => {
+      const info = this.levelFor(c.score);
+      return {...c, ...info, scorePercent: c.score + '%'};
+    });
+    return {
+      nama,
+      initial: nama.trim()[0]?.toUpperCase() || 'P',
+      membershipPlan: 'Paket Akses Penuh',
+      membershipExpiry: '18 September 2026',
+      sesiTerpakai: 23,
+      sesiTotal: 40,
+      sesiPercent: Math.round((23 / 40) * 100) + '%',
+      readinessScore: overall,
+      readinessLabel: overallInfo.level,
+      readinessColor: overallInfo.badgeText,
+      readinessDasharray: `${(overall / 100) * circumference} ${circumference}`,
+      categories: cats,
+    };
+  }
+}
+
+</script>
+</body>
+</html>

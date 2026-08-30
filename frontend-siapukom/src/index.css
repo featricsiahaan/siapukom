@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --navy: #0f2c59;
+  --navy-hover: #183a73;
+  --gold: #c9962e;
+  --gold-light: #e5ba73;
+  --gold-brown: #8a6a2e;
+  --bg-tint-1: #f6f8fc;
+  --bg-tint-2: #f8f9fc;
+  --bg-tint-3: #eef1f6;
+  --bg-tint-4: #eef1f7;
+  --white: #ffffff;
+  --green: #2e8b57;
+  --amber: #b8860b;
+  --red: #c0392b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: var(--navy);
+}
+
+a {
+  color: var(--navy);
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+input:focus {
+  outline: 2px solid var(--navy);
+  outline-offset: 1px;
+}
+
+.link-hover:hover {
+  color: var(--gold) !important;
+}
+
+.link-hover-brown:hover {
+  color: var(--gold-brown) !important;
+}
+
+.btn-primary:hover {
+  background: var(--navy-hover) !important;
+}
+
+.option-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 13px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(15, 44, 89, 0.15);
+  background: #fff;
+  cursor: pointer;
+}
+
+.option-row input[type='radio'] {
+  margin-top: 3px;
+}

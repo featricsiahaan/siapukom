@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap">
+  <style>
+    body{margin:0}
+    a{color:#0F2C59;text-decoration:none}
+    a:hover{color:#C9962E}
+  </style>
+</helmet>
+
+<div style="background:#FFFFFF;color:#0F2C59;font-family:'Plus Jakarta Sans',system-ui,sans-serif;overflow:hidden">
+
+  <div style="display:flex;align-items:center;gap:40px;padding:22px 64px;border-bottom:1px solid rgba(15,44,89,0.08)">
+    <div style="display:flex;align-items:center;gap:10px">
+      
+      <div style="font-size:19px;font-weight:800;letter-spacing:-0.01em"><span style="color:#0F2C59">Siap</span><span style="color:#C9962E">UKOM</span></div>
+    </div>
+    <div style="display:flex;gap:32px;margin-left:24px;font-size:14.5px;font-weight:500">
+      <a href="#fitur" style-hover="color:#C9962E">Fitur</a>
+      <a href="#harga" style-hover="color:#C9962E">Harga</a>
+    </div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:14px">
+      <a href="SiapUKOM Masuk.dc.html" style="font-size:14.5px;font-weight:600" style-hover="color:#C9962E">Masuk</a>
+      <a href="SiapUKOM Latihan.dc.html" style="background:#0F2C59;color:#fff;font-size:14px;font-weight:700;padding:11px 22px;border-radius:8px" style-hover="background:#183A73">Mulai Gratis</a>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;padding:88px 64px 96px;max-width:1280px;margin:0 auto">
+    <div>
+      <span style="display:inline-flex;align-items:center;background:rgba(229,186,115,0.18);color:#8A6A2E;font-size:12.5px;font-weight:700;letter-spacing:0.02em;padding:7px 16px;border-radius:999px;margin-bottom:24px">Persiapan UKMPPD &amp; Uji Kompetensi</span>
+      <h1 style="font-size:52px;line-height:1.12;font-weight:800;letter-spacing:-0.02em;margin:0 0 22px;max-width:15ch">Lulus Uji Kompetensi dengan Percaya Diri.</h1>
+      <p style="font-size:17px;line-height:1.6;color:rgba(15,44,89,0.68);max-width:46ch;margin:0 0 34px">Latihan soal tersusun sesuai <i>blueprint</i> resmi, simulasi ujian menyerupai kondisi CBT, dan gambaran kesiapan per kategori materi — dalam satu tempat.</p>
+      <div style="display:flex;align-items:center;gap:22px;margin-bottom:28px">
+        <a href="SiapUKOM Latihan.dc.html" style="background:#0F2C59;color:#fff;font-size:15.5px;font-weight:700;padding:16px 30px;border-radius:10px;box-shadow:0 10px 24px rgba(15,44,89,0.22)" style-hover="background:#183A73">Mulai Latihan Gratis</a>
+        <a href="#demo" style="color:#C9962E;font-size:15px;font-weight:700" style-hover="color:#8A6A2E">Lihat Demo →</a>
+      </div>
+      <p style="font-size:13px;color:rgba(15,44,89,0.5);margin:0">Dipakai mahasiswa profesi dokter di seluruh Indonesia.</p>
+    </div>
+
+    <div id="demo" style="display:flex;justify-content:center;scroll-margin-top:24px">
+      <div style="width:100%;max-width:480px;border-radius:14px;overflow:hidden;background:#fff;box-shadow:0 0 0 1px rgba(15,44,89,0.08),0 24px 60px rgba(15,44,89,0.22)">
+        <div style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:#EEF1F6">
+          <span style="width:11px;height:11px;border-radius:50%;background:#ff5f57"></span>
+          <span style="width:11px;height:11px;border-radius:50%;background:#febc2e"></span>
+          <span style="width:11px;height:11px;border-radius:50%;background:#28c840"></span>
+          <span style="margin-left:12px;font-size:12px;font-weight:600;color:rgba(15,44,89,0.55)">SiapUkom — Dashboard</span>
+        </div>
+        <div style="background:#F8F9FC;padding:22px;display:flex;flex-direction:column;gap:16px">
+          <div style="font-size:13px;font-weight:700;color:#0F2C59">Dashboard Kesiapan</div>
+          <div style="display:flex;gap:18px;align-items:center;background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 10px rgba(15,44,89,0.06)">
+            <div style="width:76px;height:76px;border-radius:50%;background:conic-gradient(#E5BA73 0 71%, #E7EAF1 0 100%);display:flex;align-items:center;justify-content:center;flex:none">
+              <div style="width:56px;height:56px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#0F2C59">71%</div>
+            </div>
+            <div>
+              <div style="font-size:12px;font-weight:700;color:#0F2C59">Skor Kesiapan</div>
+              <div style="font-size:11px;color:rgba(15,44,89,0.55)">Rata-rata 5 sesi terakhir</div>
+            </div>
+          </div>
+          <div style="background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 10px rgba(15,44,89,0.06);display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:#0F2C59"><span>Kardiovaskular</span><span>78%</span></div>
+            <div style="height:6px;background:#E7EAF1;border-radius:4px"><div style="width:78%;height:100%;background:#0F2C59;border-radius:4px"></div></div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:#0F2C59"><span>Neurologi</span><span>52%</span></div>
+            <div style="height:6px;background:#E7EAF1;border-radius:4px"><div style="width:52%;height:100%;background:#E5BA73;border-radius:4px"></div></div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:#0F2C59"><span>Pediatri</span><span>66%</span></div>
+            <div style="height:6px;background:#E7EAF1;border-radius:4px"><div style="width:66%;height:100%;background:#0F2C59;border-radius:4px"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="fitur" style="background:#F6F8FC;padding:88px 64px">
+    <div style="max-width:1280px;margin:0 auto">
+      <div style="text-align:center;margin-bottom:52px">
+        <h2 style="font-size:34px;font-weight:800;letter-spacing:-0.01em;margin:0 0 12px">Kenapa SiapUKOM</h2>
+        <p style="font-size:15.5px;color:rgba(15,44,89,0.6);margin:0">Dirancang khusus untuk kebutuhan koas menghadapi UKMPPD.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:28px">
+        <div style="background:#fff;border-radius:16px;padding:34px;box-shadow:0 8px 28px rgba(15,44,89,0.08);display:flex;flex-direction:column;gap:14px">
+          <div style="width:48px;height:48px;border-radius:12px;background:rgba(229,186,115,0.16);display:flex;align-items:center;justify-content:center">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C9962E" stroke-width="1.8"><path d="M4 5.5A2.5 2.5 0 016.5 3H20v15H6.5A2.5 2.5 0 004 20.5v-15z"></path><path d="M4 19a2.5 2.5 0 012.5-2.5H20"></path></svg>
+          </div>
+          <div style="font-size:17px;font-weight:700">Bank Soal Terupdate</div>
+          <p style="font-size:14px;line-height:1.6;color:rgba(15,44,89,0.65);margin:0">Soal disusun mengikuti proporsi blueprint resmi, bukan kumpulan soal acak.</p>
+        </div>
+        <div style="background:#fff;border-radius:16px;padding:34px;box-shadow:0 8px 28px rgba(15,44,89,0.08);display:flex;flex-direction:column;gap:14px">
+          <div style="width:48px;height:48px;border-radius:12px;background:rgba(229,186,115,0.16);display:flex;align-items:center;justify-content:center">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C9962E" stroke-width="1.8"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3.2 1.8"></path></svg>
+          </div>
+          <div style="font-size:17px;font-weight:700">Simulasi Mirip Asli</div>
+          <p style="font-size:14px;line-height:1.6;color:rgba(15,44,89,0.65);margin:0">Timer berjalan, navigasi bernomor, dan format menyerupai kondisi CBT sesungguhnya.</p>
+        </div>
+        <div style="background:#fff;border-radius:16px;padding:34px;box-shadow:0 8px 28px rgba(15,44,89,0.08);display:flex;flex-direction:column;gap:14px">
+          <div style="width:48px;height:48px;border-radius:12px;background:rgba(229,186,115,0.16);display:flex;align-items:center;justify-content:center">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C9962E" stroke-width="1.8"><path d="M4 20V10M11 20V4M18 20v-7"></path></svg>
+          </div>
+          <div style="font-size:17px;font-weight:700">Analitik Kesiapan</div>
+          <p style="font-size:14px;line-height:1.6;color:rgba(15,44,89,0.65);margin:0">Pantau kesiapan per kategori materi, bukan hanya skor total.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="harga" style="background:#F6F8FC;padding:88px 64px;scroll-margin-top:24px">
+    <div style="max-width:1280px;margin:0 auto">
+      <div style="text-align:center;margin-bottom:52px">
+        <h2 style="font-size:34px;font-weight:800;letter-spacing:-0.01em;margin:0 0 12px">Harga</h2>
+        <p style="font-size:15.5px;color:rgba(15,44,89,0.6);margin:0">Model harga masih dalam riset — coba dulu versi gratisnya.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:28px;max-width:800px;margin:0 auto">
+        <div style="background:#fff;border-radius:16px;padding:34px;box-shadow:0 8px 28px rgba(15,44,89,0.08);display:flex;flex-direction:column;gap:14px">
+          <div style="font-size:13px;font-weight:700;color:#C9962E">GRATIS</div>
+          <div style="font-size:28px;font-weight:800">Rp 0</div>
+          <p style="font-size:14px;line-height:1.6;color:rgba(15,44,89,0.65);margin:0">Latihan terbatas dengan soal contoh dan pembahasan langsung.</p>
+          <a href="SiapUKOM Latihan.dc.html" style="margin-top:auto;text-align:center;background:#fff;color:#0F2C59;border:1px solid rgba(15,44,89,0.2);font-size:14px;font-weight:700;padding:13px 22px;border-radius:10px">Mulai Gratis</a>
+        </div>
+        <div style="background:#0F2C59;color:#fff;border-radius:16px;padding:34px;box-shadow:0 8px 28px rgba(15,44,89,0.16);display:flex;flex-direction:column;gap:14px">
+          <div style="font-size:13px;font-weight:700;color:#E5BA73">AKSES PENUH</div>
+          <div style="font-size:28px;font-weight:800">Segera Hadir</div>
+          <p style="font-size:14px;line-height:1.6;opacity:0.8;margin:0">Bank soal lengkap, simulasi format penuh, dan dashboard kesiapan lintas perangkat.</p>
+          <a href="SiapUKOM.dc.html" style="margin-top:auto;text-align:center;background:#E5BA73;color:#0F2C59;font-size:14px;font-weight:700;padding:13px 22px;border-radius:10px">Lihat Pratinjau</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:28px 64px;text-align:center;font-size:12.5px;color:rgba(15,44,89,0.45)">© 2026 SiapUkom</div>
+
+</div>
+
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,19 @@
+# Claude Code local settings (machine-specific, not for sharing)
+.claude/
+
+# Design handoff archive (source files already extracted in the folder alongside it)
+*.zip
+
+# Dependencies & build output (each app also has its own .gitignore)
+node_modules/
+dist/
+dist-ssr/
+
+# Env files with secrets
+.env
+.env.*.local
+.env.local
+
+# OS/editor junk
+*.log
+.DS_Store

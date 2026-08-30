@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <style>
+    body{margin:0}
+    a{color:#0F2C59;text-decoration:none}
+    a:hover{color:#C9962E}
+    input:focus{outline:2px solid #0F2C59;outline-offset:1px}
+  </style>
+</helmet>
+
+<div style="min-height:100vh;background:#FFFFFF;color:#0F2C59;font-family:'Plus Jakarta Sans',system-ui,sans-serif;display:flex;flex-direction:column">
+
+  <div style="display:flex;align-items:center;gap:16px;padding:22px 64px;border-bottom:1px solid rgba(15,44,89,0.08)">
+    <a href="SiapUKOM Landing.dc.html" style="font-size:14px;font-weight:600" style-hover="color:#C9962E">← Kembali</a>
+    <div style="font-size:18px;font-weight:800;margin-left:8px"><span style="color:#0F2C59">Siap</span><span style="color:#C9962E">UKOM</span></div>
+  </div>
+
+  <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:56px 24px">
+    <div style="width:100%;max-width:400px">
+      <h1 style="font-size:28px;font-weight:800;letter-spacing:-0.01em;margin:0 0 8px">Masuk</h1>
+      <p style="font-size:14.5px;color:rgba(15,44,89,0.65);margin:0 0 28px">Masuk untuk melanjutkan latihan dan melihat kesiapanmu.</p>
+
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px">
+        <label style="font-size:13px;font-weight:700">Nama</label>
+        <input type="text" placeholder="Nama lengkap" value="{{ nama }}" onChange="{{ onNamaChange }}" style="{{ namaInputStyle }}" />
+        <sc-if value="{{ errorNama }}" hint-placeholder-val="{{ false }}">
+          <span style="font-size:12px;color:#C0392B">{{ errorNama }}</span>
+        </sc-if>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px">
+        <label style="font-size:13px;font-weight:700">Password</label>
+        <input type="password" placeholder="Kata sandi" value="{{ password }}" onChange="{{ onPasswordChange }}" style="{{ passwordInputStyle }}" />
+        <sc-if value="{{ errorPassword }}" hint-placeholder-val="{{ false }}">
+          <span style="font-size:12px;color:#C0392B">{{ errorPassword }}</span>
+        </sc-if>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;margin-bottom:22px">
+        <a href="#lupa" style="font-size:12.5px;font-weight:600;color:#C9962E" style-hover="color:#8A6A2E">Lupa password?</a>
+      </div>
+
+      <button onClick="{{ onSubmit }}" style="width:100%;background:#0F2C59;color:#fff;font-size:15px;font-weight:700;padding:14px;border-radius:10px;border:none;cursor:pointer;box-shadow:0 10px 24px rgba(15,44,89,0.22)">{{ submitLabel }}</button>
+
+      <sc-if value="{{ showSuccess }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:16px;padding:14px 16px;border-radius:10px;background:rgba(229,186,115,0.18);color:#8A6A2E;font-size:13.5px;font-weight:600;text-align:center">Berhasil masuk, {{ nama }}. Mengarahkan ke aplikasi…</div>
+      </sc-if>
+
+      <p style="text-align:center;font-size:13px;color:rgba(15,44,89,0.55);margin:24px 0 0">Belum punya akun? <a href="SiapUKOM Latihan.dc.html" style="font-weight:700;color:#0F2C59" style-hover="color:#C9962E">Coba Latihan Gratis</a></p>
+      <p style="text-align:center;font-size:11.5px;color:rgba(15,44,89,0.4);margin:12px 0 0">Prototipe — nama &amp; password belum tersambung ke server sungguhan.</p>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+
+class Component extends DCLogic {
+  state = {nama: '', password: '', errorNama: '', errorPassword: '', showSuccess: false};
+
+  onNamaChange = (e) => this.setState({nama: e.target.value, errorNama: ''});
+  onPasswordChange = (e) => this.setState({password: e.target.value, errorPassword: ''});
+
+  onSubmit = () => {
+    const {nama, password} = this.state;
+    const errorNama = nama.trim() ? '' : 'Nama wajib diisi';
+    const errorPassword = password.trim() ? '' : (password.length && password.length < 4 ? 'Password minimal 4 karakter' : (password.trim() ? '' : 'Password wajib diisi'));
+    if (errorNama || errorPassword) {
+      this.setState({errorNama, errorPassword});
+      return;
+    }
+    localStorage.setItem('siapukom_nama', nama);
+    this.setState({showSuccess: true});
+    setTimeout(() => { window.location.href = 'SiapUKOM.dc.html'; }, 900);
+  };
+
+  renderVals() {
+    const s = this.state;
+    const inputBase = 'padding:12px 14px;font-size:14.5px;border-radius:10px;border:1px solid ';
+    return {
+      nama: s.nama, password: s.password, errorNama: s.errorNama, errorPassword: s.errorPassword,
+      onNamaChange: this.onNamaChange, onPasswordChange: this.onPasswordChange, onSubmit: this.onSubmit,
+      namaInputStyle: inputBase + (s.errorNama ? '#C0392B' : 'rgba(15,44,89,0.2)'),
+      passwordInputStyle: inputBase + (s.errorPassword ? '#C0392B' : 'rgba(15,44,89,0.2)'),
+      submitLabel: s.showSuccess ? 'Berhasil…' : 'Masuk',
+      showSuccess: s.showSuccess,
+    };
+  }
+}
+
+</script>
+</body>
+</html>

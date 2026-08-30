@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <style>
+    body{margin:0}
+    a{color:#0F2C59;text-decoration:none}
+    a:hover{color:#C9962E}
+  </style>
+</helmet>
+
+<div style="min-height:100vh;background:#FFFFFF;color:#0F2C59;font-family:'Plus Jakarta Sans',system-ui,sans-serif;display:flex;flex-direction:column">
+
+  <div style="display:flex;align-items:center;gap:16px;padding:20px 64px;border-bottom:1px solid rgba(15,44,89,0.08)">
+    <a href="SiapUKOM Landing.dc.html" style="font-size:14px;font-weight:600" style-hover="color:#C9962E">← Kembali</a>
+    <div style="font-size:18px;font-weight:800;margin-left:8px"><span style="color:#0F2C59">Siap</span><span style="color:#C9962E">UKOM</span></div>
+    <span style="margin-left:6px;font-size:12px;font-weight:700;color:#8A6A2E;background:rgba(229,186,115,0.18);padding:4px 10px;border-radius:999px">Latihan Gratis</span>
+    <a href="SiapUKOM.dc.html" style="margin-left:auto;font-size:14px;font-weight:700;color:#0F2C59" style-hover="color:#C9962E">Akses Penuh →</a>
+  </div>
+
+  <div style="flex:1;padding:56px 64px;display:flex;justify-content:center">
+  <div style="width:100%;max-width:720px">
+
+  <sc-if value="{{ showMenu }}" hint-placeholder-val="{{ true }}">
+    <h1 style="font-size:36px;font-weight:800;letter-spacing:-0.01em;margin:0 0 10px">Latihan Gratis</h1>
+    <p style="font-size:15.5px;color:rgba(15,44,89,0.65);margin:0 0 32px;max-width:52ch">Coba beberapa soal vignette klinis contoh dengan pembahasan langsung. Pilih kategori dan jumlah soal untuk mulai.</p>
+
+    <div style="margin-bottom:28px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px">Kategori</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <sc-for list="{{ kategoriPills }}" as="k" hint-placeholder-count="9">
+          <button style="{{ k.style }}" onClick="{{ k.onClick }}">{{ k.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="margin-bottom:36px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px">Jumlah Soal</div>
+      <div style="display:flex;gap:8px">
+        <sc-for list="{{ jumlahPills }}" as="j" hint-placeholder-count="3">
+          <button style="{{ j.style }}" onClick="{{ j.onClick }}">{{ j.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <button style="background:#0F2C59;color:#fff;font-size:15.5px;font-weight:700;padding:16px 32px;border-radius:10px;border:none;cursor:pointer;box-shadow:0 10px 24px rgba(15,44,89,0.22)" onClick="{{ startLatihan }}">Mulai Latihan</button>
+    <p style="font-size:12px;color:rgba(15,44,89,0.45);margin-top:14px">Prototipe — menggunakan 8 soal contoh, bukan bank soal final.</p>
+  </sc-if>
+
+  <sc-if value="{{ showSession }}" hint-placeholder-val="{{ false }}">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">
+      <span style="font-size:12px;font-weight:700;color:#8A6A2E;background:rgba(229,186,115,0.18);padding:4px 10px;border-radius:999px">{{ currentQ.kategori }}</span>
+      <span style="margin-left:auto;font-size:13px;color:rgba(15,44,89,0.6)">{{ progressText }}</span>
+    </div>
+    <div style="height:6px;background:#EEF1F6;border-radius:4px;margin-bottom:26px;overflow:hidden">
+      <div style="height:100%;background:#E5BA73;border-radius:4px;width:{{ progressPct }}"></div>
+    </div>
+
+    <div style="background:#fff;border-radius:16px;padding:32px;box-shadow:0 8px 28px rgba(15,44,89,0.08)">
+      <p style="font-size:16px;line-height:1.6;margin:0 0 22px">{{ currentQ.pertanyaan }}</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <sc-for list="{{ currentOptions }}" as="opt" hint-placeholder-count="5">
+          <label style="{{ opt.rowStyle }}">
+            <input type="radio" name="opt-current" style="margin-top:3px" checked="{{ opt.selected }}" disabled="{{ opt.disabled }}" onChange="{{ opt.onSelect }}" />
+            <span><strong>{{ opt.letter }}.</strong> {{ opt.text }}</span>
+          </label>
+        </sc-for>
+      </div>
+      <sc-if value="{{ showFeedbackBox }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:20px;padding:16px;border-radius:10px;background:{{ feedbackBg }}">
+          <div style="font-weight:700;color:{{ feedbackColor }};margin-bottom:6px">{{ feedbackTitle }}</div>
+          <p style="margin:0;font-size:14px;color:rgba(15,44,89,0.75)">{{ currentQ.pembahasan }}</p>
+        </div>
+      </sc-if>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:24px">
+      <button style="background:#fff;color:#0F2C59;border:1px solid rgba(15,44,89,0.2);font-size:14px;font-weight:700;padding:12px 22px;border-radius:10px;cursor:pointer" disabled="{{ isFirstQuestion }}" onClick="{{ prevQuestion }}">← Sebelumnya</button>
+      <sc-if value="{{ isLastQuestion }}" hint-placeholder-val="{{ false }}">
+        <button style="margin-left:auto;background:#0F2C59;color:#fff;border:none;font-size:14px;font-weight:700;padding:12px 26px;border-radius:10px;cursor:pointer" onClick="{{ finishLatihan }}">Lihat Hasil</button>
+      </sc-if>
+      <sc-if value="{{ notLastQuestion }}" hint-placeholder-val="{{ true }}">
+        <button style="margin-left:auto;background:#0F2C59;color:#fff;border:none;font-size:14px;font-weight:700;padding:12px 26px;border-radius:10px;cursor:pointer" onClick="{{ nextQuestion }}">Selanjutnya →</button>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showResult }}" hint-placeholder-val="{{ false }}">
+    <div style="text-align:center;margin-bottom:36px">
+      <svg width="140" height="140" viewBox="0 0 140 140">
+        <circle cx="70" cy="70" r="60" fill="none" stroke="#EEF1F6" stroke-width="12"/>
+        <circle cx="70" cy="70" r="60" fill="none" stroke="#E5BA73" stroke-width="12" stroke-linecap="round" stroke-dasharray="{{ gaugeCircumference }}" stroke-dashoffset="{{ gaugeOffset }}" transform="rotate(-90 70 70)"/>
+        <text x="70" y="78" text-anchor="middle" font-family="'Plus Jakarta Sans',sans-serif" font-size="28" font-weight="800" fill="#0F2C59">{{ resultScore }}%</text>
+      </svg>
+      <h2 style="font-size:24px;font-weight:800;margin:12px 0 4px">Latihan Selesai!</h2>
+      <p style="font-size:14.5px;color:rgba(15,44,89,0.65);margin:0">{{ resultCorrect }} dari {{ resultTotal }} soal benar</p>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:32px">
+      <sc-for list="{{ resultByKategori }}" as="b" hint-placeholder-count="4">
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span>{{ b.kategori }}</span><span>{{ b.pct }}%</span></div>
+          <div style="height:7px;background:#EEF1F6;border-radius:4px;overflow:hidden"><div style="height:100%;width:{{ b.width }};background:#0F2C59;border-radius:4px"></div></div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <button style="background:#fff;color:#0F2C59;border:1px solid rgba(15,44,89,0.2);font-size:14.5px;font-weight:700;padding:14px 26px;border-radius:10px;cursor:pointer" onClick="{{ resetMenu }}">Coba Lagi</button>
+      <a href="SiapUKOM.dc.html" style="background:#0F2C59;color:#fff;font-size:14.5px;font-weight:700;padding:14px 26px;border-radius:10px">Daftar untuk Akses Penuh</a>
+    </div>
+  </sc-if>
+
+  </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+
+const KATEGORI = ['Kardiovaskular','Respirasi','Gastrointestinal','Endokrin & Metabolik','Muskuloskeletal','Neurologi','Obstetri & Ginekologi','Pediatri'];
+
+function makeBank() {
+  return [
+    {id:1, kategori:'Kardiovaskular', pertanyaan:'Laki-laki 58 tahun datang dengan nyeri dada substernal seperti tertindih selama 1 jam, menjalar ke lengan kiri, disertai keringat dingin. EKG menunjukkan elevasi segmen ST di sadapan V1-V4. Apakah diagnosis paling mungkin?', opsi:[{letter:'A',text:'Angina pektoris stabil'},{letter:'B',text:'STEMI anterior'},{letter:'C',text:'Perikarditis akut'},{letter:'D',text:'Diseksi aorta'},{letter:'E',text:'Emboli paru'}], kunci:'B', pembahasan:'Nyeri dada khas iskemik dengan elevasi ST kontigu di V1-V4 menunjukkan STEMI dinding anterior (oklusi LAD).'},
+    {id:2, kategori:'Respirasi', pertanyaan:'Perempuan 24 tahun mengalami sesak napas mendadak setelah kecelakaan lalu lintas dengan trauma dada. Pemeriksaan: trakea terdorong ke kanan, hipersonor pada perkusi hemitoraks kiri, vena leher distensi. Tindakan awal yang paling tepat?', opsi:[{letter:'A',text:'Foto toraks segera'},{letter:'B',text:'Needle decompression'},{letter:'C',text:'Pemberian oksigen dan observasi'},{letter:'D',text:'Perikardiosentesis'},{letter:'E',text:'Intubasi endotrakeal'}], kunci:'B', pembahasan:'Tanda deviasi trakea, hipersonor, dan distensi vena leher pasca trauma dada mengarah ke tension pneumothorax — dekompresi jarum segera.'},
+    {id:3, kategori:'Gastrointestinal', pertanyaan:'Laki-laki 45 tahun dengan riwayat konsumsi alkohol berat mengeluh nyeri epigastrium hebat yang menjalar ke punggung sejak 6 jam lalu, disertai mual muntah. Amilase serum meningkat 5 kali batas atas normal. Diagnosis paling mungkin?', opsi:[{letter:'A',text:'Kolesistitis akut'},{letter:'B',text:'Ulkus peptikum perforasi'},{letter:'C',text:'Pankreatitis akut'},{letter:'D',text:'Apendisitis akut'},{letter:'E',text:'Hepatitis alkoholik'}], kunci:'C', pembahasan:'Nyeri epigastrium menjalar ke punggung dengan amilase meningkat signifikan pada konteks konsumsi alkohol berat khas pankreatitis akut.'},
+    {id:4, kategori:'Endokrin & Metabolik', pertanyaan:'Perempuan 30 tahun dibawa ke IGD dengan penurunan kesadaran, napas cepat dan dalam, serta napas berbau aseton. GDS 420 mg/dL, riwayat DM tipe 1 tidak rutin insulin. Apakah diagnosis paling mungkin?', opsi:[{letter:'A',text:'Hipoglikemia berat'},{letter:'B',text:'Ketoasidosis diabetik'},{letter:'C',text:'Status hiperosmolar hiperglikemik'},{letter:'D',text:'Asidosis laktat'},{letter:'E',text:'Krisis tiroid'}], kunci:'B', pembahasan:'Napas Kussmaul berbau aseton, hiperglikemia, dan riwayat DM tipe 1 tanpa insulin mengarah ke ketoasidosis diabetik.'},
+    {id:5, kategori:'Muskuloskeletal', pertanyaan:'Laki-laki 20 tahun jatuh dari sepeda motor dengan tangan menumpu tanah dalam posisi ekstensi. Tampak deformitas pergelangan tangan menyerupai "dinner fork". Diagnosis paling mungkin?', opsi:[{letter:'A',text:'Fraktur Colles'},{letter:'B',text:'Fraktur Smith'},{letter:'C',text:'Fraktur skafoid'},{letter:'D',text:'Dislokasi lunatum'},{letter:'E',text:'Fraktur Galeazzi'}], kunci:'A', pembahasan:'Jatuh dengan tangan ekstensi (FOOSH) menyebabkan fraktur ujung distal radius dengan deformitas dinner fork khas fraktur Colles.'},
+    {id:6, kategori:'Neurologi', pertanyaan:'Laki-laki 65 tahun mengalami kelemahan sisi tubuh kanan mendadak, wajah asimetris, dan bicara pelo sejak 2 jam lalu. Tekanan darah 160/95. Pemeriksaan penunjang awal yang paling tepat sebelum tata laksana definitif?', opsi:[{letter:'A',text:'MRI kepala dengan kontras'},{letter:'B',text:'CT scan kepala non-kontras'},{letter:'C',text:'Angiografi serebral'},{letter:'D',text:'Pungsi lumbal'},{letter:'E',text:'EEG'}], kunci:'B', pembahasan:'Onset defisit neurologis fokal akut memerlukan CT scan kepala non-kontras segera sebelum pertimbangan trombolisis.'},
+    {id:7, kategori:'Obstetri & Ginekologi', pertanyaan:'Perempuan G2P1A0 usia kehamilan 32 minggu datang dengan perdarahan pervaginam berwarna merah segar tanpa nyeri perut. Tidak ada riwayat trauma. Diagnosis paling mungkin?', opsi:[{letter:'A',text:'Solusio plasenta'},{letter:'B',text:'Plasenta previa'},{letter:'C',text:'Vasa previa'},{letter:'D',text:'Ruptur uteri'},{letter:'E',text:'Persalinan prematur'}], kunci:'B', pembahasan:'Perdarahan pervaginam merah segar tanpa nyeri pada trimester ketiga adalah gambaran klasik plasenta previa.'},
+    {id:8, kategori:'Pediatri', pertanyaan:'Anak perempuan 2 tahun demam tinggi 5 hari, ruam polimorfik, konjungtivitis bilateral non-purulen, bibir merah dan pecah-pecah, serta edema pada tangan. Diagnosis paling mungkin?', opsi:[{letter:'A',text:'Demam skarlatina'},{letter:'B',text:'Sindrom Stevens-Johnson'},{letter:'C',text:'Penyakit Kawasaki'},{letter:'D',text:'Campak'},{letter:'E',text:'Demam berdarah dengue'}], kunci:'C', pembahasan:'Kombinasi demam \u22655 hari, konjungtivitis bilateral, perubahan mukosa bibir, ruam polimorfik, dan edema ekstremitas memenuhi kriteria klinis penyakit Kawasaki.'},
+  ];
+}
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+class Component extends DCLogic {
+  kategoriList = KATEGORI;
+  bank = makeBank();
+
+  state = {
+    screen: 'menu',
+    kategori: 'Semua Kategori',
+    jumlah: 5,
+    sessionQuestions: [], current: 0, answers: {}, showFeedback: {},
+  };
+
+  setKategori = (k) => this.setState({kategori: k});
+  setJumlah = (j) => this.setState({jumlah: j});
+
+  startLatihan = () => {
+    const pool = this.state.kategori === 'Semua Kategori' ? this.bank : this.bank.filter(q => q.kategori === this.state.kategori);
+    const source = pool.length ? pool : this.bank;
+    const qs = shuffle(source).slice(0, Math.min(this.state.jumlah, source.length));
+    this.setState({sessionQuestions: qs, current: 0, answers: {}, showFeedback: {}, screen: 'session'});
+  };
+
+  selectAnswer = (letter) => {
+    this.setState(s => ({
+      answers: {...s.answers, [s.current]: letter},
+      showFeedback: {...s.showFeedback, [s.current]: true},
+    }));
+  };
+
+  nextQuestion = () => this.setState(s => ({current: Math.min(s.current + 1, s.sessionQuestions.length - 1)}));
+  prevQuestion = () => this.setState(s => ({current: Math.max(s.current - 1, 0)}));
+
+  finishLatihan = () => this.setState({screen: 'result'});
+  resetMenu = () => this.setState({screen: 'menu', sessionQuestions: [], current: 0, answers: {}, showFeedback: {}});
+
+  renderVals() {
+    const s = this.state;
+    const kategoriPills = ['Semua Kategori', ...this.kategoriList].map(k => {
+      const active = s.kategori === k;
+      return {label: k, onClick: () => this.setKategori(k),
+        style: `font-size:13px;font-weight:600;padding:9px 16px;border-radius:999px;border:1px solid ${active?'#0F2C59':'rgba(15,44,89,0.2)'};background:${active?'#0F2C59':'#fff'};color:${active?'#fff':'#0F2C59'};cursor:pointer`};
+    });
+    const jumlahPills = [5,10,20].map(v => {
+      const active = s.jumlah === v;
+      return {label: String(v), onClick: () => this.setJumlah(v),
+        style: `font-size:13.5px;font-weight:700;padding:10px 20px;border-radius:10px;border:1px solid ${active?'#0F2C59':'rgba(15,44,89,0.2)'};background:${active?'#0F2C59':'#fff'};color:${active?'#fff':'#0F2C59'};cursor:pointer`};
+    });
+
+    const total = s.sessionQuestions.length;
+    const currentQ = s.sessionQuestions[s.current] || {kategori:'', pertanyaan:'', opsi:[], kunci:'', pembahasan:''};
+    const answeredLetter = s.answers[s.current];
+    const feedbackShown = !!s.showFeedback[s.current];
+
+    const currentOptions = (currentQ.opsi || []).map(o => {
+      const selected = answeredLetter === o.letter;
+      let bg = '#fff', border = 'rgba(15,44,89,0.15)', textDecoration = 'none', opacity = '1';
+      if (feedbackShown) {
+        if (o.letter === currentQ.kunci) { bg = 'rgba(229,186,115,0.18)'; border = '#E5BA73'; }
+        else if (selected) { bg = '#EEF1F6'; border = 'rgba(15,44,89,0.3)'; textDecoration = 'line-through'; opacity = '0.7'; }
+      } else if (selected) { bg = 'rgba(15,44,89,0.06)'; border = '#0F2C59'; }
+      const rowStyle = `display:flex;gap:10px;align-items:flex-start;padding:13px 16px;border-radius:10px;border:1px solid ${border};background:${bg};cursor:pointer;text-decoration:${textDecoration};opacity:${opacity}`;
+      return {letter:o.letter, text:o.text, selected, disabled: feedbackShown, rowStyle, onSelect: () => this.selectAnswer(o.letter)};
+    });
+
+    let resultScore = 0, resultCorrect = 0, resultByKategori = [];
+    if (s.screen === 'result') {
+      let correct = 0; const catCount = {}, catCorrect = {};
+      s.sessionQuestions.forEach((q, i) => {
+        const ok = s.answers[i] === q.kunci;
+        if (ok) correct++;
+        catCount[q.kategori] = (catCount[q.kategori]||0)+1;
+        catCorrect[q.kategori] = (catCorrect[q.kategori]||0)+(ok?1:0);
+      });
+      resultCorrect = correct;
+      resultScore = total ? Math.round(correct/total*100) : 0;
+      resultByKategori = Object.keys(catCount).map(k => ({kategori:k, pct: Math.round(catCorrect[k]/catCount[k]*100), width: Math.round(catCorrect[k]/catCount[k]*100)+'%'}));
+    }
+    const circumference = 2*Math.PI*60;
+
+    return {
+      showMenu: s.screen === 'menu', showSession: s.screen === 'session', showResult: s.screen === 'result',
+      kategoriPills, jumlahPills, startLatihan: this.startLatihan,
+
+      currentQ, currentOptions, showFeedbackBox: feedbackShown,
+      feedbackTitle: answeredLetter === currentQ.kunci ? 'Benar!' : 'Kurang tepat',
+      feedbackBg: answeredLetter === currentQ.kunci ? 'rgba(229,186,115,0.18)' : '#EEF1F6',
+      feedbackColor: '#0F2C59',
+      progressText: total ? `Soal ${s.current+1} dari ${total}` : '',
+      progressPct: total ? Math.round(((s.current+1)/total)*100)+'%' : '0%',
+      isFirstQuestion: s.current === 0, isLastQuestion: s.current === total-1, notLastQuestion: s.current !== total-1,
+      prevQuestion: this.prevQuestion, nextQuestion: this.nextQuestion, finishLatihan: this.finishLatihan,
+
+      resultScore, resultCorrect, resultTotal: total, resultByKategori,
+      gaugeCircumference: circumference, gaugeOffset: circumference*(1-resultScore/100),
+      resetMenu: this.resetMenu,
+    };
+  }
+}
+
+</script>
+</body>
+</html>
