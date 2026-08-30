@@ -7,6 +7,11 @@ import { HttpError } from '../middleware/errorHandler';
 import { requireAuth, requireAdmin } from '../middleware/auth';
 import { extractTextFromDocument } from '../services/documentText';
 import { parseQuestionsFromText } from '../services/ruleBasedParser';
+import { parseQuestionsFromCsv } from '../services/csvParser';
+
+function isCsv(mimetype: string, filename: string): boolean {
+  return mimetype === 'text/csv' || mimetype === 'application/vnd.ms-excel' || filename.toLowerCase().endsWith('.csv');
+}
 
 const router = Router();
 router.use(requireAuth, requireAdmin);
@@ -22,8 +27,19 @@ router.post(
   asyncHandler(async (req, res) => {
     if (!req.file) throw new HttpError(400, 'File tidak ditemukan (field "file")');
 
-    const text = await extractTextFromDocument(req.file.buffer, req.file.mimetype, req.file.originalname);
-    const { questions: extracted, warnings } = parseQuestionsFromText(text);
+    let extracted: { kategori: string; pertanyaan: string; opsi: { letter: string; text: string }[]; kunci: string; pembahasan: string }[];
+    let warnings: string[];
+
+    if (isCsv(req.file.mimetype, req.file.originalname)) {
+      const result = parseQuestionsFromCsv(req.file.buffer.toString('utf-8'));
+      extracted = result.questions;
+      warnings = result.warnings;
+    } else {
+      const text = await extractTextFromDocument(req.file.buffer, req.file.mimetype, req.file.originalname);
+      const result = parseQuestionsFromText(text);
+      extracted = result.questions;
+      warnings = result.warnings;
+    }
 
     if (extracted.length === 0) {
       return res.json({ imported: 0, categoriesCreated: [], questions: [], warnings });

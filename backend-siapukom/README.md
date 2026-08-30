@@ -88,9 +88,29 @@ Semua response JSON. Endpoint yang butuh login mengharapkan header `Authorizatio
 | `POST /api/admin/questions/approve-batch` | admin | `{ids: string[]}` → set beberapa soal draft jadi ACTIVE sekaligus |
 | `DELETE /api/admin/questions/:id` | admin | Hapus soal (dipakai untuk menolak draft yang salah) |
 
-## Import Bank Soal dari PDF/Word
+## Import Bank Soal dari PDF/Word/CSV
 
-Endpoint `POST /api/admin/import` memakai **parser berbasis format tetap** (bukan AI, jadi gratis tanpa API eksternal) — dokumen sumber **wajib** mengikuti pola penulisan berikut persis (spasi/kapitalisasi kata kunci boleh bervariasi, tapi strukturnya harus konsisten):
+Endpoint `POST /api/admin/import` menerima file `.pdf`, `.docx`, atau `.csv` (dideteksi otomatis dari ekstensi/mimetype) dan memakai **parser berbasis format tetap** (bukan AI, jadi gratis tanpa API eksternal).
+
+### Format CSV (paling gampang untuk data tabular)
+
+Header wajib ada (nama kolom tidak case-sensitive), delimiter `;` atau `,` (dideteksi otomatis dari baris header):
+
+```
+materi;pertanyaan;opsi_a;opsi_b;opsi_c;opsi_d;opsi_e;kunci;pembahasan
+Kardiovaskular;Laki-laki 50 tahun...;Angina stabil;STEMI inferior;Perikarditis;Diseksi aorta;Emboli paru;B;Elevasi ST di sadapan inferior...
+```
+
+- Kolom `materi` (atau `kategori`) → jadi kategori soal.
+- Kolom `opsi_a` s.d. `opsi_e` → opsi jawaban (minimal 2 kolom opsi harus ada; kolom yang kosong di suatu baris otomatis dilewati).
+- Kolom `kunci` (atau `jawaban`) → satu huruf sesuai salah satu kolom opsi yang terisi.
+- Kolom `pembahasan` (atau `penjelasan`) → opsional.
+- Kolom lain (misal `tingkat`/level kesulitan) **diabaikan** — skema saat ini belum menyimpan field itu; dilaporkan lewat field `ignoredColumns` di response.
+- Field tidak perlu dibungkus tanda kutip; jika suatu field (biasanya `pembahasan`) kebetulan mengandung karakter delimiter, parser otomatis menggabungkannya kembali ke kolom terakhir supaya teksnya tidak terpotong.
+
+### Format PDF/Word (teks bebas terstruktur)
+
+Dokumen sumber **wajib** mengikuti pola penulisan berikut persis (spasi/kapitalisasi kata kunci boleh bervariasi, tapi strukturnya harus konsisten):
 
 ```
 Kategori: Kardiovaskular
