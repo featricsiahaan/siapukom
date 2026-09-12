@@ -68,16 +68,12 @@ export interface WrongAnswer {
   opsi: Opsi[];
   answerLetter: string | null;
   kunci: string;
-  pembahasan: string | null;
-  pembahasanLocked: boolean;
 }
 
 export interface FinishSimulasiResponse extends FinishSessionResponse {
   analisaKategori: AnalisaKategori[];
   areasToImprove: string[];
   wrongAnswers: WrongAnswer[];
-  pembahasanTerbukaCount: number;
-  pembahasanTerkunciCount: number;
 }
 
 export interface SimulasiStatus {

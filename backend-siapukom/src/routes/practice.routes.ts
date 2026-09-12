@@ -11,7 +11,6 @@ const router = Router();
 
 const SIMULASI_JUMLAH_SOAL = 150;
 const SIMULASI_DURASI_MENIT = 200;
-const SIMULASI_PEMBAHASAN_TERBUKA = 5;
 
 const startSessionSchema = z.object({
   categoryId: z.string().trim().min(1).optional(),
@@ -224,27 +223,20 @@ router.post(
 
     const wrongAnswers = session.answers
       .filter((a) => a.isCorrect !== true)
-      .map((a, idx) => {
-        const locked = idx >= SIMULASI_PEMBAHASAN_TERBUKA;
-        return {
-          order: a.order,
-          kategori: a.question.category.name,
-          pertanyaan: a.question.pertanyaan,
-          opsi: a.question.opsi as Opsi[],
-          answerLetter: a.answerLetter,
-          kunci: a.question.kunci,
-          pembahasan: locked ? null : a.question.pembahasan,
-          pembahasanLocked: locked,
-        };
-      });
+      .map((a) => ({
+        order: a.order,
+        kategori: a.question.category.name,
+        pertanyaan: a.question.pertanyaan,
+        opsi: a.question.opsi as Opsi[],
+        answerLetter: a.answerLetter,
+        kunci: a.question.kunci,
+      }));
 
     res.json({
       ...baseResult,
       analisaKategori,
       areasToImprove,
       wrongAnswers,
-      pembahasanTerbukaCount: Math.min(wrongAnswers.length, SIMULASI_PEMBAHASAN_TERBUKA),
-      pembahasanTerkunciCount: Math.max(0, wrongAnswers.length - SIMULASI_PEMBAHASAN_TERBUKA),
     });
   })
 );

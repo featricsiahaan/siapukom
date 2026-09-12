@@ -547,12 +547,7 @@ function SimulasiResult({ result }: { result: FinishSimulasiResponse }) {
         ))}
       </div>
 
-      <h3 style={{ fontSize: 16, fontWeight: 800, margin: '0 0 6px' }}>Pembahasan Soal Salah ({result.wrongAnswers.length})</h3>
-      <p style={{ fontSize: 12.5, color: 'rgba(15,44,89,0.5)', margin: '0 0 16px' }}>
-        {result.pembahasanTerkunciCount > 0
-          ? `Pembahasan lengkap terbuka untuk ${result.pembahasanTerbukaCount} soal pertama. ${result.pembahasanTerkunciCount} lainnya tersedia di Akses Penuh.`
-          : 'Semua pembahasan tersedia di bawah.'}
-      </p>
+      <h3 style={{ fontSize: 16, fontWeight: 800, margin: '0 0 16px' }}>Soal Salah & Kunci Jawaban ({result.wrongAnswers.length})</h3>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 32 }}>
         {result.wrongAnswers.map((w) => (
           <div key={w.order} style={{ background: '#fff', border: '1px solid rgba(15,44,89,0.1)', borderRadius: 12, padding: 20 }}>
@@ -563,18 +558,11 @@ function SimulasiResult({ result }: { result: FinishSimulasiResponse }) {
               <span style={{ fontSize: 11.5, color: 'rgba(15,44,89,0.45)' }}>Soal #{w.order + 1}</span>
             </div>
             <p style={{ fontSize: 14, lineHeight: 1.6, margin: '0 0 10px' }}>{w.pertanyaan}</p>
-            <div style={{ fontSize: 13, marginBottom: 6 }}>
+            <div style={{ fontSize: 13 }}>
               <span style={{ color: '#C0392B', fontWeight: 700 }}>Jawaban Anda: {w.answerLetter ?? '(tidak dijawab)'}</span>
               {'  '}
               <span style={{ color: '#2E8B57', fontWeight: 700 }}>Kunci: {w.kunci}</span>
             </div>
-            {w.pembahasanLocked ? (
-              <div style={{ fontSize: 13, color: 'rgba(15,44,89,0.5)', fontStyle: 'italic' }}>
-                🔒 Pembahasan lengkap tersedia setelah upgrade ke Akses Penuh.
-              </div>
-            ) : (
-              <p style={{ fontSize: 13, color: 'rgba(15,44,89,0.75)', margin: 0 }}>{w.pembahasan}</p>
-            )}
           </div>
         ))}
       </div>
