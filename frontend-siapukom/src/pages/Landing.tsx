@@ -73,7 +73,7 @@ export function Landing() {
               marginBottom: 24,
             }}
           >
-            Persiapan UKMPPD &amp; Uji Kompetensi
+            Persiapan UKNPDPD
           </span>
           <h1
             style={{
@@ -115,9 +115,9 @@ export function Landing() {
             >
               Mulai Latihan Gratis
             </Link>
-            <a href="#demo" className="link-hover-brown" style={{ color: '#C9962E', fontSize: 15, fontWeight: 700 }}>
-              Lihat Demo →
-            </a>
+            <Link to="/masuk" className="link-hover-brown" style={{ color: '#C9962E', fontSize: 15, fontWeight: 700 }}>
+              Masuk →
+            </Link>
           </div>
           <p style={{ fontSize: 13, color: 'rgba(15,44,89,0.5)', margin: 0 }}>
             Dipakai mahasiswa profesi dokter di seluruh Indonesia.
@@ -355,7 +355,7 @@ export function Landing() {
       </div>
 
       <div style={{ padding: '28px 64px', textAlign: 'center', fontSize: 12.5, color: 'rgba(15,44,89,0.45)' }}>
-        © 2026 SiapUkom
+        SiapUKOM 2026 • Developed by Featric Anju
       </div>
     </div>
   );
