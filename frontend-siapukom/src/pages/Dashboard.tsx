@@ -66,9 +66,9 @@ export function Dashboard() {
             <Link to="/latihan" className="link-hover">
               Latihan
             </Link>
-            <a href="#simulasi" className="link-hover">
+            <Link to="/simulasi" className="link-hover">
               Simulasi
-            </a>
+            </Link>
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>

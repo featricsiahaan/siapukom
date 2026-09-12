@@ -3,7 +3,9 @@ import type {
   Category,
   DashboardResponse,
   FinishSessionResponse,
+  FinishSimulasiResponse,
   PublicUser,
+  SimulasiStatus,
   StartSessionResponse,
 } from './types';
 
@@ -51,9 +53,21 @@ export function getCategories() {
 export function startSession(categoryId: string | null, jumlah: number, token?: string | null) {
   return request<StartSessionResponse>('/practice/sessions', {
     method: 'POST',
-    body: { categoryId: categoryId ?? undefined, jumlah },
+    body: { categoryId: categoryId ?? undefined, jumlah, mode: 'LATIHAN' },
     token,
   });
+}
+
+export function startSimulasi(token: string) {
+  return request<StartSessionResponse>('/practice/sessions', {
+    method: 'POST',
+    body: { mode: 'SIMULASI' },
+    token,
+  });
+}
+
+export function getSimulasiStatus(token: string) {
+  return request<SimulasiStatus>('/practice/simulasi/status', { token });
 }
 
 export function answerQuestion(
@@ -71,6 +85,13 @@ export function answerQuestion(
 
 export function finishSession(sessionId: string, token?: string | null) {
   return request<FinishSessionResponse>(`/practice/sessions/${sessionId}/finish`, {
+    method: 'POST',
+    token,
+  });
+}
+
+export function finishSimulasi(sessionId: string, token: string) {
+  return request<FinishSimulasiResponse>(`/practice/sessions/${sessionId}/finish`, {
     method: 'POST',
     token,
   });

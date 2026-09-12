@@ -17,6 +17,11 @@ enum SessionStatus {
   FINISHED
 }
 
+enum SessionMode {
+  LATIHAN
+  SIMULASI
+}
+
 enum QuestionStatus {
   DRAFT
   ACTIVE
@@ -42,6 +47,8 @@ model Membership {
   expiryDate    DateTime?
   sessionsUsed  Int       @default(0)
   sessionsTotal Int       @default(0)
+  simulationAttemptsUsed  Int @default(0)
+  simulationAttemptsLimit Int?
   updatedAt     DateTime  @updatedAt
 }
 
@@ -78,6 +85,8 @@ model PracticeSession {
   totalQuestions Int
   correctCount   Int           @default(0)
   status         SessionStatus @default(IN_PROGRESS)
+  mode           SessionMode   @default(LATIHAN)
+  expiresAt      DateTime?
   createdAt      DateTime      @default(now())
   finishedAt     DateTime?
 

@@ -68,7 +68,10 @@ export function Latihan() {
     setAnswers((prev) => ({ ...prev, [current]: letter }));
     try {
       const res = await api.answerQuestion(sessionId, current, letter, token);
-      setFeedback((prev) => ({ ...prev, [current]: res }));
+      setFeedback((prev) => ({
+        ...prev,
+        [current]: { correct: res.correct ?? false, kunci: res.kunci ?? '', pembahasan: res.pembahasan ?? '' },
+      }));
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Gagal mengirim jawaban.');
     }

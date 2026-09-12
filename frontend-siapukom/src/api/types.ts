@@ -27,13 +27,17 @@ export interface SessionQuestion {
 
 export interface StartSessionResponse {
   sessionId: string;
+  mode?: 'LATIHAN' | 'SIMULASI';
+  expiresAt?: string | null;
+  durasiMenit?: number | null;
   questions: SessionQuestion[];
 }
 
 export interface AnswerResponse {
-  correct: boolean;
-  kunci: string;
-  pembahasan: string;
+  correct?: boolean;
+  kunci?: string;
+  pembahasan?: string;
+  saved?: boolean;
 }
 
 export interface KategoriBreakdown {
@@ -47,6 +51,40 @@ export interface FinishSessionResponse {
   resultCorrect: number;
   resultTotal: number;
   resultByKategori: KategoriBreakdown[];
+}
+
+export interface AnalisaKategori {
+  kategori: string;
+  pct: number;
+  level: string;
+  badgeBg: string;
+  badgeText: string;
+}
+
+export interface WrongAnswer {
+  order: number;
+  kategori: string;
+  pertanyaan: string;
+  opsi: Opsi[];
+  answerLetter: string | null;
+  kunci: string;
+  pembahasan: string | null;
+  pembahasanLocked: boolean;
+}
+
+export interface FinishSimulasiResponse extends FinishSessionResponse {
+  analisaKategori: AnalisaKategori[];
+  areasToImprove: string[];
+  wrongAnswers: WrongAnswer[];
+  pembahasanTerbukaCount: number;
+  pembahasanTerkunciCount: number;
+}
+
+export interface SimulasiStatus {
+  simulationAttemptsUsed: number;
+  simulationAttemptsLimit: number | null;
+  jumlahSoal: number;
+  durasiMenit: number;
 }
 
 export interface DashboardCategory {

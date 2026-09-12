@@ -53,9 +53,11 @@ router.post(
         password: passwordHash,
         membership: {
           create: {
-            plan: 'Gratis',
+            plan: 'Trial',
             sessionsUsed: 0,
             sessionsTotal: 0,
+            simulationAttemptsUsed: 0,
+            simulationAttemptsLimit: 2,
           },
         },
       },
