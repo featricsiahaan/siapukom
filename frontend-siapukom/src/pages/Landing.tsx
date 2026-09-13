@@ -119,8 +119,18 @@ export function Landing() {
               Masuk →
             </Link>
           </div>
-          <p style={{ fontSize: 13, color: 'rgba(15,44,89,0.5)', margin: 0 }}>
-            Dipakai mahasiswa profesi dokter di seluruh Indonesia.
+          <p
+            style={{
+              fontFamily: "'Playfair Display', Georgia, serif",
+              fontWeight: 800,
+              fontStyle: 'italic',
+              fontSize: 24,
+              letterSpacing: '0.01em',
+              color: '#C9962E',
+              margin: '18px 0 0',
+            }}
+          >
+            Victory Loves Preparation.
           </p>
         </div>
 
