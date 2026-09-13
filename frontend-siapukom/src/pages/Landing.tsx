@@ -119,19 +119,31 @@ export function Landing() {
               Masuk →
             </Link>
           </div>
-          <p
-            style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
-              fontWeight: 800,
-              fontStyle: 'italic',
-              fontSize: 24,
-              letterSpacing: '0.01em',
-              color: '#C9962E',
-              margin: '18px 0 0',
-            }}
-          >
-            Victory Loves Preparation.
-          </p>
+          <div style={{ marginTop: 20 }}>
+            <div
+              style={{
+                fontFamily: "'Alex Brush', cursive",
+                fontSize: 44,
+                lineHeight: 1,
+                color: '#C9962E',
+              }}
+            >
+              Victory Loves Preparation
+            </div>
+            <div
+              style={{
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontWeight: 700,
+                fontSize: 14,
+                letterSpacing: '0.28em',
+                textTransform: 'uppercase',
+                color: '#8A6A2E',
+                marginTop: 6,
+              }}
+            >
+              Amat Victoria Curam
+            </div>
+          </div>
         </div>
 
         <div id="demo" style={{ display: 'flex', justifyContent: 'center', scrollMarginTop: 24 }}>
