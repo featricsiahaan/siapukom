@@ -17,7 +17,8 @@ const SEMUA_KATEGORI = 'Semua Kategori';
 const JUMLAH_OPTIONS = [5, 10, 20];
 
 export function Latihan() {
-  const { token } = useAuth();
+  const { token, isAuthenticated } = useAuth();
+  const kembaliTo = isAuthenticated ? '/dashboard' : '/';
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [kategoriPilihan, setKategoriPilihan] = useState<string>(SEMUA_KATEGORI);
@@ -110,7 +111,7 @@ export function Latihan() {
   return (
     <div style={{ minHeight: '100vh', background: '#FFFFFF', color: '#0F2C59', display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '20px 64px', borderBottom: '1px solid rgba(15,44,89,0.08)' }}>
-        <Link to="/" className="link-hover" style={{ fontSize: 14, fontWeight: 600 }}>
+        <Link to={kembaliTo} className="link-hover" style={{ fontSize: 14, fontWeight: 600 }}>
           ← Kembali
         </Link>
         <div style={{ fontSize: 18, fontWeight: 800, marginLeft: 8 }}>

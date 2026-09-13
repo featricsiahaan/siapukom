@@ -4,8 +4,9 @@ import { useAuth } from '../context/AuthContext';
 import { ApiError } from '../api/client';
 
 export function Masuk() {
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const kembaliTo = isAuthenticated ? '/dashboard' : '/';
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -59,7 +60,7 @@ export function Masuk() {
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '22px 64px', borderBottom: '1px solid rgba(15,44,89,0.08)' }}>
-        <Link to="/" className="link-hover" style={{ fontSize: 14, fontWeight: 600 }}>
+        <Link to={kembaliTo} className="link-hover" style={{ fontSize: 14, fontWeight: 600 }}>
           ← Kembali
         </Link>
         <div style={{ fontSize: 18, fontWeight: 800, marginLeft: 8 }}>
