@@ -14,15 +14,22 @@ interface Feedback {
 }
 
 const SEMUA_KATEGORI = 'Semua Kategori';
-const JUMLAH_OPTIONS = [5, 10, 20];
+const JUMLAH_OPTIONS_GUEST = [5, 10, 20];
+const JUMLAH_OPTIONS_LOGGED_IN = [25];
 
 export function Latihan() {
   const { token, isAuthenticated } = useAuth();
   const kembaliTo = isAuthenticated ? '/dashboard' : '/';
+  const jumlahOptions = isAuthenticated ? JUMLAH_OPTIONS_LOGGED_IN : JUMLAH_OPTIONS_GUEST;
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [kategoriPilihan, setKategoriPilihan] = useState<string>(SEMUA_KATEGORI);
-  const [jumlah, setJumlah] = useState(5);
+  const [jumlah, setJumlah] = useState(isAuthenticated ? 25 : 5);
+
+  useEffect(() => {
+    if (!jumlahOptions.includes(jumlah)) setJumlah(jumlahOptions[0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
 
   const [screen, setScreen] = useState<Screen>('menu');
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -181,7 +188,7 @@ export function Latihan() {
               <div style={{ marginBottom: 36 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>Jumlah Soal</div>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  {JUMLAH_OPTIONS.map((v) => {
+                  {jumlahOptions.map((v) => {
                     const active = jumlah === v;
                     return (
                       <button
