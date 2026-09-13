@@ -122,9 +122,9 @@ export function Landing() {
           <div style={{ marginTop: 20 }}>
             <div
               style={{
-                fontFamily: "'Alex Brush', cursive",
-                fontSize: 44,
-                lineHeight: 1,
+                fontFamily: "'Mrs Saint Delafield', cursive",
+                fontSize: 58,
+                lineHeight: 1.15,
                 color: '#C9962E',
               }}
             >
