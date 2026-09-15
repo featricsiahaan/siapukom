@@ -122,7 +122,9 @@ export function Landing() {
           <div style={{ marginTop: 20 }}>
             <div
               style={{
-                fontFamily: "'Mrs Saint Delafield', cursive",
+                fontFamily: "'Playfair Display', Georgia, serif",
+                fontStyle: 'italic',
+                fontWeight: 800,
                 fontSize: 58,
                 lineHeight: 1.15,
                 color: '#C9962E',
