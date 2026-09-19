@@ -15,7 +15,8 @@ const upload = multer({
   limits: { fileSize: 20 * 1024 * 1024 },
 });
 
-async function ensureSlideAccess(userId: string) {
+async function ensureSlideAccess(userId: string, role: string) {
+  if (role === 'ADMIN') return;
   const membership = await prisma.membership.findUnique({ where: { userId } });
   if (!membership?.hasSlideAccess) {
     throw new HttpError(403, 'Fitur Materi Belajar khusus untuk pemegang Akses Penuh.');
@@ -63,7 +64,7 @@ router.get(
   '/',
   requireAuth,
   asyncHandler(async (req, res) => {
-    await ensureSlideAccess(req.user!.id);
+    await ensureSlideAccess(req.user!.id, req.user!.role);
 
     const slides = await prisma.slide.findMany({
       include: { category: true },
@@ -87,7 +88,7 @@ router.get(
   '/:id/file',
   requireAuth,
   asyncHandler(async (req, res) => {
-    await ensureSlideAccess(req.user!.id);
+    await ensureSlideAccess(req.user!.id, req.user!.role);
 
     const slide = await prisma.slide.findUnique({ where: { id: req.params.id } });
     if (!slide) throw new HttpError(404, 'Materi tidak ditemukan');

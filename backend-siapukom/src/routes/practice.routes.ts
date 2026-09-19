@@ -45,12 +45,15 @@ router.post(
       kategoriLatihanLimit: number;
     } | null = null;
 
+    const isAdmin = req.user?.role === 'ADMIN';
+
     if (mode === 'SIMULASI') {
       if (!req.user) {
         throw new HttpError(401, 'Simulasi ujian membutuhkan akun. Silakan masuk terlebih dahulu.');
       }
       membership = await prisma.membership.findUnique({ where: { userId: req.user.id } });
       if (
+        !isAdmin &&
         membership &&
         membership.simulationAttemptsLimit !== null &&
         membership.simulationAttemptsUsed >= membership.simulationAttemptsLimit
@@ -65,7 +68,7 @@ router.post(
         throw new HttpError(400, 'Pilih satu kategori untuk latihan kategori khusus.');
       }
       membership = await prisma.membership.findUnique({ where: { userId: req.user.id } });
-      if (!membership || membership.kategoriLatihanUsed >= membership.kategoriLatihanLimit) {
+      if (!isAdmin && (!membership || membership.kategoriLatihanUsed >= membership.kategoriLatihanLimit)) {
         throw new HttpError(403, 'Kesempatan latihan kategori khusus Anda sudah habis. Beli Akses Penuh untuk menambah kesempatan.');
       }
     }
