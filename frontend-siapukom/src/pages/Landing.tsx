@@ -125,8 +125,9 @@ export function Landing() {
                 fontFamily: "'Playfair Display', Georgia, serif",
                 fontStyle: 'italic',
                 fontWeight: 800,
-                fontSize: 58,
+                fontSize: 44,
                 lineHeight: 1.15,
+                whiteSpace: 'nowrap',
                 color: '#C9962E',
               }}
             >
