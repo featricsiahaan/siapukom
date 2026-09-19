@@ -14,7 +14,7 @@ interface Feedback {
 }
 
 const SEMUA_KATEGORI = 'Semua Kategori';
-const JUMLAH_OPTIONS_GUEST = [5, 10, 20];
+const JUMLAH_OPTIONS_GUEST = [10, 20];
 
 export function Latihan() {
   const { token, isAuthenticated } = useAuth();
@@ -23,7 +23,7 @@ export function Latihan() {
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [kategoriPilihan, setKategoriPilihan] = useState<string>(SEMUA_KATEGORI);
-  const [jumlah, setJumlah] = useState(5);
+  const [jumlah, setJumlah] = useState(10);
   const [status, setStatus] = useState<SimulasiStatus | null>(null);
   const [kategoriKhususPilihan, setKategoriKhususPilihan] = useState<string>('');
 

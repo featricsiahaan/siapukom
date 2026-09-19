@@ -72,20 +72,33 @@ router.post(
 
     // Simulasi selalu mengambil dari seluruh bank soal (tidak difilter kategori) agar merepresentasikan format CBT penuh.
     const effectiveCategoryId = mode === 'SIMULASI' ? undefined : categoryId;
-    const effectiveJumlah = mode === 'SIMULASI' ? SIMULASI_JUMLAH_SOAL : mode === 'KATEGORI' ? KATEGORI_JUMLAH_SOAL : (jumlah ?? 5);
+    const effectiveJumlah = mode === 'SIMULASI' ? SIMULASI_JUMLAH_SOAL : mode === 'KATEGORI' ? KATEGORI_JUMLAH_SOAL : (jumlah ?? 10);
+
+    // Latihan gratis untuk tamu (anonim) memakai urutan soal tetap (tidak diacak) per kategori,
+    // supaya mengulang-ulang latihan tidak memunculkan soal baru untuk "menghabiskan" bank soal gratis.
+    const isAnonymousLatihan = mode === 'LATIHAN' && !req.user;
 
     const pool = await prisma.question.findMany({
       where: effectiveCategoryId ? { categoryId: effectiveCategoryId, status: 'ACTIVE' } : { status: 'ACTIVE' },
       include: { category: true },
+      orderBy: isAnonymousLatihan ? { createdAt: 'asc' } : undefined,
     });
 
     const source =
-      pool.length > 0 ? pool : await prisma.question.findMany({ where: { status: 'ACTIVE' }, include: { category: true } });
+      pool.length > 0
+        ? pool
+        : await prisma.question.findMany({
+            where: { status: 'ACTIVE' },
+            include: { category: true },
+            orderBy: isAnonymousLatihan ? { createdAt: 'asc' } : undefined,
+          });
     if (source.length === 0) {
       throw new HttpError(503, 'Bank soal belum tersedia');
     }
 
-    const picked = shuffle(source).slice(0, Math.min(effectiveJumlah, source.length));
+    const picked = isAnonymousLatihan
+      ? source.slice(0, Math.min(effectiveJumlah, source.length))
+      : shuffle(source).slice(0, Math.min(effectiveJumlah, source.length));
     const expiresAt = mode === 'SIMULASI' ? new Date(Date.now() + SIMULASI_DURASI_MENIT * 60 * 1000) : null;
 
     const session = await prisma.practiceSession.create({
