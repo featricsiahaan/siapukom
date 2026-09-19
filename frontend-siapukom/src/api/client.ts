@@ -8,6 +8,7 @@ import type {
   PaymentStatusResponse,
   PublicUser,
   SimulasiStatus,
+  SlideItem,
   StartSessionResponse,
 } from './types';
 
@@ -52,10 +53,15 @@ export function getCategories() {
   return request<{ categories: Category[] }>('/categories');
 }
 
-export function startSession(categoryId: string | null, jumlah: number, token?: string | null) {
+export function startSession(
+  categoryId: string | null,
+  jumlah: number,
+  token?: string | null,
+  mode: 'LATIHAN' | 'KATEGORI' = 'LATIHAN'
+) {
   return request<StartSessionResponse>('/practice/sessions', {
     method: 'POST',
-    body: { categoryId: categoryId ?? undefined, jumlah, mode: 'LATIHAN' },
+    body: { categoryId: categoryId ?? undefined, jumlah, mode },
     token,
   });
 }
@@ -109,4 +115,18 @@ export function createPayment(token: string) {
 
 export function getPaymentStatus(token: string, orderId: string) {
   return request<PaymentStatusResponse>(`/payments/${orderId}/status`, { token });
+}
+
+export function getMateri(token: string) {
+  return request<{ slides: SlideItem[] }>('/materi', { token });
+}
+
+export async function getMateriFileBlob(token: string, id: string): Promise<Blob> {
+  const res = await fetch(`${API_URL}/materi/${id}/file`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    throw new ApiError(res.status, 'Gagal memuat file materi.');
+  }
+  return res.blob();
 }

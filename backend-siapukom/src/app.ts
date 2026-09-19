@@ -10,6 +10,7 @@ import practiceRoutes from './routes/practice.routes';
 import dashboardRoutes from './routes/dashboard.routes';
 import adminRoutes from './routes/admin.routes';
 import paymentsRoutes from './routes/payments.routes';
+import materiRoutes from './routes/materi.routes';
 
 export function createApp() {
   const app = express();
@@ -35,6 +36,7 @@ export function createApp() {
   app.use('/api/dashboard', dashboardRoutes);
   app.use('/api/admin', adminRoutes);
   app.use('/api/payments', paymentsRoutes);
+  app.use('/api/materi', materiRoutes);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

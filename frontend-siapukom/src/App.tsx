@@ -7,6 +7,7 @@ import { Latihan } from './pages/Latihan';
 import { Simulasi } from './pages/Simulasi';
 import { Dashboard } from './pages/Dashboard';
 import { Upgrade } from './pages/Upgrade';
+import { Materi } from './pages/Materi';
 
 function App() {
   return (
@@ -37,6 +38,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Upgrade />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/materi"
+            element={
+              <ProtectedRoute>
+                <Materi />
               </ProtectedRoute>
             }
           />

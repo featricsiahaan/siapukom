@@ -3,13 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import * as api from '../api/client';
 import { ApiError } from '../api/client';
-import type { DashboardResponse } from '../api/types';
+import type { DashboardResponse, SimulasiStatus } from '../api/types';
 
 export function Dashboard() {
   const { token, logout } = useAuth();
   const navigate = useNavigate();
 
   const [data, setData] = useState<DashboardResponse | null>(null);
+  const [status, setStatus] = useState<SimulasiStatus | null>(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -18,6 +19,7 @@ export function Dashboard() {
       .getDashboard(token)
       .then(setData)
       .catch((err) => setError(err instanceof ApiError ? err.message : 'Gagal memuat dashboard.'));
+    api.getSimulasiStatus(token).then(setStatus).catch(() => {});
   }, [token]);
 
   const onLogout = () => {
@@ -43,10 +45,7 @@ export function Dashboard() {
 
   const circumference = 2 * Math.PI * 60;
   const filled = (data.readiness.score / 100) * circumference;
-  const isAksesPenuhActive =
-    data.membership?.plan === 'Akses Penuh' &&
-    !!data.membership.expiry &&
-    new Date(data.membership.expiry) > new Date();
+  const pernahBeli = data.membership?.plan === 'Akses Penuh';
 
   return (
     <div style={{ minHeight: '100vh', background: '#F6F8FC', color: '#0F2C59' }}>
@@ -72,6 +71,9 @@ export function Dashboard() {
             </Link>
             <Link to="/simulasi" className="link-hover">
               Simulasi
+            </Link>
+            <Link to="/materi" className="link-hover">
+              Materi
             </Link>
           </div>
         </div>
@@ -129,62 +131,40 @@ export function Dashboard() {
             </div>
             <div>
               <div style={{ fontSize: 22, fontWeight: 800 }}>{data.membership?.plan ?? 'Gratis'}</div>
-              <div style={{ fontSize: 13, opacity: 0.75, marginTop: 4 }}>
-                {data.membership?.expiry
-                  ? `${isAksesPenuhActive ? 'Berlaku hingga' : 'Kedaluwarsa pada'} ${new Date(data.membership.expiry).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`
-                  : 'Belum ada masa berlaku aktif'}
-              </div>
             </div>
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, opacity: 0.8, marginBottom: 6 }}>
-                <span>Sesi latihan terpakai</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 12.5, opacity: 0.9 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Simulasi Ujian</span>
                 <span>
-                  {data.membership?.sessionsUsed ?? 0}/{data.membership?.sessionsTotal ?? 0}
+                  {status?.simulationAttemptsUsed ?? 0}/{status?.simulationAttemptsLimit ?? '-'}
                 </span>
               </div>
-              <div style={{ height: 8, background: 'rgba(255,255,255,0.18)', borderRadius: 99, overflow: 'hidden' }}>
-                <div
-                  style={{
-                    height: '100%',
-                    background: '#E5BA73',
-                    borderRadius: 99,
-                    width: data.membership?.sessionsPercent ?? '0%',
-                  }}
-                />
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Latihan Kategori Khusus</span>
+                <span>
+                  {status?.kategoriLatihanUsed ?? 0}/{status?.kategoriLatihanLimit ?? 0}
+                </span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Akses Materi Belajar</span>
+                <span>{status?.hasSlideAccess ? 'Aktif' : 'Belum'}</span>
               </div>
             </div>
-            {isAksesPenuhActive ? (
-              <div
-                style={{
-                  marginTop: 'auto',
-                  textAlign: 'center',
-                  background: 'rgba(255,255,255,0.12)',
-                  color: '#E5BA73',
-                  fontSize: 13.5,
-                  fontWeight: 700,
-                  padding: '11px 18px',
-                  borderRadius: 10,
-                }}
-              >
-                ✓ Akses Penuh Aktif
-              </div>
-            ) : (
-              <Link
-                to="/upgrade"
-                style={{
-                  marginTop: 'auto',
-                  textAlign: 'center',
-                  background: '#E5BA73',
-                  color: '#0F2C59',
-                  fontSize: 13.5,
-                  fontWeight: 700,
-                  padding: '11px 18px',
-                  borderRadius: 10,
-                }}
-              >
-                {data.membership?.plan === 'Akses Penuh' ? 'Perpanjang Akses Penuh' : 'Upgrade ke Akses Penuh'}
-              </Link>
-            )}
+            <Link
+              to="/upgrade"
+              style={{
+                marginTop: 'auto',
+                textAlign: 'center',
+                background: '#E5BA73',
+                color: '#0F2C59',
+                fontSize: 13.5,
+                fontWeight: 700,
+                padding: '11px 18px',
+                borderRadius: 10,
+              }}
+            >
+              {pernahBeli ? 'Tambah Kuota Akses Penuh' : 'Upgrade ke Akses Penuh'}
+            </Link>
           </div>
 
           <div

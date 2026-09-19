@@ -114,7 +114,7 @@ export function Upgrade() {
             Upgrade ke Akses Penuh
           </h1>
           <p style={{ fontSize: 14.5, color: 'rgba(15,44,89,0.65)', margin: '0 0 28px', textAlign: 'center' }}>
-            Bank soal lengkap, simulasi tanpa batas, dan dashboard kesiapan penuh — aktif 30 hari, perpanjang manual saat masa aktif habis.
+            3x Simulasi Ujian, 5x Latihan Kategori Khusus (30 soal), dan akses penuh Slide Belajar.
           </p>
 
           <div
@@ -131,11 +131,9 @@ export function Upgrade() {
                 <div style={{ fontSize: 13, fontWeight: 700, color: '#E5BA73', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
                   Akses Penuh
                 </div>
-                <div style={{ fontSize: 34, fontWeight: 800, margin: '10px 0 4px' }}>
-                  {formatRupiah(amount)} <span style={{ fontSize: 15, fontWeight: 600, opacity: 0.6 }}>/30 hari</span>
-                </div>
+                <div style={{ fontSize: 34, fontWeight: 800, margin: '10px 0 4px' }}>{formatRupiah(amount)}</div>
                 <p style={{ fontSize: 12.5, color: 'rgba(15,44,89,0.5)', margin: '0 0 20px' }}>
-                  Perpanjang manual saat masa aktif habis.
+                  3x Simulasi + 5x Latihan Kategori + akses Slide Belajar selamanya.
                 </p>
                 <button
                   onClick={startPayment}

@@ -9,7 +9,8 @@ import { createQrisCharge, verifySignature } from '../services/midtrans';
 const router = Router();
 
 const AKSES_PENUH_PRICE = 20000;
-const MEMBERSHIP_DURATION_DAYS = 30;
+const SIMULASI_TOP_UP = 3;
+const KATEGORI_LATIHAN_TOP_UP = 5;
 
 router.post(
   '/create',
@@ -106,11 +107,6 @@ router.post(
         throw new HttpError(400, 'Nominal pembayaran tidak sesuai');
       }
 
-      const membership = await prisma.membership.findUnique({ where: { userId: payment.userId } });
-      const now = new Date();
-      const base = membership?.expiryDate && membership.expiryDate > now ? membership.expiryDate : now;
-      const newExpiry = new Date(base.getTime() + MEMBERSHIP_DURATION_DAYS * 24 * 60 * 60 * 1000);
-
       await prisma.$transaction([
         prisma.payment.update({
           where: { id: payment.id },
@@ -118,7 +114,12 @@ router.post(
         }),
         prisma.membership.update({
           where: { userId: payment.userId },
-          data: { plan: 'Akses Penuh', expiryDate: newExpiry },
+          data: {
+            plan: 'Akses Penuh',
+            simulationAttemptsLimit: { increment: SIMULASI_TOP_UP },
+            kategoriLatihanLimit: { increment: KATEGORI_LATIHAN_TOP_UP },
+            hasSlideAccess: true,
+          },
         }),
       ]);
     } else if (body.transaction_status === 'expire') {

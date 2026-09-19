@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import * as api from '../api/client';
 import { ApiError } from '../api/client';
-import type { Category, FinishSessionResponse, SessionQuestion } from '../api/types';
+import type { Category, FinishSessionResponse, SessionQuestion, SimulasiStatus } from '../api/types';
 
 type Screen = 'menu' | 'session' | 'result';
 
@@ -25,11 +25,18 @@ export function Latihan() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [kategoriPilihan, setKategoriPilihan] = useState<string>(SEMUA_KATEGORI);
   const [jumlah, setJumlah] = useState(isAuthenticated ? 25 : 5);
+  const [status, setStatus] = useState<SimulasiStatus | null>(null);
+  const [kategoriKhususPilihan, setKategoriKhususPilihan] = useState<string>('');
 
   useEffect(() => {
     if (!jumlahOptions.includes(jumlah)) setJumlah(jumlahOptions[0]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    if (!token) return;
+    api.getSimulasiStatus(token).then(setStatus).catch(() => {});
+  }, [token]);
 
   const [screen, setScreen] = useState<Screen>('menu');
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -66,6 +73,29 @@ export function Latihan() {
       setScreen('session');
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Gagal memulai sesi latihan.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const startKategoriKhusus = async () => {
+    if (!kategoriKhususPilihan) {
+      setError('Pilih satu kategori untuk latihan kategori khusus.');
+      return;
+    }
+    setError('');
+    setLoading(true);
+    try {
+      const categoryId = categories.find((c) => c.name === kategoriKhususPilihan)?.id ?? null;
+      const res = await api.startSession(categoryId, 30, token, 'KATEGORI');
+      setSessionId(res.sessionId);
+      setQuestions(res.questions);
+      setCurrent(0);
+      setAnswers({});
+      setFeedback({});
+      setScreen('session');
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Gagal memulai latihan kategori khusus.');
     } finally {
       setLoading(false);
     }
@@ -234,6 +264,110 @@ export function Latihan() {
               <p style={{ fontSize: 12, color: 'rgba(15,44,89,0.45)', marginTop: 14 }}>
                 Soal diambil dari bank soal server secara acak setiap sesi.
               </p>
+
+              {isAuthenticated && (
+                <div style={{ marginTop: 44, paddingTop: 36, borderTop: '1px solid rgba(15,44,89,0.1)' }}>
+                  <h2 style={{ fontSize: 20, fontWeight: 800, margin: '0 0 8px' }}>Latihan Kategori Khusus</h2>
+                  <p style={{ fontSize: 14, color: 'rgba(15,44,89,0.65)', margin: '0 0 18px', maxWidth: '52ch' }}>
+                    30 soal fokus pada satu kategori untuk mempertajam satu bidang ilmu.
+                  </p>
+
+                  {!status || status.kategoriLatihanLimit === 0 ? (
+                    <div>
+                      <div
+                        style={{
+                          padding: '14px 16px',
+                          borderRadius: 10,
+                          background: 'rgba(229,186,115,0.12)',
+                          color: '#8A6A2E',
+                          fontSize: 13.5,
+                          fontWeight: 600,
+                          marginBottom: 14,
+                        }}
+                      >
+                        Fitur Akses Penuh. Beli paket untuk membuka kesempatan latihan kategori khusus.
+                      </div>
+                      <Link
+                        to="/upgrade"
+                        style={{ background: '#0F2C59', color: '#fff', fontSize: 14, fontWeight: 700, padding: '12px 22px', borderRadius: 10 }}
+                      >
+                        Upgrade ke Akses Penuh
+                      </Link>
+                    </div>
+                  ) : status.kategoriLatihanUsed >= status.kategoriLatihanLimit ? (
+                    <div>
+                      <div
+                        style={{
+                          padding: '14px 16px',
+                          borderRadius: 10,
+                          background: 'rgba(192,57,43,0.08)',
+                          color: '#C0392B',
+                          fontSize: 13.5,
+                          fontWeight: 600,
+                          marginBottom: 14,
+                        }}
+                      >
+                        Kesempatan latihan kategori khusus Anda sudah habis ({status.kategoriLatihanUsed}/{status.kategoriLatihanLimit}).
+                      </div>
+                      <Link
+                        to="/upgrade"
+                        style={{ background: '#0F2C59', color: '#fff', fontSize: 14, fontWeight: 700, padding: '12px 22px', borderRadius: 10 }}
+                      >
+                        Tambah Kuota Akses Penuh
+                      </Link>
+                    </div>
+                  ) : (
+                    <>
+                      <p style={{ fontSize: 13, fontWeight: 700, color: 'rgba(15,44,89,0.6)', marginBottom: 14 }}>
+                        Sisa kesempatan: {status.kategoriLatihanLimit - status.kategoriLatihanUsed} dari {status.kategoriLatihanLimit}
+                      </p>
+                      <div style={{ marginBottom: 18 }}>
+                        <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>Pilih Kategori</div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                          {categories.map((c) => {
+                            const active = kategoriKhususPilihan === c.name;
+                            return (
+                              <button
+                                key={c.id}
+                                onClick={() => setKategoriKhususPilihan(c.name)}
+                                style={{
+                                  fontSize: 13,
+                                  fontWeight: 600,
+                                  padding: '9px 16px',
+                                  borderRadius: 999,
+                                  border: `1px solid ${active ? '#0F2C59' : 'rgba(15,44,89,0.2)'}`,
+                                  background: active ? '#0F2C59' : '#fff',
+                                  color: active ? '#fff' : '#0F2C59',
+                                  cursor: 'pointer',
+                                }}
+                              >
+                                {c.name}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                      <button
+                        onClick={startKategoriKhusus}
+                        disabled={loading || !kategoriKhususPilihan}
+                        style={{
+                          background: '#0F2C59',
+                          color: '#fff',
+                          fontSize: 14.5,
+                          fontWeight: 700,
+                          padding: '13px 26px',
+                          borderRadius: 10,
+                          border: 'none',
+                          cursor: loading || !kategoriKhususPilihan ? 'default' : 'pointer',
+                          opacity: loading || !kategoriKhususPilihan ? 0.6 : 1,
+                        }}
+                      >
+                        {loading ? 'Memuat…' : 'Mulai Latihan Kategori'}
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
             </>
           )}
 

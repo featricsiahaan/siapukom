@@ -58,7 +58,6 @@ router.get(
       membership: membership
         ? {
             plan: membership.plan,
-            expiry: membership.expiryDate,
             sessionsUsed: membership.sessionsUsed,
             sessionsTotal: membership.sessionsTotal,
             sessionsPercent:

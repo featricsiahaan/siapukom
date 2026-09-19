@@ -11,11 +11,12 @@ const router = Router();
 
 const SIMULASI_JUMLAH_SOAL = 150;
 const SIMULASI_DURASI_MENIT = 200;
+const KATEGORI_JUMLAH_SOAL = 30;
 
 const startSessionSchema = z.object({
   categoryId: z.string().trim().min(1).optional(),
   jumlah: z.number().int().positive().max(150).optional(),
-  mode: z.enum(['LATIHAN', 'SIMULASI']).default('LATIHAN'),
+  mode: z.enum(['LATIHAN', 'SIMULASI', 'KATEGORI']).default('LATIHAN'),
 });
 
 const answerSchema = z.object({
@@ -40,8 +41,8 @@ router.post(
     let membership: {
       simulationAttemptsUsed: number;
       simulationAttemptsLimit: number | null;
-      plan: string;
-      expiryDate: Date | null;
+      kategoriLatihanUsed: number;
+      kategoriLatihanLimit: number;
     } | null = null;
 
     if (mode === 'SIMULASI') {
@@ -49,27 +50,29 @@ router.post(
         throw new HttpError(401, 'Simulasi ujian membutuhkan akun. Silakan masuk terlebih dahulu.');
       }
       membership = await prisma.membership.findUnique({ where: { userId: req.user.id } });
-
-      if (membership?.plan === 'Akses Penuh') {
-        const isActive = membership.expiryDate != null && membership.expiryDate > new Date();
-        if (!isActive) {
-          throw new HttpError(403, 'Masa aktif Akses Penuh Anda sudah berakhir. Perpanjang untuk melanjutkan simulasi.');
-        }
-      } else if (
+      if (
         membership &&
         membership.simulationAttemptsLimit !== null &&
         membership.simulationAttemptsUsed >= membership.simulationAttemptsLimit
       ) {
-        throw new HttpError(
-          403,
-          'Kesempatan trial simulasi Anda sudah habis. Upgrade ke Akses Penuh untuk simulasi tanpa batas.'
-        );
+        throw new HttpError(403, 'Kesempatan simulasi Anda sudah habis. Beli Akses Penuh untuk menambah kesempatan.');
+      }
+    } else if (mode === 'KATEGORI') {
+      if (!req.user) {
+        throw new HttpError(401, 'Latihan kategori khusus membutuhkan akun. Silakan masuk terlebih dahulu.');
+      }
+      if (!categoryId) {
+        throw new HttpError(400, 'Pilih satu kategori untuk latihan kategori khusus.');
+      }
+      membership = await prisma.membership.findUnique({ where: { userId: req.user.id } });
+      if (!membership || membership.kategoriLatihanUsed >= membership.kategoriLatihanLimit) {
+        throw new HttpError(403, 'Kesempatan latihan kategori khusus Anda sudah habis. Beli Akses Penuh untuk menambah kesempatan.');
       }
     }
 
     // Simulasi selalu mengambil dari seluruh bank soal (tidak difilter kategori) agar merepresentasikan format CBT penuh.
     const effectiveCategoryId = mode === 'SIMULASI' ? undefined : categoryId;
-    const effectiveJumlah = mode === 'SIMULASI' ? SIMULASI_JUMLAH_SOAL : (jumlah ?? 5);
+    const effectiveJumlah = mode === 'SIMULASI' ? SIMULASI_JUMLAH_SOAL : mode === 'KATEGORI' ? KATEGORI_JUMLAH_SOAL : (jumlah ?? 5);
 
     const pool = await prisma.question.findMany({
       where: effectiveCategoryId ? { categoryId: effectiveCategoryId, status: 'ACTIVE' } : { status: 'ACTIVE' },
@@ -105,6 +108,11 @@ router.post(
       await prisma.membership.updateMany({
         where: { userId: req.user.id },
         data: { simulationAttemptsUsed: { increment: 1 } },
+      });
+    } else if (mode === 'KATEGORI' && req.user) {
+      await prisma.membership.updateMany({
+        where: { userId: req.user.id },
+        data: { kategoriLatihanUsed: { increment: 1 } },
       });
     }
 
@@ -257,19 +265,16 @@ router.get(
   requireAuth,
   asyncHandler(async (req, res) => {
     const membership = await prisma.membership.findUnique({ where: { userId: req.user!.id } });
-    const now = new Date();
-    const isAksesPenuhActive =
-      membership?.plan === 'Akses Penuh' && membership.expiryDate != null && membership.expiryDate > now;
-    const isAksesPenuhExpired = membership?.plan === 'Akses Penuh' && !isAksesPenuhActive;
 
     res.json({
       simulationAttemptsUsed: membership?.simulationAttemptsUsed ?? 0,
       simulationAttemptsLimit: membership?.simulationAttemptsLimit ?? null,
-      isAksesPenuhActive,
-      isAksesPenuhExpired,
-      expiryDate: membership?.expiryDate ?? null,
+      kategoriLatihanUsed: membership?.kategoriLatihanUsed ?? 0,
+      kategoriLatihanLimit: membership?.kategoriLatihanLimit ?? 0,
+      hasSlideAccess: membership?.hasSlideAccess ?? false,
       jumlahSoal: SIMULASI_JUMLAH_SOAL,
       durasiMenit: SIMULASI_DURASI_MENIT,
+      jumlahSoalKategori: KATEGORI_JUMLAH_SOAL,
     });
   })
 );

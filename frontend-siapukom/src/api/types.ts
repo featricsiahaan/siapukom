@@ -27,7 +27,7 @@ export interface SessionQuestion {
 
 export interface StartSessionResponse {
   sessionId: string;
-  mode?: 'LATIHAN' | 'SIMULASI';
+  mode?: 'LATIHAN' | 'SIMULASI' | 'KATEGORI';
   expiresAt?: string | null;
   durasiMenit?: number | null;
   questions: SessionQuestion[];
@@ -79,11 +79,12 @@ export interface FinishSimulasiResponse extends FinishSessionResponse {
 export interface SimulasiStatus {
   simulationAttemptsUsed: number;
   simulationAttemptsLimit: number | null;
-  isAksesPenuhActive: boolean;
-  isAksesPenuhExpired: boolean;
-  expiryDate: string | null;
+  kategoriLatihanUsed: number;
+  kategoriLatihanLimit: number;
+  hasSlideAccess: boolean;
   jumlahSoal: number;
   durasiMenit: number;
+  jumlahSoalKategori: number;
 }
 
 export interface DashboardCategory {
@@ -97,7 +98,6 @@ export interface DashboardCategory {
 
 export interface DashboardMembership {
   plan: string;
-  expiry: string | null;
   sessionsUsed: number;
   sessionsTotal: number;
   sessionsPercent: string;
@@ -128,4 +128,13 @@ export type PaymentStatusValue = 'PENDING' | 'SETTLEMENT' | 'EXPIRE' | 'CANCEL' 
 
 export interface PaymentStatusResponse {
   status: PaymentStatusValue;
+}
+
+export interface SlideItem {
+  id: string;
+  title: string;
+  kategori: string | null;
+  mimeType: string;
+  fileSize: number;
+  createdAt: string;
 }
