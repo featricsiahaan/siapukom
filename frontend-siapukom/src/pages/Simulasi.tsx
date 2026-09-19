@@ -253,13 +253,15 @@ export function Simulasi() {
                       marginBottom: 16,
                     }}
                   >
-                    Kesempatan trial simulasi Anda sudah habis.
+                    {status?.simulationAttemptsLimit === 0
+                      ? 'Simulasi Ujian adalah fitur Akses Penuh. Beli paket untuk mendapat kesempatan simulasi.'
+                      : 'Kesempatan simulasi Anda sudah habis.'}
                   </div>
                   <Link
                     to="/upgrade"
                     style={{ background: '#0F2C59', color: '#fff', fontSize: 15, fontWeight: 700, padding: '14px 28px', borderRadius: 10 }}
                   >
-                    Upgrade ke Akses Penuh
+                    {status?.simulationAttemptsLimit === 0 ? 'Upgrade ke Akses Penuh' : 'Tambah Kuota Akses Penuh'}
                   </Link>
                 </div>
               ) : (

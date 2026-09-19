@@ -15,23 +15,17 @@ interface Feedback {
 
 const SEMUA_KATEGORI = 'Semua Kategori';
 const JUMLAH_OPTIONS_GUEST = [5, 10, 20];
-const JUMLAH_OPTIONS_LOGGED_IN = [25];
 
 export function Latihan() {
   const { token, isAuthenticated } = useAuth();
   const kembaliTo = isAuthenticated ? '/dashboard' : '/';
-  const jumlahOptions = isAuthenticated ? JUMLAH_OPTIONS_LOGGED_IN : JUMLAH_OPTIONS_GUEST;
+  const jumlahOptions = JUMLAH_OPTIONS_GUEST;
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [kategoriPilihan, setKategoriPilihan] = useState<string>(SEMUA_KATEGORI);
-  const [jumlah, setJumlah] = useState(isAuthenticated ? 25 : 5);
+  const [jumlah, setJumlah] = useState(5);
   const [status, setStatus] = useState<SimulasiStatus | null>(null);
   const [kategoriKhususPilihan, setKategoriKhususPilihan] = useState<string>('');
-
-  useEffect(() => {
-    if (!jumlahOptions.includes(jumlah)) setJumlah(jumlahOptions[0]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated]);
 
   useEffect(() => {
     if (!token) return;
@@ -166,7 +160,7 @@ export function Latihan() {
             borderRadius: 999,
           }}
         >
-          Latihan Gratis
+          {isAuthenticated ? 'Latihan Kategori Khusus' : 'Latihan Gratis'}
         </span>
         <Link to="/upgrade" className="link-hover" style={{ marginLeft: 'auto', fontSize: 14, fontWeight: 700, color: '#0F2C59' }}>
           Akses Penuh →
@@ -183,91 +177,102 @@ export function Latihan() {
 
           {screen === 'menu' && (
             <>
-              <h1 style={{ fontSize: 36, fontWeight: 800, letterSpacing: '-0.01em', margin: '0 0 10px' }}>Latihan Gratis</h1>
-              <p style={{ fontSize: 15.5, color: 'rgba(15,44,89,0.65)', margin: '0 0 32px', maxWidth: '52ch' }}>
-                Coba beberapa soal vignette klinis contoh dengan pembahasan langsung. Pilih kategori dan jumlah soal untuk mulai.
-              </p>
+              {!isAuthenticated && (
+                <>
+                  <h1 style={{ fontSize: 36, fontWeight: 800, letterSpacing: '-0.01em', margin: '0 0 10px' }}>Latihan Gratis</h1>
+                  <p style={{ fontSize: 15.5, color: 'rgba(15,44,89,0.65)', margin: '0 0 32px', maxWidth: '52ch' }}>
+                    Coba beberapa soal vignette klinis contoh dengan pembahasan langsung. Pilih kategori dan jumlah soal untuk mulai.
+                  </p>
 
-              <div style={{ marginBottom: 28 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>Kategori</div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                  {[SEMUA_KATEGORI, ...categories.map((c) => c.name)].map((k) => {
-                    const active = kategoriPilihan === k;
-                    return (
-                      <button
-                        key={k}
-                        onClick={() => setKategoriPilihan(k)}
-                        style={{
-                          fontSize: 13,
-                          fontWeight: 600,
-                          padding: '9px 16px',
-                          borderRadius: 999,
-                          border: `1px solid ${active ? '#0F2C59' : 'rgba(15,44,89,0.2)'}`,
-                          background: active ? '#0F2C59' : '#fff',
-                          color: active ? '#fff' : '#0F2C59',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        {k}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+                  <div style={{ marginBottom: 28 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>Kategori</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                      {[SEMUA_KATEGORI, ...categories.map((c) => c.name)].map((k) => {
+                        const active = kategoriPilihan === k;
+                        return (
+                          <button
+                            key={k}
+                            onClick={() => setKategoriPilihan(k)}
+                            style={{
+                              fontSize: 13,
+                              fontWeight: 600,
+                              padding: '9px 16px',
+                              borderRadius: 999,
+                              border: `1px solid ${active ? '#0F2C59' : 'rgba(15,44,89,0.2)'}`,
+                              background: active ? '#0F2C59' : '#fff',
+                              color: active ? '#fff' : '#0F2C59',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            {k}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
 
-              <div style={{ marginBottom: 36 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>Jumlah Soal</div>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  {jumlahOptions.map((v) => {
-                    const active = jumlah === v;
-                    return (
-                      <button
-                        key={v}
-                        onClick={() => setJumlah(v)}
-                        style={{
-                          fontSize: 13.5,
-                          fontWeight: 700,
-                          padding: '10px 20px',
-                          borderRadius: 10,
-                          border: `1px solid ${active ? '#0F2C59' : 'rgba(15,44,89,0.2)'}`,
-                          background: active ? '#0F2C59' : '#fff',
-                          color: active ? '#fff' : '#0F2C59',
-                          cursor: 'pointer',
-                        }}
-                      >
-                        {v}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+                  <div style={{ marginBottom: 36 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>Jumlah Soal</div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      {jumlahOptions.map((v) => {
+                        const active = jumlah === v;
+                        return (
+                          <button
+                            key={v}
+                            onClick={() => setJumlah(v)}
+                            style={{
+                              fontSize: 13.5,
+                              fontWeight: 700,
+                              padding: '10px 20px',
+                              borderRadius: 10,
+                              border: `1px solid ${active ? '#0F2C59' : 'rgba(15,44,89,0.2)'}`,
+                              background: active ? '#0F2C59' : '#fff',
+                              color: active ? '#fff' : '#0F2C59',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            {v}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
 
-              <button
-                onClick={startLatihan}
-                disabled={loading}
-                className="btn-primary"
-                style={{
-                  background: '#0F2C59',
-                  color: '#fff',
-                  fontSize: 15.5,
-                  fontWeight: 700,
-                  padding: '16px 32px',
-                  borderRadius: 10,
-                  border: 'none',
-                  cursor: loading ? 'default' : 'pointer',
-                  opacity: loading ? 0.7 : 1,
-                  boxShadow: '0 10px 24px rgba(15,44,89,0.22)',
-                }}
-              >
-                {loading ? 'Memuat…' : 'Mulai Latihan'}
-              </button>
-              <p style={{ fontSize: 12, color: 'rgba(15,44,89,0.45)', marginTop: 14 }}>
-                Soal diambil dari bank soal server secara acak setiap sesi.
-              </p>
+                  <button
+                    onClick={startLatihan}
+                    disabled={loading}
+                    className="btn-primary"
+                    style={{
+                      background: '#0F2C59',
+                      color: '#fff',
+                      fontSize: 15.5,
+                      fontWeight: 700,
+                      padding: '16px 32px',
+                      borderRadius: 10,
+                      border: 'none',
+                      cursor: loading ? 'default' : 'pointer',
+                      opacity: loading ? 0.7 : 1,
+                      boxShadow: '0 10px 24px rgba(15,44,89,0.22)',
+                    }}
+                  >
+                    {loading ? 'Memuat…' : 'Mulai Latihan'}
+                  </button>
+                  <p style={{ fontSize: 12, color: 'rgba(15,44,89,0.45)', marginTop: 14 }}>
+                    Soal diambil dari bank soal server secara acak setiap sesi.
+                  </p>
+                  <p style={{ fontSize: 13, color: 'rgba(15,44,89,0.55)', marginTop: 24 }}>
+                    Sudah punya akun?{' '}
+                    <Link to="/masuk" className="link-hover" style={{ fontWeight: 700, color: '#0F2C59' }}>
+                      Masuk
+                    </Link>{' '}
+                    untuk latihan kategori khusus dengan kuota Akses Penuh.
+                  </p>
+                </>
+              )}
 
               {isAuthenticated && (
-                <div style={{ marginTop: 44, paddingTop: 36, borderTop: '1px solid rgba(15,44,89,0.1)' }}>
-                  <h2 style={{ fontSize: 20, fontWeight: 800, margin: '0 0 8px' }}>Latihan Kategori Khusus</h2>
+                <div>
+                  <h1 style={{ fontSize: 32, fontWeight: 800, letterSpacing: '-0.01em', margin: '0 0 8px' }}>Latihan Kategori Khusus</h1>
                   <p style={{ fontSize: 14, color: 'rgba(15,44,89,0.65)', margin: '0 0 18px', maxWidth: '52ch' }}>
                     30 soal fokus pada satu kategori untuk mempertajam satu bidang ilmu.
                   </p>
