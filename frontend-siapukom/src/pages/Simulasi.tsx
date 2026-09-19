@@ -255,7 +255,7 @@ export function Simulasi() {
                     Kesempatan trial simulasi Anda sudah habis.
                   </div>
                   <Link
-                    to="/dashboard"
+                    to="/upgrade"
                     style={{ background: '#0F2C59', color: '#fff', fontSize: 15, fontWeight: 700, padding: '14px 28px', borderRadius: 10 }}
                   >
                     Upgrade ke Akses Penuh

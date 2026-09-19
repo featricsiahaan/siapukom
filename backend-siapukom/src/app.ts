@@ -9,6 +9,7 @@ import categoriesRoutes from './routes/categories.routes';
 import practiceRoutes from './routes/practice.routes';
 import dashboardRoutes from './routes/dashboard.routes';
 import adminRoutes from './routes/admin.routes';
+import paymentsRoutes from './routes/payments.routes';
 
 export function createApp() {
   const app = express();
@@ -33,6 +34,7 @@ export function createApp() {
   app.use('/api/practice', practiceRoutes);
   app.use('/api/dashboard', dashboardRoutes);
   app.use('/api/admin', adminRoutes);
+  app.use('/api/payments', paymentsRoutes);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

@@ -149,21 +149,38 @@ export function Dashboard() {
                 />
               </div>
             </div>
-            <Link
-              to="/latihan"
-              style={{
-                marginTop: 'auto',
-                textAlign: 'center',
-                background: '#E5BA73',
-                color: '#0F2C59',
-                fontSize: 13.5,
-                fontWeight: 700,
-                padding: '11px 18px',
-                borderRadius: 10,
-              }}
-            >
-              Perpanjang / Tambah Sesi
-            </Link>
+            {data.membership?.plan === 'Akses Penuh' ? (
+              <div
+                style={{
+                  marginTop: 'auto',
+                  textAlign: 'center',
+                  background: 'rgba(255,255,255,0.12)',
+                  color: '#E5BA73',
+                  fontSize: 13.5,
+                  fontWeight: 700,
+                  padding: '11px 18px',
+                  borderRadius: 10,
+                }}
+              >
+                ✓ Akses Penuh Aktif
+              </div>
+            ) : (
+              <Link
+                to="/upgrade"
+                style={{
+                  marginTop: 'auto',
+                  textAlign: 'center',
+                  background: '#E5BA73',
+                  color: '#0F2C59',
+                  fontSize: 13.5,
+                  fontWeight: 700,
+                  padding: '11px 18px',
+                  borderRadius: 10,
+                }}
+              >
+                Upgrade ke Akses Penuh
+              </Link>
+            )}
           </div>
 
           <div

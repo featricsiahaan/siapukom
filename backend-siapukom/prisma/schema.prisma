@@ -27,6 +27,14 @@ enum QuestionStatus {
   ACTIVE
 }
 
+enum PaymentStatus {
+  PENDING
+  SETTLEMENT
+  EXPIRE
+  CANCEL
+  DENY
+}
+
 model User {
   id        String   @id @default(cuid())
   nama      String
@@ -37,6 +45,7 @@ model User {
 
   membership Membership?
   sessions   PracticeSession[]
+  payments   Payment[]
 }
 
 model Membership {
@@ -50,6 +59,23 @@ model Membership {
   simulationAttemptsUsed  Int @default(0)
   simulationAttemptsLimit Int?
   updatedAt     DateTime  @updatedAt
+}
+
+model Payment {
+  id                    String        @id @default(cuid())
+  userId                String
+  user                  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderId               String        @unique
+  amount                Int
+  status                PaymentStatus @default(PENDING)
+  midtransTransactionId String?
+  qrUrl                 String?
+  expiresAt             DateTime
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  paidAt                DateTime?
+
+  @@index([userId, status])
 }
 
 model Category {

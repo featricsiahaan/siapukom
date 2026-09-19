@@ -1,9 +1,11 @@
 import type {
   AnswerResponse,
   Category,
+  CreatePaymentResponse,
   DashboardResponse,
   FinishSessionResponse,
   FinishSimulasiResponse,
+  PaymentStatusResponse,
   PublicUser,
   SimulasiStatus,
   StartSessionResponse,
@@ -99,4 +101,12 @@ export function finishSimulasi(sessionId: string, token: string) {
 
 export function getDashboard(token: string) {
   return request<DashboardResponse>('/dashboard', { token });
+}
+
+export function createPayment(token: string) {
+  return request<CreatePaymentResponse>('/payments/create', { method: 'POST', token });
+}
+
+export function getPaymentStatus(token: string, orderId: string) {
+  return request<PaymentStatusResponse>(`/payments/${orderId}/status`, { token });
 }

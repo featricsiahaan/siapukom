@@ -138,7 +138,7 @@ export function Latihan() {
         >
           Latihan Gratis
         </span>
-        <Link to="/dashboard" className="link-hover" style={{ marginLeft: 'auto', fontSize: 14, fontWeight: 700, color: '#0F2C59' }}>
+        <Link to="/upgrade" className="link-hover" style={{ marginLeft: 'auto', fontSize: 14, fontWeight: 700, color: '#0F2C59' }}>
           Akses Penuh →
         </Link>
       </div>
@@ -441,7 +441,7 @@ export function Latihan() {
                   Coba Lagi
                 </button>
                 <Link
-                  to="/dashboard"
+                  to="/upgrade"
                   style={{
                     background: '#0F2C59',
                     color: '#fff',

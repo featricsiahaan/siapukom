@@ -15,6 +15,8 @@ export const env = {
   jwtSecret: required('JWT_SECRET'),
   jwtExpiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
   corsOrigin: (process.env.CORS_ORIGIN ?? '*').split(',').map((o) => o.trim()),
+  midtransServerKey: process.env.MIDTRANS_SERVER_KEY ?? '',
+  midtransIsProduction: (process.env.MIDTRANS_IS_PRODUCTION ?? 'false') === 'true',
 };
 
 export const isProduction = env.nodeEnv === 'production';

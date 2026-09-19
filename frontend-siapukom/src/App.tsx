@@ -6,6 +6,7 @@ import { Masuk } from './pages/Masuk';
 import { Latihan } from './pages/Latihan';
 import { Simulasi } from './pages/Simulasi';
 import { Dashboard } from './pages/Dashboard';
+import { Upgrade } from './pages/Upgrade';
 
 function App() {
   return (
@@ -28,6 +29,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/upgrade"
+            element={
+              <ProtectedRoute>
+                <Upgrade />
               </ProtectedRoute>
             }
           />

@@ -113,3 +113,16 @@ export interface DashboardResponse {
   };
   categories: DashboardCategory[];
 }
+
+export interface CreatePaymentResponse {
+  orderId: string;
+  qrUrl: string | null;
+  amount: number;
+  expiresAt: string;
+}
+
+export type PaymentStatusValue = 'PENDING' | 'SETTLEMENT' | 'EXPIRE' | 'CANCEL' | 'DENY';
+
+export interface PaymentStatusResponse {
+  status: PaymentStatusValue;
+}
