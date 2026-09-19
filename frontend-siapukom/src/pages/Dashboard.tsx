@@ -43,6 +43,10 @@ export function Dashboard() {
 
   const circumference = 2 * Math.PI * 60;
   const filled = (data.readiness.score / 100) * circumference;
+  const isAksesPenuhActive =
+    data.membership?.plan === 'Akses Penuh' &&
+    !!data.membership.expiry &&
+    new Date(data.membership.expiry) > new Date();
 
   return (
     <div style={{ minHeight: '100vh', background: '#F6F8FC', color: '#0F2C59' }}>
@@ -127,7 +131,7 @@ export function Dashboard() {
               <div style={{ fontSize: 22, fontWeight: 800 }}>{data.membership?.plan ?? 'Gratis'}</div>
               <div style={{ fontSize: 13, opacity: 0.75, marginTop: 4 }}>
                 {data.membership?.expiry
-                  ? `Berlaku hingga ${new Date(data.membership.expiry).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`
+                  ? `${isAksesPenuhActive ? 'Berlaku hingga' : 'Kedaluwarsa pada'} ${new Date(data.membership.expiry).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}`
                   : 'Belum ada masa berlaku aktif'}
               </div>
             </div>
@@ -149,7 +153,7 @@ export function Dashboard() {
                 />
               </div>
             </div>
-            {data.membership?.plan === 'Akses Penuh' ? (
+            {isAksesPenuhActive ? (
               <div
                 style={{
                   marginTop: 'auto',
@@ -178,7 +182,7 @@ export function Dashboard() {
                   borderRadius: 10,
                 }}
               >
-                Upgrade ke Akses Penuh
+                {data.membership?.plan === 'Akses Penuh' ? 'Perpanjang Akses Penuh' : 'Upgrade ke Akses Penuh'}
               </Link>
             )}
           </div>

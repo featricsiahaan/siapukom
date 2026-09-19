@@ -37,14 +37,25 @@ router.post(
   asyncHandler(async (req, res) => {
     const { categoryId, jumlah, mode } = startSessionSchema.parse(req.body);
 
-    let membership: { simulationAttemptsUsed: number; simulationAttemptsLimit: number | null } | null = null;
+    let membership: {
+      simulationAttemptsUsed: number;
+      simulationAttemptsLimit: number | null;
+      plan: string;
+      expiryDate: Date | null;
+    } | null = null;
 
     if (mode === 'SIMULASI') {
       if (!req.user) {
         throw new HttpError(401, 'Simulasi ujian membutuhkan akun. Silakan masuk terlebih dahulu.');
       }
       membership = await prisma.membership.findUnique({ where: { userId: req.user.id } });
-      if (
+
+      if (membership?.plan === 'Akses Penuh') {
+        const isActive = membership.expiryDate != null && membership.expiryDate > new Date();
+        if (!isActive) {
+          throw new HttpError(403, 'Masa aktif Akses Penuh Anda sudah berakhir. Perpanjang untuk melanjutkan simulasi.');
+        }
+      } else if (
         membership &&
         membership.simulationAttemptsLimit !== null &&
         membership.simulationAttemptsUsed >= membership.simulationAttemptsLimit
@@ -246,9 +257,17 @@ router.get(
   requireAuth,
   asyncHandler(async (req, res) => {
     const membership = await prisma.membership.findUnique({ where: { userId: req.user!.id } });
+    const now = new Date();
+    const isAksesPenuhActive =
+      membership?.plan === 'Akses Penuh' && membership.expiryDate != null && membership.expiryDate > now;
+    const isAksesPenuhExpired = membership?.plan === 'Akses Penuh' && !isAksesPenuhActive;
+
     res.json({
       simulationAttemptsUsed: membership?.simulationAttemptsUsed ?? 0,
       simulationAttemptsLimit: membership?.simulationAttemptsLimit ?? null,
+      isAksesPenuhActive,
+      isAksesPenuhExpired,
+      expiryDate: membership?.expiryDate ?? null,
       jumlahSoal: SIMULASI_JUMLAH_SOAL,
       durasiMenit: SIMULASI_DURASI_MENIT,
     });

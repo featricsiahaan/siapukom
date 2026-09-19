@@ -116,7 +116,13 @@ export function Simulasi() {
   const currentQ = questions[current];
   const unansweredCount = total - Object.keys(answers).length;
 
-  const kuotaHabis = status?.simulationAttemptsLimit != null && status.simulationAttemptsUsed >= status.simulationAttemptsLimit;
+  const kuotaHabis =
+    !status?.isAksesPenuhActive &&
+    status?.simulationAttemptsLimit != null &&
+    status.simulationAttemptsUsed >= status.simulationAttemptsLimit;
+
+  const formatTanggal = (iso: string) =>
+    new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
   if (!isAuthenticated) {
     return (
@@ -228,18 +234,46 @@ export function Simulasi() {
 
               <div style={{ background: '#F6F8FC', borderRadius: 14, padding: 24, marginBottom: 28 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(15,44,89,0.5)', textTransform: 'uppercase', marginBottom: 8 }}>
-                  Kesempatan Trial
+                  {status?.isAksesPenuhActive || status?.isAksesPenuhExpired ? 'Status Akses Penuh' : 'Kesempatan Trial'}
                 </div>
-                {status?.simulationAttemptsLimit == null ? (
-                  <div style={{ fontSize: 20, fontWeight: 800 }}>Tidak terbatas</div>
+                {status?.isAksesPenuhActive ? (
+                  <div style={{ fontSize: 20, fontWeight: 800 }}>
+                    Tidak terbatas{status.expiryDate ? ` — aktif hingga ${formatTanggal(status.expiryDate)}` : ''}
+                  </div>
+                ) : status?.isAksesPenuhExpired ? (
+                  <div style={{ fontSize: 20, fontWeight: 800, color: '#C0392B' }}>
+                    Berakhir{status.expiryDate ? ` pada ${formatTanggal(status.expiryDate)}` : ''}
+                  </div>
                 ) : (
                   <div style={{ fontSize: 20, fontWeight: 800 }}>
-                    {status.simulationAttemptsUsed} / {status.simulationAttemptsLimit} terpakai
+                    {status?.simulationAttemptsUsed ?? 0} / {status?.simulationAttemptsLimit ?? 2} terpakai
                   </div>
                 )}
               </div>
 
-              {kuotaHabis ? (
+              {status?.isAksesPenuhExpired ? (
+                <div>
+                  <div
+                    style={{
+                      padding: '16px 18px',
+                      borderRadius: 10,
+                      background: 'rgba(192,57,43,0.08)',
+                      color: '#C0392B',
+                      fontSize: 14,
+                      fontWeight: 600,
+                      marginBottom: 16,
+                    }}
+                  >
+                    Masa aktif Akses Penuh Anda sudah berakhir. Perpanjang untuk melanjutkan simulasi.
+                  </div>
+                  <Link
+                    to="/upgrade"
+                    style={{ background: '#0F2C59', color: '#fff', fontSize: 15, fontWeight: 700, padding: '14px 28px', borderRadius: 10 }}
+                  >
+                    Perpanjang Akses Penuh
+                  </Link>
+                </div>
+              ) : kuotaHabis ? (
                 <div>
                   <div
                     style={{

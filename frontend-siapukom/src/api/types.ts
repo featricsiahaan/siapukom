@@ -79,6 +79,9 @@ export interface FinishSimulasiResponse extends FinishSessionResponse {
 export interface SimulasiStatus {
   simulationAttemptsUsed: number;
   simulationAttemptsLimit: number | null;
+  isAksesPenuhActive: boolean;
+  isAksesPenuhExpired: boolean;
+  expiryDate: string | null;
   jumlahSoal: number;
   durasiMenit: number;
 }

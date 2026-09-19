@@ -8,18 +8,14 @@ import { createQrisCharge, verifySignature } from '../services/midtrans';
 
 const router = Router();
 
-const AKSES_PENUH_PRICE = 15000;
+const AKSES_PENUH_PRICE = 20000;
+const MEMBERSHIP_DURATION_DAYS = 30;
 
 router.post(
   '/create',
   requireAuth,
   asyncHandler(async (req, res) => {
     const userId = req.user!.id;
-
-    const membership = await prisma.membership.findUnique({ where: { userId } });
-    if (membership?.plan === 'Akses Penuh') {
-      throw new HttpError(409, 'Anda sudah memiliki Akses Penuh');
-    }
 
     const existing = await prisma.payment.findFirst({
       where: { userId, status: 'PENDING', expiresAt: { gt: new Date() } },
@@ -109,6 +105,12 @@ router.post(
       if (Math.round(Number(body.gross_amount)) !== payment.amount) {
         throw new HttpError(400, 'Nominal pembayaran tidak sesuai');
       }
+
+      const membership = await prisma.membership.findUnique({ where: { userId: payment.userId } });
+      const now = new Date();
+      const base = membership?.expiryDate && membership.expiryDate > now ? membership.expiryDate : now;
+      const newExpiry = new Date(base.getTime() + MEMBERSHIP_DURATION_DAYS * 24 * 60 * 60 * 1000);
+
       await prisma.$transaction([
         prisma.payment.update({
           where: { id: payment.id },
@@ -116,7 +118,7 @@ router.post(
         }),
         prisma.membership.update({
           where: { userId: payment.userId },
-          data: { plan: 'Akses Penuh', simulationAttemptsLimit: null },
+          data: { plan: 'Akses Penuh', expiryDate: newExpiry },
         }),
       ]);
     } else if (body.transaction_status === 'expire') {

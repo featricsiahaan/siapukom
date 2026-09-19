@@ -355,7 +355,7 @@ export function Landing() {
               }}
             >
               <div style={{ fontSize: 13, fontWeight: 700, color: '#E5BA73' }}>AKSES PENUH</div>
-              <div style={{ fontSize: 28, fontWeight: 800 }}>Rp 15.000 <span style={{ fontSize: 13, fontWeight: 600, opacity: 0.7 }}>sekali bayar</span></div>
+              <div style={{ fontSize: 28, fontWeight: 800 }}>Rp 20.000 <span style={{ fontSize: 13, fontWeight: 600, opacity: 0.7 }}>/bulan</span></div>
               <p style={{ fontSize: 14, lineHeight: 1.6, opacity: 0.8, margin: 0 }}>
                 Bank soal lengkap, simulasi format penuh, dan dashboard kesiapan lintas perangkat.
               </p>
