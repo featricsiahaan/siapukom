@@ -13,7 +13,6 @@ interface Feedback {
   pembahasan: string;
 }
 
-const SEMUA_KATEGORI = 'Semua Kategori';
 const JUMLAH_OPTIONS_GUEST = [10, 20];
 
 export function Latihan() {
@@ -22,7 +21,6 @@ export function Latihan() {
   const jumlahOptions = JUMLAH_OPTIONS_GUEST;
 
   const [categories, setCategories] = useState<Category[]>([]);
-  const [kategoriPilihan, setKategoriPilihan] = useState<string>(SEMUA_KATEGORI);
   const [jumlah, setJumlah] = useState(10);
   const [status, setStatus] = useState<SimulasiStatus | null>(null);
   const [kategoriKhususPilihan, setKategoriKhususPilihan] = useState<string>('');
@@ -54,11 +52,7 @@ export function Latihan() {
     setError('');
     setLoading(true);
     try {
-      const categoryId =
-        kategoriPilihan === SEMUA_KATEGORI
-          ? null
-          : (categories.find((c) => c.name === kategoriPilihan)?.id ?? null);
-      const res = await api.startSession(categoryId, jumlah, token);
+      const res = await api.startSession(null, jumlah, token);
       setSessionId(res.sessionId);
       setQuestions(res.questions);
       setCurrent(0);
@@ -181,35 +175,8 @@ export function Latihan() {
                 <>
                   <h1 style={{ fontSize: 36, fontWeight: 800, letterSpacing: '-0.01em', margin: '0 0 10px' }}>Latihan Gratis</h1>
                   <p style={{ fontSize: 15.5, color: 'rgba(15,44,89,0.65)', margin: '0 0 32px', maxWidth: '52ch' }}>
-                    Coba beberapa soal vignette klinis contoh dengan pembahasan langsung. Pilih kategori dan jumlah soal untuk mulai.
+                    Coba beberapa soal vignette klinis contoh dengan pembahasan langsung. Pilih jumlah soal untuk mulai.
                   </p>
-
-                  <div style={{ marginBottom: 28 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>Kategori</div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                      {[SEMUA_KATEGORI, ...categories.map((c) => c.name)].map((k) => {
-                        const active = kategoriPilihan === k;
-                        return (
-                          <button
-                            key={k}
-                            onClick={() => setKategoriPilihan(k)}
-                            style={{
-                              fontSize: 13,
-                              fontWeight: 600,
-                              padding: '9px 16px',
-                              borderRadius: 999,
-                              border: `1px solid ${active ? '#0F2C59' : 'rgba(15,44,89,0.2)'}`,
-                              background: active ? '#0F2C59' : '#fff',
-                              color: active ? '#fff' : '#0F2C59',
-                              cursor: 'pointer',
-                            }}
-                          >
-                            {k}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
 
                   <div style={{ marginBottom: 36 }}>
                     <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>Jumlah Soal</div>
