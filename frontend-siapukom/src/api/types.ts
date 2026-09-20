@@ -81,6 +81,8 @@ export interface SimulasiStatus {
   plan: string;
   isAksesPenuhActive: boolean;
   expiryDate: string | null;
+  hasMateriAccess: boolean;
+  materiExpiryDate: string | null;
   jumlahSoal: number;
   durasiMenit: number;
   jumlahSoalKategori: number;

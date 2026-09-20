@@ -6,7 +6,7 @@ import { HttpError } from '../middleware/errorHandler';
 import { attachUserIfPresent, requireAuth } from '../middleware/auth';
 import { shuffle } from '../utils/shuffle';
 import { levelFor, percentage } from '../utils/scoring';
-import { isAksesPenuhActive } from '../utils/membership';
+import { isAksesPenuhActive, isMateriAccessActive } from '../utils/membership';
 
 const router = Router();
 
@@ -272,6 +272,8 @@ router.get(
       plan: membership?.plan ?? 'Trial',
       isAksesPenuhActive: isAdmin || isAksesPenuhActive(membership),
       expiryDate: membership?.expiryDate ?? null,
+      hasMateriAccess: isAdmin || isMateriAccessActive(membership),
+      materiExpiryDate: membership?.materiExpiryDate ?? null,
       jumlahSoal: SIMULASI_JUMLAH_SOAL,
       durasiMenit: SIMULASI_DURASI_MENIT,
       jumlahSoalKategori: KATEGORI_JUMLAH_SOAL,

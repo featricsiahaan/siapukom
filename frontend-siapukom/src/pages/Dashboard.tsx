@@ -135,6 +135,12 @@ export function Dashboard() {
                   ? `Aktif hingga ${status.expiryDate ? new Date(status.expiryDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'}`
                   : 'Belum ada masa aktif'}
               </div>
+              <div style={{ fontSize: 12, opacity: 0.65, marginTop: 4 }}>
+                Slide Belajar:{' '}
+                {status?.hasMateriAccess
+                  ? `Aktif hingga ${status.materiExpiryDate ? new Date(status.materiExpiryDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'}`
+                  : 'Belum aktif (khusus paket 1 Bulan)'}
+              </div>
             </div>
             <Link
               to="/upgrade"

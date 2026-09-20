@@ -5,7 +5,7 @@ import { prisma } from '../lib/prisma';
 import { asyncHandler } from '../middleware/asyncHandler';
 import { HttpError } from '../middleware/errorHandler';
 import { requireAuth, requireAdmin } from '../middleware/auth';
-import { isAksesPenuhActive } from '../utils/membership';
+import { isMateriAccessActive } from '../utils/membership';
 
 const router = Router();
 
@@ -19,8 +19,8 @@ const upload = multer({
 async function ensureSlideAccess(userId: string, role: string) {
   if (role === 'ADMIN') return;
   const membership = await prisma.membership.findUnique({ where: { userId } });
-  if (!isAksesPenuhActive(membership)) {
-    throw new HttpError(403, 'Fitur Materi Belajar khusus untuk pemegang Akses Penuh.');
+  if (!isMateriAccessActive(membership)) {
+    throw new HttpError(403, 'Fitur Materi Belajar hanya tersedia untuk paket Akses Penuh 1 Bulan.');
   }
 }
 

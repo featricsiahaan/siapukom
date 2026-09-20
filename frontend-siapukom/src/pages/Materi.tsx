@@ -25,7 +25,7 @@ export function Materi() {
       .getSimulasiStatus(token)
       .then((s) => {
         setStatus(s);
-        if (s.isAksesPenuhActive) {
+        if (s.hasMateriAccess) {
           return api.getMateri(token).then((res) => setSlides(res.slides));
         }
       })
@@ -85,7 +85,7 @@ export function Materi() {
 
           {loading && <p style={{ fontSize: 14, color: 'rgba(15,44,89,0.6)' }}>Memuat…</p>}
 
-          {!loading && status && !status.isAksesPenuhActive && (
+          {!loading && status && !status.hasMateriAccess && (
             <div>
               <div
                 style={{
@@ -98,22 +98,24 @@ export function Materi() {
                   marginBottom: 16,
                 }}
               >
-                Materi Belajar adalah fitur Akses Penuh. Beli paket untuk membuka akses slide dan bahan bacaan.
+                {status?.isAksesPenuhActive
+                  ? 'Materi Belajar hanya tersedia untuk paket Akses Penuh 1 Bulan. Paket 2 Minggu Anda tidak mencakup fitur ini.'
+                  : 'Materi Belajar adalah fitur Akses Penuh paket 1 Bulan. Beli paket untuk membuka akses slide dan bahan bacaan.'}
               </div>
               <Link
                 to="/upgrade"
                 style={{ background: '#0F2C59', color: '#fff', fontSize: 15, fontWeight: 700, padding: '14px 28px', borderRadius: 10 }}
               >
-                Upgrade ke Akses Penuh
+                {status?.isAksesPenuhActive ? 'Upgrade ke Paket 1 Bulan' : 'Upgrade ke Akses Penuh'}
               </Link>
             </div>
           )}
 
-          {!loading && status?.isAksesPenuhActive && slides.length === 0 && (
+          {!loading && status?.hasMateriAccess && slides.length === 0 && (
             <p style={{ fontSize: 14, color: 'rgba(15,44,89,0.55)' }}>Belum ada materi yang diunggah.</p>
           )}
 
-          {!loading && status?.isAksesPenuhActive && slides.length > 0 && (
+          {!loading && status?.hasMateriAccess && slides.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {slides.map((s) => (
                 <div

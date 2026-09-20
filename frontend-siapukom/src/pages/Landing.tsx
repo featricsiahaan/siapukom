@@ -357,7 +357,7 @@ export function Landing() {
               <div style={{ fontSize: 13, fontWeight: 700, color: '#E5BA73' }}>AKSES PENUH — 2 MINGGU</div>
               <div style={{ fontSize: 26, fontWeight: 800 }}>Rp 17.000</div>
               <p style={{ fontSize: 13.5, lineHeight: 1.6, opacity: 0.8, margin: 0 }}>
-                Simulasi Ujian, Latihan Kategori Khusus, dan Slide Belajar tanpa batas selama 2 minggu.
+                Simulasi Ujian dan Latihan Kategori Khusus tanpa batas selama 2 minggu (tanpa Slide Belajar).
               </p>
               <Link
                 to="/upgrade"
@@ -390,7 +390,7 @@ export function Landing() {
               <div style={{ fontSize: 13, fontWeight: 700, color: '#E5BA73' }}>AKSES PENUH — 1 BULAN</div>
               <div style={{ fontSize: 26, fontWeight: 800 }}>Rp 30.000</div>
               <p style={{ fontSize: 13.5, lineHeight: 1.6, opacity: 0.8, margin: 0 }}>
-                Simulasi Ujian, Latihan Kategori Khusus, dan Slide Belajar tanpa batas selama 1 bulan.
+                Simulasi Ujian, Latihan Kategori Khusus, dan Slide Belajar — semua tanpa batas selama 1 bulan.
               </p>
               <Link
                 to="/upgrade"

@@ -120,7 +120,7 @@ export function Upgrade() {
             Upgrade ke Akses Penuh
           </h1>
           <p style={{ fontSize: 14.5, color: 'rgba(15,44,89,0.65)', margin: '0 0 28px', textAlign: 'center' }}>
-            Simulasi Ujian, Latihan Kategori Khusus, dan Slide Belajar — semua tanpa batas selama masa aktif.
+            Simulasi Ujian dan Latihan Kategori Khusus tanpa batas selama masa aktif. Akses Slide Belajar khusus paket 1 Bulan.
           </p>
 
           <div
@@ -166,7 +166,9 @@ export function Upgrade() {
                   })}
                 </div>
                 <p style={{ fontSize: 12.5, color: 'rgba(15,44,89,0.5)', margin: '0 0 20px' }}>
-                  Simulasi, Latihan Kategori Khusus, dan Slide Belajar tanpa batas selama masa aktif.
+                  {packageType === '1_BULAN'
+                    ? 'Termasuk Simulasi, Latihan Kategori Khusus, dan Slide Belajar tanpa batas.'
+                    : 'Termasuk Simulasi dan Latihan Kategori Khusus tanpa batas (tanpa akses Slide Belajar).'}
                 </p>
                 <button
                   onClick={startPayment}

@@ -9,8 +9,8 @@ import { createQrisCharge, verifySignature } from '../services/midtrans';
 const router = Router();
 
 const PACKAGES = {
-  '2_MINGGU': { amount: 17000, days: 14, label: '2 Minggu' },
-  '1_BULAN': { amount: 30000, days: 30, label: '1 Bulan' },
+  '2_MINGGU': { amount: 17000, days: 14, label: '2 Minggu', includesMateri: false },
+  '1_BULAN': { amount: 30000, days: 30, label: '1 Bulan', includesMateri: true },
 } as const;
 
 const createPaymentSchema = z.object({
@@ -48,6 +48,7 @@ router.post(
         orderId,
         amount: pkg.amount,
         durationDays: pkg.days,
+        includesMateri: pkg.includesMateri,
         status: 'PENDING',
         midtransTransactionId: charge.transactionId,
         qrUrl: charge.qrUrl,
@@ -120,6 +121,13 @@ router.post(
       const base = membership?.expiryDate && membership.expiryDate > now ? membership.expiryDate : now;
       const newExpiry = new Date(base.getTime() + payment.durationDays * 24 * 60 * 60 * 1000);
 
+      let newMateriExpiry = membership?.materiExpiryDate ?? null;
+      if (payment.includesMateri) {
+        const materiBase =
+          membership?.materiExpiryDate && membership.materiExpiryDate > now ? membership.materiExpiryDate : now;
+        newMateriExpiry = new Date(materiBase.getTime() + payment.durationDays * 24 * 60 * 60 * 1000);
+      }
+
       await prisma.$transaction([
         prisma.payment.update({
           where: { id: payment.id },
@@ -127,7 +135,7 @@ router.post(
         }),
         prisma.membership.update({
           where: { userId: payment.userId },
-          data: { plan: 'Akses Penuh', expiryDate: newExpiry },
+          data: { plan: 'Akses Penuh', expiryDate: newExpiry, materiExpiryDate: newMateriExpiry },
         }),
       ]);
     } else if (body.transaction_status === 'expire') {

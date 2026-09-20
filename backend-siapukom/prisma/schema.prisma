@@ -55,6 +55,7 @@ model Membership {
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   plan          String    @default("Gratis")
   expiryDate    DateTime?
+  materiExpiryDate DateTime?
   sessionsUsed  Int       @default(0)
   sessionsTotal Int       @default(0)
   updatedAt     DateTime  @updatedAt
@@ -67,6 +68,7 @@ model Payment {
   orderId               String        @unique
   amount                Int
   durationDays          Int
+  includesMateri        Boolean       @default(false)
   status                PaymentStatus @default(PENDING)
   midtransTransactionId String?
   qrUrl                 String?
