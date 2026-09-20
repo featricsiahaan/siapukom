@@ -25,6 +25,8 @@ export function Latihan() {
   const [status, setStatus] = useState<SimulasiStatus | null>(null);
   const [kategoriKhususPilihan, setKategoriKhususPilihan] = useState<string>('');
 
+  const kategoriTersedia = categories.filter((c) => c.questionCount >= (status?.jumlahSoalKategori ?? 30));
+
   useEffect(() => {
     if (!token) return;
     api.getSimulasiStatus(token).then(setStatus).catch(() => {});
@@ -296,7 +298,7 @@ export function Latihan() {
                       <div style={{ marginBottom: 18 }}>
                         <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>Pilih Kategori</div>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                          {categories.map((c) => {
+                          {kategoriTersedia.map((c) => {
                             const active = kategoriKhususPilihan === c.name;
                             return (
                               <button
@@ -318,6 +320,11 @@ export function Latihan() {
                             );
                           })}
                         </div>
+                        {kategoriTersedia.length < categories.length && (
+                          <p style={{ fontSize: 11.5, color: 'rgba(15,44,89,0.45)', marginTop: 8 }}>
+                            Sebagian kategori belum tersedia karena soalnya belum cukup ({status?.jumlahSoalKategori ?? 30} soal/kategori).
+                          </p>
+                        )}
                       </div>
                       <button
                         onClick={startKategoriKhusus}

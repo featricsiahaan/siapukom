@@ -71,6 +71,14 @@ router.post(
       if (!isAdmin && (!membership || membership.kategoriLatihanUsed >= membership.kategoriLatihanLimit)) {
         throw new HttpError(403, 'Kesempatan latihan kategori khusus Anda sudah habis. Beli Akses Penuh untuk menambah kesempatan.');
       }
+
+      const categoryQuestionCount = await prisma.question.count({ where: { categoryId, status: 'ACTIVE' } });
+      if (categoryQuestionCount < KATEGORI_JUMLAH_SOAL) {
+        throw new HttpError(
+          409,
+          `Kategori ini baru punya ${categoryQuestionCount} soal aktif, minimal ${KATEGORI_JUMLAH_SOAL} soal dibutuhkan untuk latihan kategori khusus. Pilih kategori lain.`
+        );
+      }
     }
 
     // Simulasi selalu mengambil dari seluruh bank soal (tidak difilter kategori) agar merepresentasikan format CBT penuh.

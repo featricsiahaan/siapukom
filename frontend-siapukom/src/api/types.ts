@@ -8,6 +8,7 @@ export interface PublicUser {
 export interface Category {
   id: string;
   name: string;
+  questionCount: number;
 }
 
 export interface Opsi {
