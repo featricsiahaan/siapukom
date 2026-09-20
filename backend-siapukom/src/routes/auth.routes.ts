@@ -56,8 +56,6 @@ router.post(
             plan: 'Trial',
             sessionsUsed: 0,
             sessionsTotal: 0,
-            simulationAttemptsUsed: 0,
-            simulationAttemptsLimit: 0,
           },
         },
       },

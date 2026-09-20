@@ -45,7 +45,6 @@ export function Dashboard() {
 
   const circumference = 2 * Math.PI * 60;
   const filled = (data.readiness.score / 100) * circumference;
-  const pernahBeli = data.membership?.plan === 'Akses Penuh';
 
   return (
     <div style={{ minHeight: '100vh', background: '#F6F8FC', color: '#0F2C59' }}>
@@ -131,23 +130,10 @@ export function Dashboard() {
             </div>
             <div>
               <div style={{ fontSize: 22, fontWeight: 800 }}>{data.membership?.plan ?? 'Gratis'}</div>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontSize: 12.5, opacity: 0.9 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Simulasi Ujian</span>
-                <span>
-                  {status?.simulationAttemptsUsed ?? 0}/{status?.simulationAttemptsLimit ?? '-'}
-                </span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Latihan Kategori Khusus</span>
-                <span>
-                  {status?.kategoriLatihanUsed ?? 0}/{status?.kategoriLatihanLimit ?? 0}
-                </span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Akses Materi Belajar</span>
-                <span>{status?.hasSlideAccess ? 'Aktif' : 'Belum'}</span>
+              <div style={{ fontSize: 13, opacity: 0.75, marginTop: 4 }}>
+                {status?.isAksesPenuhActive
+                  ? `Aktif hingga ${status.expiryDate ? new Date(status.expiryDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'}`
+                  : 'Belum ada masa aktif'}
               </div>
             </div>
             <Link
@@ -163,7 +149,7 @@ export function Dashboard() {
                 borderRadius: 10,
               }}
             >
-              {pernahBeli ? 'Tambah Kuota Akses Penuh' : 'Upgrade ke Akses Penuh'}
+              {status?.isAksesPenuhActive ? 'Perpanjang Akses Penuh' : 'Upgrade ke Akses Penuh'}
             </Link>
           </div>
 

@@ -54,13 +54,9 @@ model Membership {
   userId        String    @unique
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   plan          String    @default("Gratis")
+  expiryDate    DateTime?
   sessionsUsed  Int       @default(0)
   sessionsTotal Int       @default(0)
-  simulationAttemptsUsed  Int @default(0)
-  simulationAttemptsLimit Int?
-  kategoriLatihanUsed     Int     @default(0)
-  kategoriLatihanLimit    Int     @default(0)
-  hasSlideAccess          Boolean @default(false)
   updatedAt     DateTime  @updatedAt
 }
 
@@ -70,6 +66,7 @@ model Payment {
   user                  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   orderId               String        @unique
   amount                Int
+  durationDays          Int
   status                PaymentStatus @default(PENDING)
   midtransTransactionId String?
   qrUrl                 String?

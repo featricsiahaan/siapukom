@@ -78,15 +78,15 @@ export interface FinishSimulasiResponse extends FinishSessionResponse {
 }
 
 export interface SimulasiStatus {
-  simulationAttemptsUsed: number;
-  simulationAttemptsLimit: number | null;
-  kategoriLatihanUsed: number;
-  kategoriLatihanLimit: number;
-  hasSlideAccess: boolean;
+  plan: string;
+  isAksesPenuhActive: boolean;
+  expiryDate: string | null;
   jumlahSoal: number;
   durasiMenit: number;
   jumlahSoalKategori: number;
 }
+
+export type PackageType = '2_MINGGU' | '1_BULAN';
 
 export interface DashboardCategory {
   name: string;

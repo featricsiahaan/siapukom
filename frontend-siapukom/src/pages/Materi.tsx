@@ -25,7 +25,7 @@ export function Materi() {
       .getSimulasiStatus(token)
       .then((s) => {
         setStatus(s);
-        if (s.hasSlideAccess) {
+        if (s.isAksesPenuhActive) {
           return api.getMateri(token).then((res) => setSlides(res.slides));
         }
       })
@@ -85,7 +85,7 @@ export function Materi() {
 
           {loading && <p style={{ fontSize: 14, color: 'rgba(15,44,89,0.6)' }}>Memuat…</p>}
 
-          {!loading && status && !status.hasSlideAccess && (
+          {!loading && status && !status.isAksesPenuhActive && (
             <div>
               <div
                 style={{
@@ -109,11 +109,11 @@ export function Materi() {
             </div>
           )}
 
-          {!loading && status?.hasSlideAccess && slides.length === 0 && (
+          {!loading && status?.isAksesPenuhActive && slides.length === 0 && (
             <p style={{ fontSize: 14, color: 'rgba(15,44,89,0.55)' }}>Belum ada materi yang diunggah.</p>
           )}
 
-          {!loading && status?.hasSlideAccess && slides.length > 0 && (
+          {!loading && status?.isAksesPenuhActive && slides.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {slides.map((s) => (
                 <div

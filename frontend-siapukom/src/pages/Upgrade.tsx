@@ -3,11 +3,16 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import * as api from '../api/client';
 import { ApiError } from '../api/client';
-import type { PaymentStatusValue } from '../api/types';
+import type { PackageType, PaymentStatusValue } from '../api/types';
 
 type Screen = 'idle' | 'loading' | 'qr' | 'success' | 'expired' | 'error';
 
 const POLL_INTERVAL_MS = 3000;
+
+const PACKAGES: { type: PackageType; label: string; amount: number }[] = [
+  { type: '2_MINGGU', label: '2 Minggu', amount: 17000 },
+  { type: '1_BULAN', label: '1 Bulan', amount: 30000 },
+];
 
 function formatRupiah(amount: number): string {
   return `Rp ${amount.toLocaleString('id-ID')}`;
@@ -25,8 +30,9 @@ export function Upgrade() {
 
   const [screen, setScreen] = useState<Screen>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [packageType, setPackageType] = useState<PackageType>('1_BULAN');
   const [qrUrl, setQrUrl] = useState<string | null>(null);
-  const [amount, setAmount] = useState(20000);
+  const [amount, setAmount] = useState(PACKAGES[1].amount);
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
   const [secondsLeft, setSecondsLeft] = useState(0);
 
@@ -75,7 +81,7 @@ export function Upgrade() {
     setErrorMessage('');
     setScreen('loading');
     try {
-      const res = await api.createPayment(token);
+      const res = await api.createPayment(token, packageType);
       setQrUrl(res.qrUrl);
       setAmount(res.amount);
       setExpiresAt(res.expiresAt);
@@ -114,7 +120,7 @@ export function Upgrade() {
             Upgrade ke Akses Penuh
           </h1>
           <p style={{ fontSize: 14.5, color: 'rgba(15,44,89,0.65)', margin: '0 0 28px', textAlign: 'center' }}>
-            3x Simulasi Ujian, 5x Latihan Kategori Khusus (30 soal), dan akses penuh Slide Belajar.
+            Simulasi Ujian, Latihan Kategori Khusus, dan Slide Belajar — semua tanpa batas selama masa aktif.
           </p>
 
           <div
@@ -128,12 +134,39 @@ export function Upgrade() {
           >
             {screen === 'idle' && (
               <>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#E5BA73', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
-                  Akses Penuh
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#E5BA73', textTransform: 'uppercase', letterSpacing: '0.02em', marginBottom: 16 }}>
+                  Pilih Masa Aktif
                 </div>
-                <div style={{ fontSize: 34, fontWeight: 800, margin: '10px 0 4px' }}>{formatRupiah(amount)}</div>
+                <div style={{ display: 'flex', gap: 10, marginBottom: 24 }}>
+                  {PACKAGES.map((pkg) => {
+                    const active = packageType === pkg.type;
+                    return (
+                      <button
+                        key={pkg.type}
+                        onClick={() => {
+                          setPackageType(pkg.type);
+                          setAmount(pkg.amount);
+                        }}
+                        style={{
+                          flex: 1,
+                          textAlign: 'left',
+                          padding: '14px 16px',
+                          borderRadius: 12,
+                          border: `2px solid ${active ? '#0F2C59' : 'rgba(15,44,89,0.15)'}`,
+                          background: active ? 'rgba(15,44,89,0.04)' : '#fff',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <div style={{ fontSize: 13, fontWeight: 700, color: '#0F2C59' }}>{pkg.label}</div>
+                        <div style={{ fontSize: 18, fontWeight: 800, color: '#0F2C59', marginTop: 4 }}>
+                          {formatRupiah(pkg.amount)}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
                 <p style={{ fontSize: 12.5, color: 'rgba(15,44,89,0.5)', margin: '0 0 20px' }}>
-                  3x Simulasi + 5x Latihan Kategori + akses Slide Belajar selamanya.
+                  Simulasi, Latihan Kategori Khusus, dan Slide Belajar tanpa batas selama masa aktif.
                 </p>
                 <button
                   onClick={startPayment}

@@ -116,8 +116,8 @@ export function Simulasi() {
   const currentQ = questions[current];
   const unansweredCount = total - Object.keys(answers).length;
 
-  const kuotaHabis =
-    status?.simulationAttemptsLimit != null && status.simulationAttemptsUsed >= status.simulationAttemptsLimit;
+  const formatTanggal = (iso: string) =>
+    new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
   if (!isAuthenticated) {
     return (
@@ -229,18 +229,18 @@ export function Simulasi() {
 
               <div style={{ background: '#F6F8FC', borderRadius: 14, padding: 24, marginBottom: 28 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: 'rgba(15,44,89,0.5)', textTransform: 'uppercase', marginBottom: 8 }}>
-                  Kesempatan Simulasi
+                  Status Akses Penuh
                 </div>
-                {status?.simulationAttemptsLimit == null ? (
-                  <div style={{ fontSize: 20, fontWeight: 800 }}>Tidak terbatas</div>
-                ) : (
+                {status?.isAksesPenuhActive ? (
                   <div style={{ fontSize: 20, fontWeight: 800 }}>
-                    {status.simulationAttemptsUsed} / {status.simulationAttemptsLimit} terpakai
+                    Aktif{status.expiryDate ? ` — hingga ${formatTanggal(status.expiryDate)}` : ''}
                   </div>
+                ) : (
+                  <div style={{ fontSize: 20, fontWeight: 800, color: '#C0392B' }}>Tidak aktif</div>
                 )}
               </div>
 
-              {kuotaHabis ? (
+              {!status?.isAksesPenuhActive ? (
                 <div>
                   <div
                     style={{
@@ -253,15 +253,13 @@ export function Simulasi() {
                       marginBottom: 16,
                     }}
                   >
-                    {status?.simulationAttemptsLimit === 0
-                      ? 'Simulasi Ujian adalah fitur Akses Penuh. Beli paket untuk mendapat kesempatan simulasi.'
-                      : 'Kesempatan simulasi Anda sudah habis.'}
+                    Simulasi Ujian adalah fitur Akses Penuh. Beli paket untuk mengakses.
                   </div>
                   <Link
                     to="/upgrade"
                     style={{ background: '#0F2C59', color: '#fff', fontSize: 15, fontWeight: 700, padding: '14px 28px', borderRadius: 10 }}
                   >
-                    {status?.simulationAttemptsLimit === 0 ? 'Upgrade ke Akses Penuh' : 'Tambah Kuota Akses Penuh'}
+                    Upgrade ke Akses Penuh
                   </Link>
                 </div>
               ) : (

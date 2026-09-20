@@ -5,6 +5,7 @@ import type {
   DashboardResponse,
   FinishSessionResponse,
   FinishSimulasiResponse,
+  PackageType,
   PaymentStatusResponse,
   PublicUser,
   SimulasiStatus,
@@ -109,8 +110,8 @@ export function getDashboard(token: string) {
   return request<DashboardResponse>('/dashboard', { token });
 }
 
-export function createPayment(token: string) {
-  return request<CreatePaymentResponse>('/payments/create', { method: 'POST', token });
+export function createPayment(token: string, packageType: PackageType) {
+  return request<CreatePaymentResponse>('/payments/create', { method: 'POST', body: { packageType }, token });
 }
 
 export function getPaymentStatus(token: string, orderId: string) {

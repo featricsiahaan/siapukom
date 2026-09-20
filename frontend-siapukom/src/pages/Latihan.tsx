@@ -246,7 +246,7 @@ export function Latihan() {
                     30 soal fokus pada satu kategori untuk mempertajam satu bidang ilmu.
                   </p>
 
-                  {!status || status.kategoriLatihanLimit === 0 ? (
+                  {!status?.isAksesPenuhActive ? (
                     <div>
                       <div
                         style={{
@@ -259,7 +259,7 @@ export function Latihan() {
                           marginBottom: 14,
                         }}
                       >
-                        Fitur Akses Penuh. Beli paket untuk membuka kesempatan latihan kategori khusus.
+                        Fitur Akses Penuh. Beli paket untuk membuka Latihan Kategori Khusus.
                       </div>
                       <Link
                         to="/upgrade"
@@ -268,32 +268,10 @@ export function Latihan() {
                         Upgrade ke Akses Penuh
                       </Link>
                     </div>
-                  ) : status.kategoriLatihanUsed >= status.kategoriLatihanLimit ? (
-                    <div>
-                      <div
-                        style={{
-                          padding: '14px 16px',
-                          borderRadius: 10,
-                          background: 'rgba(192,57,43,0.08)',
-                          color: '#C0392B',
-                          fontSize: 13.5,
-                          fontWeight: 600,
-                          marginBottom: 14,
-                        }}
-                      >
-                        Kesempatan latihan kategori khusus Anda sudah habis ({status.kategoriLatihanUsed}/{status.kategoriLatihanLimit}).
-                      </div>
-                      <Link
-                        to="/upgrade"
-                        style={{ background: '#0F2C59', color: '#fff', fontSize: 14, fontWeight: 700, padding: '12px 22px', borderRadius: 10 }}
-                      >
-                        Tambah Kuota Akses Penuh
-                      </Link>
-                    </div>
                   ) : (
                     <>
                       <p style={{ fontSize: 13, fontWeight: 700, color: 'rgba(15,44,89,0.6)', marginBottom: 14 }}>
-                        Sisa kesempatan: {status.kategoriLatihanLimit - status.kategoriLatihanUsed} dari {status.kategoriLatihanLimit}
+                        Aktif{status.expiryDate ? ` hingga ${new Date(status.expiryDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}` : ''}
                       </p>
                       <div style={{ marginBottom: 18 }}>
                         <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10 }}>Pilih Kategori</div>

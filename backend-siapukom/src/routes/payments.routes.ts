@@ -8,18 +8,25 @@ import { createQrisCharge, verifySignature } from '../services/midtrans';
 
 const router = Router();
 
-const AKSES_PENUH_PRICE = 20000;
-const SIMULASI_TOP_UP = 3;
-const KATEGORI_LATIHAN_TOP_UP = 5;
+const PACKAGES = {
+  '2_MINGGU': { amount: 17000, days: 14, label: '2 Minggu' },
+  '1_BULAN': { amount: 30000, days: 30, label: '1 Bulan' },
+} as const;
+
+const createPaymentSchema = z.object({
+  packageType: z.enum(['2_MINGGU', '1_BULAN']),
+});
 
 router.post(
   '/create',
   requireAuth,
   asyncHandler(async (req, res) => {
     const userId = req.user!.id;
+    const { packageType } = createPaymentSchema.parse(req.body);
+    const pkg = PACKAGES[packageType];
 
     const existing = await prisma.payment.findFirst({
-      where: { userId, status: 'PENDING', expiresAt: { gt: new Date() } },
+      where: { userId, status: 'PENDING', expiresAt: { gt: new Date() }, amount: pkg.amount },
       orderBy: { createdAt: 'desc' },
     });
     if (existing) {
@@ -32,14 +39,15 @@ router.post(
     }
 
     const orderId = `SIAPUKOM-${Date.now()}-${userId.slice(0, 6)}`;
-    const charge = await createQrisCharge({ orderId, amount: AKSES_PENUH_PRICE });
+    const charge = await createQrisCharge({ orderId, amount: pkg.amount });
     const expiresAt = charge.expiryTime ? new Date(charge.expiryTime) : new Date(Date.now() + 30 * 60 * 1000);
 
     const payment = await prisma.payment.create({
       data: {
         userId,
         orderId,
-        amount: AKSES_PENUH_PRICE,
+        amount: pkg.amount,
+        durationDays: pkg.days,
         status: 'PENDING',
         midtransTransactionId: charge.transactionId,
         qrUrl: charge.qrUrl,
@@ -107,6 +115,11 @@ router.post(
         throw new HttpError(400, 'Nominal pembayaran tidak sesuai');
       }
 
+      const membership = await prisma.membership.findUnique({ where: { userId: payment.userId } });
+      const now = new Date();
+      const base = membership?.expiryDate && membership.expiryDate > now ? membership.expiryDate : now;
+      const newExpiry = new Date(base.getTime() + payment.durationDays * 24 * 60 * 60 * 1000);
+
       await prisma.$transaction([
         prisma.payment.update({
           where: { id: payment.id },
@@ -114,12 +127,7 @@ router.post(
         }),
         prisma.membership.update({
           where: { userId: payment.userId },
-          data: {
-            plan: 'Akses Penuh',
-            simulationAttemptsLimit: { increment: SIMULASI_TOP_UP },
-            kategoriLatihanLimit: { increment: KATEGORI_LATIHAN_TOP_UP },
-            hasSlideAccess: true,
-          },
+          data: { plan: 'Akses Penuh', expiryDate: newExpiry },
         }),
       ]);
     } else if (body.transaction_status === 'expire') {

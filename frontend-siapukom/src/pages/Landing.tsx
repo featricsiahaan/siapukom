@@ -308,12 +308,12 @@ export function Landing() {
               Model harga masih dalam riset — coba dulu versi gratisnya.
             </p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 28, maxWidth: 800, margin: '0 auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 24, maxWidth: 1040, margin: '0 auto' }}>
             <div
               style={{
                 background: '#fff',
                 borderRadius: 16,
-                padding: 34,
+                padding: 32,
                 boxShadow: '0 8px 28px rgba(15,44,89,0.08)',
                 display: 'flex',
                 flexDirection: 'column',
@@ -321,8 +321,8 @@ export function Landing() {
               }}
             >
               <div style={{ fontSize: 13, fontWeight: 700, color: '#C9962E' }}>GRATIS</div>
-              <div style={{ fontSize: 28, fontWeight: 800 }}>Rp 0</div>
-              <p style={{ fontSize: 14, lineHeight: 1.6, color: 'rgba(15,44,89,0.65)', margin: 0 }}>
+              <div style={{ fontSize: 26, fontWeight: 800 }}>Rp 0</div>
+              <p style={{ fontSize: 13.5, lineHeight: 1.6, color: 'rgba(15,44,89,0.65)', margin: 0 }}>
                 Latihan terbatas dengan soal contoh dan pembahasan langsung.
               </p>
               <Link
@@ -347,17 +347,50 @@ export function Landing() {
                 background: '#0F2C59',
                 color: '#fff',
                 borderRadius: 16,
-                padding: 34,
+                padding: 32,
                 boxShadow: '0 8px 28px rgba(15,44,89,0.16)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 14,
               }}
             >
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#E5BA73' }}>AKSES PENUH</div>
-              <div style={{ fontSize: 28, fontWeight: 800 }}>Rp 20.000</div>
-              <p style={{ fontSize: 14, lineHeight: 1.6, opacity: 0.8, margin: 0 }}>
-                3x Simulasi Ujian, 5x Latihan Kategori Khusus, dan akses Slide Belajar.
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#E5BA73' }}>AKSES PENUH — 2 MINGGU</div>
+              <div style={{ fontSize: 26, fontWeight: 800 }}>Rp 17.000</div>
+              <p style={{ fontSize: 13.5, lineHeight: 1.6, opacity: 0.8, margin: 0 }}>
+                Simulasi Ujian, Latihan Kategori Khusus, dan Slide Belajar tanpa batas selama 2 minggu.
+              </p>
+              <Link
+                to="/upgrade"
+                style={{
+                  marginTop: 'auto',
+                  textAlign: 'center',
+                  background: '#E5BA73',
+                  color: '#0F2C59',
+                  fontSize: 14,
+                  fontWeight: 700,
+                  padding: '13px 22px',
+                  borderRadius: 10,
+                }}
+              >
+                Upgrade Sekarang
+              </Link>
+            </div>
+            <div
+              style={{
+                background: '#0F2C59',
+                color: '#fff',
+                borderRadius: 16,
+                padding: 32,
+                boxShadow: '0 8px 28px rgba(15,44,89,0.16)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 14,
+              }}
+            >
+              <div style={{ fontSize: 13, fontWeight: 700, color: '#E5BA73' }}>AKSES PENUH — 1 BULAN</div>
+              <div style={{ fontSize: 26, fontWeight: 800 }}>Rp 30.000</div>
+              <p style={{ fontSize: 13.5, lineHeight: 1.6, opacity: 0.8, margin: 0 }}>
+                Simulasi Ujian, Latihan Kategori Khusus, dan Slide Belajar tanpa batas selama 1 bulan.
               </p>
               <Link
                 to="/upgrade"

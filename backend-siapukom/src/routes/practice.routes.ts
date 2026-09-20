@@ -6,6 +6,7 @@ import { HttpError } from '../middleware/errorHandler';
 import { attachUserIfPresent, requireAuth } from '../middleware/auth';
 import { shuffle } from '../utils/shuffle';
 import { levelFor, percentage } from '../utils/scoring';
+import { isAksesPenuhActive } from '../utils/membership';
 
 const router = Router();
 
@@ -38,27 +39,15 @@ router.post(
   asyncHandler(async (req, res) => {
     const { categoryId, jumlah, mode } = startSessionSchema.parse(req.body);
 
-    let membership: {
-      simulationAttemptsUsed: number;
-      simulationAttemptsLimit: number | null;
-      kategoriLatihanUsed: number;
-      kategoriLatihanLimit: number;
-    } | null = null;
-
     const isAdmin = req.user?.role === 'ADMIN';
 
     if (mode === 'SIMULASI') {
       if (!req.user) {
         throw new HttpError(401, 'Simulasi ujian membutuhkan akun. Silakan masuk terlebih dahulu.');
       }
-      membership = await prisma.membership.findUnique({ where: { userId: req.user.id } });
-      if (
-        !isAdmin &&
-        membership &&
-        membership.simulationAttemptsLimit !== null &&
-        membership.simulationAttemptsUsed >= membership.simulationAttemptsLimit
-      ) {
-        throw new HttpError(403, 'Kesempatan simulasi Anda sudah habis. Beli Akses Penuh untuk menambah kesempatan.');
+      const membership = await prisma.membership.findUnique({ where: { userId: req.user.id } });
+      if (!isAdmin && !isAksesPenuhActive(membership)) {
+        throw new HttpError(403, 'Simulasi Ujian adalah fitur Akses Penuh. Beli paket untuk mengakses.');
       }
     } else if (mode === 'KATEGORI') {
       if (!req.user) {
@@ -67,9 +56,9 @@ router.post(
       if (!categoryId) {
         throw new HttpError(400, 'Pilih satu kategori untuk latihan kategori khusus.');
       }
-      membership = await prisma.membership.findUnique({ where: { userId: req.user.id } });
-      if (!isAdmin && (!membership || membership.kategoriLatihanUsed >= membership.kategoriLatihanLimit)) {
-        throw new HttpError(403, 'Kesempatan latihan kategori khusus Anda sudah habis. Beli Akses Penuh untuk menambah kesempatan.');
+      const membership = await prisma.membership.findUnique({ where: { userId: req.user.id } });
+      if (!isAdmin && !isAksesPenuhActive(membership)) {
+        throw new HttpError(403, 'Latihan Kategori Khusus adalah fitur Akses Penuh. Beli paket untuk mengakses.');
       }
 
       const categoryQuestionCount = await prisma.question.count({ where: { categoryId, status: 'ACTIVE' } });
@@ -127,18 +116,6 @@ router.post(
         },
       },
     });
-
-    if (mode === 'SIMULASI' && req.user) {
-      await prisma.membership.updateMany({
-        where: { userId: req.user.id },
-        data: { simulationAttemptsUsed: { increment: 1 } },
-      });
-    } else if (mode === 'KATEGORI' && req.user) {
-      await prisma.membership.updateMany({
-        where: { userId: req.user.id },
-        data: { kategoriLatihanUsed: { increment: 1 } },
-      });
-    }
 
     res.status(201).json({
       sessionId: session.id,
@@ -288,14 +265,13 @@ router.get(
   '/simulasi/status',
   requireAuth,
   asyncHandler(async (req, res) => {
+    const isAdmin = req.user!.role === 'ADMIN';
     const membership = await prisma.membership.findUnique({ where: { userId: req.user!.id } });
 
     res.json({
-      simulationAttemptsUsed: membership?.simulationAttemptsUsed ?? 0,
-      simulationAttemptsLimit: membership?.simulationAttemptsLimit ?? null,
-      kategoriLatihanUsed: membership?.kategoriLatihanUsed ?? 0,
-      kategoriLatihanLimit: membership?.kategoriLatihanLimit ?? 0,
-      hasSlideAccess: membership?.hasSlideAccess ?? false,
+      plan: membership?.plan ?? 'Trial',
+      isAksesPenuhActive: isAdmin || isAksesPenuhActive(membership),
+      expiryDate: membership?.expiryDate ?? null,
       jumlahSoal: SIMULASI_JUMLAH_SOAL,
       durasiMenit: SIMULASI_DURASI_MENIT,
       jumlahSoalKategori: KATEGORI_JUMLAH_SOAL,
