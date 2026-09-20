@@ -262,7 +262,7 @@ export function Landing() {
               Kenapa SiapUKOM
             </h2>
             <p style={{ fontSize: 15.5, color: 'rgba(15,44,89,0.6)', margin: 0 }}>
-              Dirancang khusus untuk kebutuhan koas menghadapi UKMPPD.
+              Persiapkan UKNPDPD dengan lebih mudah—belajar kapan pun dan di mana pun.
             </p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 28 }}>
