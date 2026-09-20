@@ -136,7 +136,7 @@ export function Dashboard() {
                   : 'Belum ada masa aktif'}
               </div>
               <div style={{ fontSize: 12, opacity: 0.65, marginTop: 4 }}>
-                Slide Belajar:{' '}
+                Materi Belajar:{' '}
                 {status?.hasMateriAccess
                   ? `Aktif hingga ${status.materiExpiryDate ? new Date(status.materiExpiryDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-'}`
                   : 'Belum aktif (khusus paket 1 Bulan)'}

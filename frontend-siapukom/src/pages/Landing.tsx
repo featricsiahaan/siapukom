@@ -305,7 +305,7 @@ export function Landing() {
           <div style={{ textAlign: 'center', marginBottom: 52 }}>
             <h2 style={{ fontSize: 34, fontWeight: 800, letterSpacing: '-0.01em', margin: '0 0 12px' }}>Harga</h2>
             <p style={{ fontSize: 15.5, color: 'rgba(15,44,89,0.6)', margin: 0 }}>
-              Model harga masih dalam riset — coba dulu versi gratisnya.
+              Support SiapUKOM and help us build a better learning platform for future doctors. Your support makes every improvement possible.
             </p>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 24, maxWidth: 1040, margin: '0 auto' }}>
@@ -357,7 +357,7 @@ export function Landing() {
               <div style={{ fontSize: 13, fontWeight: 700, color: '#E5BA73' }}>AKSES PENUH — 2 MINGGU</div>
               <div style={{ fontSize: 26, fontWeight: 800 }}>Rp 17.000</div>
               <p style={{ fontSize: 13.5, lineHeight: 1.6, opacity: 0.8, margin: 0 }}>
-                Simulasi Ujian dan Latihan Kategori Khusus tanpa batas selama 2 minggu (tanpa Slide Belajar).
+                Simulasi Ujian dan Latihan Kategori Khusus selama 2 minggu.
               </p>
               <Link
                 to="/upgrade"
@@ -390,7 +390,7 @@ export function Landing() {
               <div style={{ fontSize: 13, fontWeight: 700, color: '#E5BA73' }}>AKSES PENUH — 1 BULAN</div>
               <div style={{ fontSize: 26, fontWeight: 800 }}>Rp 30.000</div>
               <p style={{ fontSize: 13.5, lineHeight: 1.6, opacity: 0.8, margin: 0 }}>
-                Simulasi Ujian, Latihan Kategori Khusus, dan Slide Belajar — semua tanpa batas selama 1 bulan.
+                Simulasi Ujian, Latihan Kategori Khusus, dan Materi Belajar.
               </p>
               <Link
                 to="/upgrade"
