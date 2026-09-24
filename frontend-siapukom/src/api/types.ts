@@ -122,7 +122,7 @@ export interface DashboardResponse {
 
 export interface CreatePaymentResponse {
   orderId: string;
-  qrUrl: string | null;
+  paymentUrl: string | null;
   amount: number;
   expiresAt: string;
 }

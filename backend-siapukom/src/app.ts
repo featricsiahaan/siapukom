@@ -23,6 +23,9 @@ export function createApp() {
       credentials: true,
     })
   );
+  // DOKU menandatangani body notifikasi dari byte mentahnya, jadi jangan biarkan
+  // express.json() mem-parse ulang (re-serialize) rute ini sebelum verifikasi signature.
+  app.use('/api/payments/notification', express.raw({ type: '*/*', limit: '1mb' }));
   app.use(express.json({ limit: '1mb' }));
   app.use(morgan(isProduction ? 'combined' : 'dev'));
 

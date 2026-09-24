@@ -5,7 +5,7 @@ import * as api from '../api/client';
 import { ApiError } from '../api/client';
 import type { PackageType, PaymentStatusValue } from '../api/types';
 
-type Screen = 'idle' | 'loading' | 'qr' | 'success' | 'expired' | 'error';
+type Screen = 'idle' | 'loading' | 'waiting' | 'success' | 'expired' | 'error';
 
 const POLL_INTERVAL_MS = 3000;
 
@@ -31,7 +31,7 @@ export function Upgrade() {
   const [screen, setScreen] = useState<Screen>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [packageType, setPackageType] = useState<PackageType>('1_BULAN');
-  const [qrUrl, setQrUrl] = useState<string | null>(null);
+  const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
   const [amount, setAmount] = useState(PACKAGES[1].amount);
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
   const [secondsLeft, setSecondsLeft] = useState(0);
@@ -48,7 +48,7 @@ export function Upgrade() {
   useEffect(() => stopPolling, []);
 
   useEffect(() => {
-    if (screen !== 'qr' || !expiresAt) return;
+    if (screen !== 'waiting' || !expiresAt) return;
     const tick = () => {
       const remaining = Math.round((new Date(expiresAt).getTime() - Date.now()) / 1000);
       setSecondsLeft(remaining);
@@ -82,10 +82,13 @@ export function Upgrade() {
     setScreen('loading');
     try {
       const res = await api.createPayment(token, packageType);
-      setQrUrl(res.qrUrl);
+      setPaymentUrl(res.paymentUrl);
       setAmount(res.amount);
       setExpiresAt(res.expiresAt);
-      setScreen('qr');
+      setScreen('waiting');
+      if (res.paymentUrl) {
+        window.open(res.paymentUrl, '_blank', 'noopener,noreferrer');
+      }
 
       stopPolling();
       pollRef.current = setInterval(async () => {
@@ -195,17 +198,32 @@ export function Upgrade() {
               <p style={{ fontSize: 14.5, color: 'rgba(15,44,89,0.65)', margin: 0 }}>Menyiapkan QRIS…</p>
             )}
 
-            {screen === 'qr' && qrUrl && (
+            {screen === 'waiting' && (
               <>
-                <img
-                  src={qrUrl}
-                  alt="Kode QRIS pembayaran SiapUKOM"
-                  style={{ width: 240, height: 240, borderRadius: 12, border: '1px solid rgba(15,44,89,0.12)' }}
-                />
-                <div style={{ fontSize: 20, fontWeight: 800, margin: '18px 0 4px' }}>{formatRupiah(amount)}</div>
-                <p style={{ fontSize: 13, color: 'rgba(15,44,89,0.6)', margin: '0 0 16px' }}>
-                  Scan dengan aplikasi e-wallet atau m-banking yang mendukung QRIS.
+                <div style={{ fontSize: 20, fontWeight: 800, margin: '0 0 4px' }}>{formatRupiah(amount)}</div>
+                <p style={{ fontSize: 13, color: 'rgba(15,44,89,0.6)', margin: '0 0 20px' }}>
+                  Tab baru sudah terbuka untuk menyelesaikan pembayaran QRIS di halaman DOKU. Kalau tidak terbuka
+                  otomatis, klik tombol di bawah.
                 </p>
+                {paymentUrl && (
+                  <a
+                    href={paymentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'inline-block',
+                      background: '#0F2C59',
+                      color: '#fff',
+                      fontSize: 14.5,
+                      fontWeight: 700,
+                      padding: '13px 24px',
+                      borderRadius: 10,
+                      marginBottom: 20,
+                    }}
+                  >
+                    Buka Halaman Pembayaran
+                  </a>
+                )}
                 <div
                   style={{
                     display: 'inline-block',

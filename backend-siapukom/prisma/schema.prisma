@@ -70,8 +70,8 @@ model Payment {
   durationDays          Int
   includesMateri        Boolean       @default(false)
   status                PaymentStatus @default(PENDING)
-  midtransTransactionId String?
-  qrUrl                 String?
+  dokuTransactionId     String?
+  paymentUrl            String?
   expiresAt             DateTime
   createdAt             DateTime      @default(now())
   updatedAt             DateTime      @updatedAt
