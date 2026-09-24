@@ -106,6 +106,12 @@ async function applySettlement(payment: { id: string; userId: string; durationDa
   ]);
 }
 
+// Beberapa dashboard payment gateway melakukan ping GET ke Notify URL untuk verifikasi
+// keterjangkauan sebelum menyimpannya. Sediakan respons 200 sederhana untuk itu.
+router.get('/notification', (_req, res) => {
+  res.status(200).json({ ok: true });
+});
+
 // NOTE: body untuk rute ini adalah Buffer mentah (lihat app.ts) supaya digest signature DOKU
 // dihitung dari byte persis yang dikirim, bukan hasil re-serialize express.json().
 router.post(
