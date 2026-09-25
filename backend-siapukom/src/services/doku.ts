@@ -61,7 +61,7 @@ export async function createQrisCheckout(params: {
 
   return {
     paymentUrl,
-    expiredDate: responseBody?.response?.payment?.expired_date,
+    expiredDate: responseBody?.response?.payment?.expired_datetime,
   };
 }
 

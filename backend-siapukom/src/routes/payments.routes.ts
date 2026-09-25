@@ -40,7 +40,9 @@ router.post(
 
     const orderId = `SIAPUKOM-${Date.now()}-${userId.slice(0, 6)}`;
     const checkout = await createQrisCheckout({ orderId, amount: pkg.amount });
-    const expiresAt = checkout.expiredDate ? new Date(checkout.expiredDate) : new Date(Date.now() + 30 * 60 * 1000);
+    const parsedExpiry = checkout.expiredDate ? new Date(checkout.expiredDate) : null;
+    const expiresAt =
+      parsedExpiry && !Number.isNaN(parsedExpiry.getTime()) ? parsedExpiry : new Date(Date.now() + 30 * 60 * 1000);
 
     const payment = await prisma.payment.create({
       data: {
