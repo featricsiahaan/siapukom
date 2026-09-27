@@ -5,10 +5,11 @@
  *
  * Kolom baca-saja (jangan diedit, hanya konteks): id, kategori, moduleId_saat_ini, pertanyaan,
  * opsi, kunci, pembahasan, status_saat_ini.
- * Kolom yang DIISI penelaah: primaryArea, secondaryAreas (pisahkan dengan ";" jika lebih dari
- * satu, contoh "A1_KESELAMATAN_PASIEN;A3_PROSEDUR_INTERVENSI_KLINIS"), sourceCategory,
- * decisionType, sourceDocument, sourceTable, sourcePage, sourceVerificationStatus, reviewer,
- * status_baru (kosongkan jika belum mau mengubah status).
+ * Kolom yang DIISI penelaah: moduleId_baru (kosongkan jika moduleId_saat_ini sudah benar),
+ * primaryArea, secondaryAreas (pisahkan dengan ";" jika lebih dari satu, contoh
+ * "A1_KESELAMATAN_PASIEN;A3_PROSEDUR_INTERVENSI_KLINIS"), sourceCategory, decisionType,
+ * sourceDocument, sourceTable, sourcePage, sourceVerificationStatus, reviewer, status_baru
+ * (kosongkan jika belum mau mengubah status).
  *
  * Nilai enum yang valid ada di README.md bagian "Telaah taksonomi SKD 2026".
  *
@@ -39,6 +40,7 @@ const HEADERS = [
   'kunci',
   'pembahasan',
   'status_saat_ini',
+  'moduleId_baru',
   'primaryArea',
   'secondaryAreas',
   'sourceCategory',
@@ -97,6 +99,7 @@ async function main() {
       q.kunci,
       q.pembahasan,
       q.status,
+      '',
       q.primaryArea ?? '',
       (q.secondaryAreas ?? []).join(';'),
       q.sourceCategory ?? '',

@@ -34,8 +34,16 @@ const STATUS_VALUES = [
   'DIARSIPKAN',
 ] as const;
 
+const MODULE_VALUES = [
+  'M01_SISTEM_SARAF', 'M02_PSIKIATRI', 'M03_SISTEM_INDERA', 'M04_RESPIRASI', 'M05_KARDIOVASKULER',
+  'M06_GASTROINTESTINAL_HEPATOBILIER_PANKREAS', 'M07_GINJAL_SALURAN_KEMIH', 'M08_REPRODUKSI',
+  'M09_ENDOKRIN_METABOLIK_NUTRISI', 'M10_HEMATO_IMUNOLOGI', 'M11_MUSKULOSKELETAL', 'M12_KULIT_INTEGUMEN',
+  'M13_FORENSIK_MEDIKOLEGAL', 'M14_ANAK',
+] as const;
+
 const rowSchema = z.object({
   id: z.string().trim().min(1),
+  moduleId_baru: z.enum(MODULE_VALUES).optional().or(z.literal('')),
   primaryArea: z.enum(AREA_VALUES).optional().or(z.literal('')),
   secondaryAreas: z.string().optional().or(z.literal('')),
   sourceCategory: z.enum(['TUNTAS', 'AWAL_RUJUK', 'RUJUK_BALIK', 'BELUM_TERVERIFIKASI', 'PENGAYAAN']).optional().or(z.literal('')),
@@ -73,6 +81,7 @@ async function main() {
     const rowNumber = i + 2; // +1 header, +1 index 0-based
 
     const editableTouched = [
+      raw.moduleId_baru,
       raw.primaryArea,
       raw.secondaryAreas,
       raw.sourceCategory,
@@ -119,6 +128,7 @@ async function main() {
       await prisma.question.update({
         where: { id: parsed.data.id },
         data: {
+          moduleId: parsed.data.moduleId_baru || undefined,
           primaryArea: parsed.data.primaryArea || undefined,
           secondaryAreas: secondaryAreas.length > 0 ? (secondaryAreas as any) : undefined,
           sourceCategory: parsed.data.sourceCategory || undefined,
