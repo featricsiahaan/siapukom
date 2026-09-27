@@ -412,8 +412,29 @@ export function Landing() {
         </div>
       </div>
 
-      <div style={{ padding: '28px 64px', textAlign: 'center', fontSize: 12.5, color: 'rgba(15,44,89,0.45)' }}>
-        SiapUKOM 2026 • Developed by Featric Anju
+      <div
+        style={{
+          padding: '28px 64px',
+          textAlign: 'center',
+          fontSize: 12.5,
+          color: 'rgba(15,44,89,0.45)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 8,
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 18 }}>
+          <Link to="/legal#disclaimer" style={{ color: 'inherit' }}>
+            Disclaimer
+          </Link>
+          <Link to="/legal#privasi" style={{ color: 'inherit' }}>
+            Kebijakan Privasi
+          </Link>
+          <Link to="/legal#syarat" style={{ color: 'inherit' }}>
+            Syarat &amp; Ketentuan
+          </Link>
+        </div>
+        <div>SiapUKOM 2026 • Developed by Featric Anju</div>
       </div>
     </div>
   );

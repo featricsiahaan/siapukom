@@ -8,6 +8,7 @@ import { Simulasi } from './pages/Simulasi';
 import { Dashboard } from './pages/Dashboard';
 import { Upgrade } from './pages/Upgrade';
 import { Materi } from './pages/Materi';
+import { Legal } from './pages/Legal';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/masuk" element={<Masuk />} />
+          <Route path="/legal" element={<Legal />} />
           <Route path="/latihan" element={<Latihan />} />
           <Route
             path="/simulasi"
