@@ -1,4 +1,5 @@
 import type {
+  AdminPaymentItem,
   AnswerResponse,
   Category,
   CreateManualPaymentResponse,
@@ -129,6 +130,18 @@ export function createManualPayment(token: string, packageType: PackageType) {
 
 export function markPaymentPaid(token: string, orderId: string) {
   return request<{ status: string }>(`/payments/${orderId}/mark-paid`, { method: 'POST', token });
+}
+
+export function listAdminPayments(token: string, status = 'WAITING_CONFIRMATION') {
+  return request<{ payments: AdminPaymentItem[] }>(`/admin/payments?status=${status}`, { token });
+}
+
+export function confirmAdminPayment(token: string, orderId: string) {
+  return request<{ status: string }>(`/admin/payments/${orderId}/confirm`, { method: 'POST', token });
+}
+
+export function rejectAdminPayment(token: string, orderId: string) {
+  return request<{ status: string }>(`/admin/payments/${orderId}/reject`, { method: 'POST', token });
 }
 
 export function getMateri(token: string) {

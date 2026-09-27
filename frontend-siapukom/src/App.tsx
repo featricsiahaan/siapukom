@@ -9,6 +9,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Upgrade } from './pages/Upgrade';
 import { Materi } from './pages/Materi';
 import { Legal } from './pages/Legal';
+import { AdminPayments } from './pages/AdminPayments';
 
 function App() {
   return (
@@ -48,6 +49,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Materi />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/payments"
+            element={
+              <ProtectedRoute>
+                <AdminPayments />
               </ProtectedRoute>
             }
           />

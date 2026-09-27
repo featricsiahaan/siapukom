@@ -142,6 +142,17 @@ export interface CreateManualPaymentResponse {
 
 export type PaymentStatusValue = 'PENDING' | 'WAITING_CONFIRMATION' | 'SETTLEMENT' | 'EXPIRE' | 'CANCEL' | 'DENY';
 
+export interface AdminPaymentItem {
+  orderId: string;
+  amount: number;
+  durationDays: number;
+  method: 'DOKU' | 'MANUAL_TRANSFER';
+  status: PaymentStatusValue;
+  nama: string;
+  email: string;
+  createdAt: string;
+}
+
 export interface PaymentStatusResponse {
   status: PaymentStatusValue;
 }

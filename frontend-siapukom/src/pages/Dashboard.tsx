@@ -6,7 +6,7 @@ import { ApiError } from '../api/client';
 import type { DashboardResponse, SimulasiStatus } from '../api/types';
 
 export function Dashboard() {
-  const { token, logout } = useAuth();
+  const { token, user, logout } = useAuth();
   const navigate = useNavigate();
 
   const [data, setData] = useState<DashboardResponse | null>(null);
@@ -74,6 +74,11 @@ export function Dashboard() {
             <Link to="/materi" className="link-hover">
               Materi
             </Link>
+            {user?.role === 'ADMIN' && (
+              <Link to="/admin/payments" className="link-hover">
+                Konfirmasi Pembayaran
+              </Link>
+            )}
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
