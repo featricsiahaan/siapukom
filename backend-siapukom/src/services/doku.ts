@@ -29,7 +29,12 @@ export async function createQrisCheckout(params: {
     order: { amount: params.amount, invoice_number: params.orderId },
     payment: {
       payment_due_date: 30,
-      payment_method_types: ['VIRTUAL_ACCOUNT_BRI', 'VIRTUAL_ACCOUNT_BNI'],
+      payment_method_types: [
+        'VIRTUAL_ACCOUNT_BRI',
+        'VIRTUAL_ACCOUNT_BNI',
+        'VIRTUAL_ACCOUNT_MAYBANK',
+        'VIRTUAL_ACCOUNT_DOKU',
+      ],
     },
   });
 
