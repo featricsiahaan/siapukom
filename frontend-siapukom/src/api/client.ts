@@ -1,6 +1,7 @@
 import type {
   AnswerResponse,
   Category,
+  CreateManualPaymentResponse,
   CreatePaymentResponse,
   DashboardResponse,
   FinishSessionResponse,
@@ -116,6 +117,18 @@ export function createPayment(token: string, packageType: PackageType) {
 
 export function getPaymentStatus(token: string, orderId: string) {
   return request<PaymentStatusResponse>(`/payments/${orderId}/status`, { token });
+}
+
+export function createManualPayment(token: string, packageType: PackageType) {
+  return request<CreateManualPaymentResponse>('/payments/create-manual', {
+    method: 'POST',
+    body: { packageType },
+    token,
+  });
+}
+
+export function markPaymentPaid(token: string, orderId: string) {
+  return request<{ status: string }>(`/payments/${orderId}/mark-paid`, { method: 'POST', token });
 }
 
 export function getMateri(token: string) {

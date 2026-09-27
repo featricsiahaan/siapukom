@@ -8,6 +8,7 @@ import { requireAuth, requireAdmin } from '../middleware/auth';
 import { extractTextFromDocument } from '../services/documentText';
 import { parseQuestionsFromText } from '../services/ruleBasedParser';
 import { parseQuestionsFromCsv } from '../services/csvParser';
+import { applySettlement } from '../services/membershipSettlement';
 
 function isCsv(mimetype: string, filename: string): boolean {
   return mimetype === 'text/csv' || mimetype === 'application/vnd.ms-excel' || filename.toLowerCase().endsWith('.csv');
@@ -277,6 +278,54 @@ router.delete(
       throw new HttpError(404, 'Soal tidak ditemukan');
     });
     res.status(204).send();
+  })
+);
+
+router.get(
+  '/payments',
+  asyncHandler(async (req, res) => {
+    const status = typeof req.query.status === 'string' ? req.query.status : 'WAITING_CONFIRMATION';
+    const payments = await prisma.payment.findMany({
+      where: { status: status as any },
+      include: { user: { select: { nama: true, email: true } } },
+      orderBy: { createdAt: 'desc' },
+    });
+    res.json({
+      payments: payments.map((p) => ({
+        orderId: p.orderId,
+        amount: p.amount,
+        durationDays: p.durationDays,
+        method: p.method,
+        status: p.status,
+        nama: p.user.nama,
+        email: p.user.email,
+        createdAt: p.createdAt,
+      })),
+    });
+  })
+);
+
+router.post(
+  '/payments/:orderId/confirm',
+  asyncHandler(async (req, res) => {
+    const payment = await prisma.payment.findUnique({ where: { orderId: req.params.orderId } });
+    if (!payment) throw new HttpError(404, 'Pembayaran tidak ditemukan');
+    if (payment.status === 'SETTLEMENT') return res.json({ status: 'SETTLEMENT' });
+    if (payment.status !== 'WAITING_CONFIRMATION' && payment.status !== 'PENDING') {
+      throw new HttpError(400, 'Pembayaran ini tidak bisa dikonfirmasi dari status saat ini');
+    }
+    await applySettlement(payment);
+    res.json({ status: 'SETTLEMENT' });
+  })
+);
+
+router.post(
+  '/payments/:orderId/reject',
+  asyncHandler(async (req, res) => {
+    const payment = await prisma.payment.findUnique({ where: { orderId: req.params.orderId } });
+    if (!payment) throw new HttpError(404, 'Pembayaran tidak ditemukan');
+    const updated = await prisma.payment.update({ where: { id: payment.id }, data: { status: 'DENY' } });
+    res.json({ status: updated.status });
   })
 );
 

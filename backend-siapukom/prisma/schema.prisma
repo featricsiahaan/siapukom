@@ -88,10 +88,16 @@ enum DecisionType {
 
 enum PaymentStatus {
   PENDING
+  WAITING_CONFIRMATION
   SETTLEMENT
   EXPIRE
   CANCEL
   DENY
+}
+
+enum PaymentMethod {
+  DOKU
+  MANUAL_TRANSFER
 }
 
 model User {
@@ -128,6 +134,7 @@ model Payment {
   durationDays          Int
   includesMateri        Boolean       @default(false)
   status                PaymentStatus @default(PENDING)
+  method                PaymentMethod @default(DOKU)
   dokuTransactionId     String?
   paymentUrl            String?
   expiresAt             DateTime

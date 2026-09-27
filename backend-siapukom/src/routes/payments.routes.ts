@@ -5,6 +5,18 @@ import { asyncHandler } from '../middleware/asyncHandler';
 import { HttpError } from '../middleware/errorHandler';
 import { requireAuth } from '../middleware/auth';
 import { createQrisCheckout, verifyNotificationSignature } from '../services/doku';
+import { applySettlement } from '../services/membershipSettlement';
+
+export const MANUAL_TRANSFER_INFO = {
+  bank: {
+    bankName: 'BCA',
+    accountNumber: '0273125440',
+    accountHolder: 'Leethaream Featric Anju Siahaan',
+  },
+  gopay: {
+    phoneNumber: '+6281254147614',
+  },
+} as const;
 
 const router = Router();
 
@@ -66,6 +78,76 @@ router.post(
   })
 );
 
+router.post(
+  '/create-manual',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const userId = req.user!.id;
+    const { packageType } = createPaymentSchema.parse(req.body);
+    const pkg = PACKAGES[packageType];
+
+    const existing = await prisma.payment.findFirst({
+      where: {
+        userId,
+        method: 'MANUAL_TRANSFER',
+        status: { in: ['PENDING', 'WAITING_CONFIRMATION'] },
+        expiresAt: { gt: new Date() },
+        amount: pkg.amount,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    if (existing) {
+      return res.status(200).json({
+        orderId: existing.orderId,
+        amount: existing.amount,
+        status: existing.status,
+        expiresAt: existing.expiresAt,
+        transferInfo: MANUAL_TRANSFER_INFO,
+      });
+    }
+
+    const orderId = `SIAPUKOM-MANUAL-${Date.now()}-${userId.slice(0, 6)}`;
+    const payment = await prisma.payment.create({
+      data: {
+        userId,
+        orderId,
+        amount: pkg.amount,
+        durationDays: pkg.days,
+        includesMateri: pkg.includesMateri,
+        status: 'PENDING',
+        method: 'MANUAL_TRANSFER',
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      },
+    });
+
+    res.status(201).json({
+      orderId: payment.orderId,
+      amount: payment.amount,
+      status: payment.status,
+      expiresAt: payment.expiresAt,
+      transferInfo: MANUAL_TRANSFER_INFO,
+    });
+  })
+);
+
+router.post(
+  '/:orderId/mark-paid',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const payment = await prisma.payment.findUnique({ where: { orderId: req.params.orderId } });
+    if (!payment) throw new HttpError(404, 'Pembayaran tidak ditemukan');
+    if (payment.userId !== req.user!.id) throw new HttpError(403, 'Pembayaran ini bukan milik Anda');
+    if (payment.method !== 'MANUAL_TRANSFER') throw new HttpError(400, 'Pembayaran ini bukan transfer manual');
+    if (payment.status !== 'PENDING') throw new HttpError(400, 'Pembayaran ini sudah diproses sebelumnya');
+
+    const updated = await prisma.payment.update({
+      where: { id: payment.id },
+      data: { status: 'WAITING_CONFIRMATION' },
+    });
+    res.json({ status: updated.status });
+  })
+);
+
 router.get(
   '/:orderId/status',
   requireAuth,
@@ -82,31 +164,6 @@ router.get(
     res.json({ status: payment.status });
   })
 );
-
-async function applySettlement(payment: { id: string; userId: string; durationDays: number; includesMateri: boolean }) {
-  const membership = await prisma.membership.findUnique({ where: { userId: payment.userId } });
-  const now = new Date();
-  const base = membership?.expiryDate && membership.expiryDate > now ? membership.expiryDate : now;
-  const newExpiry = new Date(base.getTime() + payment.durationDays * 24 * 60 * 60 * 1000);
-
-  let newMateriExpiry = membership?.materiExpiryDate ?? null;
-  if (payment.includesMateri) {
-    const materiBase =
-      membership?.materiExpiryDate && membership.materiExpiryDate > now ? membership.materiExpiryDate : now;
-    newMateriExpiry = new Date(materiBase.getTime() + payment.durationDays * 24 * 60 * 60 * 1000);
-  }
-
-  await prisma.$transaction([
-    prisma.payment.update({
-      where: { id: payment.id },
-      data: { status: 'SETTLEMENT', paidAt: new Date() },
-    }),
-    prisma.membership.update({
-      where: { userId: payment.userId },
-      data: { plan: 'Akses Penuh', expiryDate: newExpiry, materiExpiryDate: newMateriExpiry },
-    }),
-  ]);
-}
 
 // Beberapa dashboard payment gateway melakukan ping GET ke Notify URL untuk verifikasi
 // keterjangkauan sebelum menyimpannya. Sediakan respons 200 sederhana untuk itu.

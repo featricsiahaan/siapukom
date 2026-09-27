@@ -127,7 +127,20 @@ export interface CreatePaymentResponse {
   expiresAt: string;
 }
 
-export type PaymentStatusValue = 'PENDING' | 'SETTLEMENT' | 'EXPIRE' | 'CANCEL' | 'DENY';
+export interface ManualTransferInfo {
+  bank: { bankName: string; accountNumber: string; accountHolder: string };
+  gopay: { phoneNumber: string };
+}
+
+export interface CreateManualPaymentResponse {
+  orderId: string;
+  amount: number;
+  status: PaymentStatusValue;
+  expiresAt: string;
+  transferInfo: ManualTransferInfo;
+}
+
+export type PaymentStatusValue = 'PENDING' | 'WAITING_CONFIRMATION' | 'SETTLEMENT' | 'EXPIRE' | 'CANCEL' | 'DENY';
 
 export interface PaymentStatusResponse {
   status: PaymentStatusValue;

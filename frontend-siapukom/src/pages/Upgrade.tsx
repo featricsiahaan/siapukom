@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import * as api from '../api/client';
 import { ApiError } from '../api/client';
-import type { PackageType, PaymentStatusValue } from '../api/types';
+import type { ManualTransferInfo, PackageType, PaymentStatusValue } from '../api/types';
 
-type Screen = 'idle' | 'loading' | 'waiting' | 'success' | 'expired' | 'error';
+type Screen = 'idle' | 'loading' | 'waiting' | 'manual-waiting' | 'success' | 'expired' | 'error';
+type PayMethod = 'DOKU' | 'MANUAL';
 
 const POLL_INTERVAL_MS = 3000;
 
@@ -31,10 +32,15 @@ export function Upgrade() {
   const [screen, setScreen] = useState<Screen>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [packageType, setPackageType] = useState<PackageType>('1_BULAN');
+  const [payMethod, setPayMethod] = useState<PayMethod>('DOKU');
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
   const [amount, setAmount] = useState(PACKAGES[1].amount);
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
   const [secondsLeft, setSecondsLeft] = useState(0);
+  const [manualOrderId, setManualOrderId] = useState<string | null>(null);
+  const [manualStatus, setManualStatus] = useState<PaymentStatusValue>('PENDING');
+  const [transferInfo, setTransferInfo] = useState<ManualTransferInfo | null>(null);
+  const [markingPaid, setMarkingPaid] = useState(false);
 
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -48,7 +54,8 @@ export function Upgrade() {
   useEffect(() => stopPolling, []);
 
   useEffect(() => {
-    if (screen !== 'waiting' || !expiresAt) return;
+    if ((screen !== 'waiting' && screen !== 'manual-waiting') || !expiresAt) return;
+    if (screen === 'manual-waiting' && manualStatus === 'WAITING_CONFIRMATION') return;
     const tick = () => {
       const remaining = Math.round((new Date(expiresAt).getTime() - Date.now()) / 1000);
       setSecondsLeft(remaining);
@@ -60,7 +67,7 @@ export function Upgrade() {
     tick();
     const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
-  }, [screen, expiresAt]);
+  }, [screen, expiresAt, manualStatus]);
 
   const applyStatus = (status: PaymentStatusValue) => {
     if (status === 'SETTLEMENT') {
@@ -73,7 +80,21 @@ export function Upgrade() {
       setErrorMessage('Pembayaran dibatalkan atau ditolak. Silakan coba lagi.');
       setScreen('error');
       stopPolling();
+    } else if (status === 'WAITING_CONFIRMATION') {
+      setManualStatus(status);
     }
+  };
+
+  const startPolling = (orderId: string) => {
+    stopPolling();
+    pollRef.current = setInterval(async () => {
+      try {
+        const statusRes = await api.getPaymentStatus(token!, orderId);
+        applyStatus(statusRes.status);
+      } catch {
+        // gangguan jaringan sesaat, coba lagi di polling berikutnya
+      }
+    }, POLL_INTERVAL_MS);
   };
 
   const startPayment = async () => {
@@ -81,6 +102,18 @@ export function Upgrade() {
     setErrorMessage('');
     setScreen('loading');
     try {
+      if (payMethod === 'MANUAL') {
+        const res = await api.createManualPayment(token, packageType);
+        setManualOrderId(res.orderId);
+        setManualStatus(res.status);
+        setTransferInfo(res.transferInfo);
+        setAmount(res.amount);
+        setExpiresAt(res.expiresAt);
+        setScreen('manual-waiting');
+        startPolling(res.orderId);
+        return;
+      }
+
       const res = await api.createPayment(token, packageType);
       setPaymentUrl(res.paymentUrl);
       setAmount(res.amount);
@@ -89,19 +122,23 @@ export function Upgrade() {
       if (res.paymentUrl) {
         window.open(res.paymentUrl, '_blank', 'noopener,noreferrer');
       }
-
-      stopPolling();
-      pollRef.current = setInterval(async () => {
-        try {
-          const statusRes = await api.getPaymentStatus(token, res.orderId);
-          applyStatus(statusRes.status);
-        } catch {
-          // gangguan jaringan sesaat, coba lagi di polling berikutnya
-        }
-      }, POLL_INTERVAL_MS);
+      startPolling(res.orderId);
     } catch (err) {
       setErrorMessage(err instanceof ApiError ? err.message : 'Gagal membuat pembayaran, coba lagi.');
       setScreen('error');
+    }
+  };
+
+  const handleMarkPaid = async () => {
+    if (!token || !manualOrderId) return;
+    setMarkingPaid(true);
+    try {
+      const res = await api.markPaymentPaid(token, manualOrderId);
+      setManualStatus(res.status as PaymentStatusValue);
+    } catch (err) {
+      setErrorMessage(err instanceof ApiError ? err.message : 'Gagal mengonfirmasi, coba lagi.');
+    } finally {
+      setMarkingPaid(false);
     }
   };
 
@@ -189,7 +226,23 @@ export function Upgrade() {
                     boxShadow: '0 10px 24px rgba(15,44,89,0.22)',
                   }}
                 >
-                  Bayar Sekarang
+                  {payMethod === 'MANUAL' ? 'Buat Pesanan' : 'Bayar Sekarang'}
+                </button>
+                <button
+                  onClick={() => setPayMethod(payMethod === 'MANUAL' ? 'DOKU' : 'MANUAL')}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'rgba(15,44,89,0.55)',
+                    fontSize: 12.5,
+                    textDecoration: 'underline',
+                    cursor: 'pointer',
+                    marginTop: 14,
+                  }}
+                >
+                  {payMethod === 'MANUAL'
+                    ? 'Kembali ke pembayaran Virtual Account'
+                    : 'Kesulitan bayar via Virtual Account? Transfer manual (BCA/GoPay)'}
                 </button>
               </>
             )}
@@ -242,6 +295,102 @@ export function Upgrade() {
                 <p style={{ fontSize: 12, color: 'rgba(15,44,89,0.45)', margin: 0 }}>
                   Halaman ini akan otomatis memperbarui status setelah pembayaran diterima.
                 </p>
+              </>
+            )}
+
+            {screen === 'manual-waiting' && transferInfo && (
+              <>
+                <div style={{ fontSize: 20, fontWeight: 800, margin: '0 0 16px' }}>{formatRupiah(amount)}</div>
+
+                {manualStatus === 'PENDING' ? (
+                  <>
+                    <div
+                      style={{
+                        background: '#F7F8FA',
+                        borderRadius: 10,
+                        padding: 16,
+                        textAlign: 'left',
+                        marginBottom: 12,
+                      }}
+                    >
+                      <div style={{ fontSize: 12, fontWeight: 700, color: 'rgba(15,44,89,0.5)', marginBottom: 6 }}>
+                        TRANSFER BANK
+                      </div>
+                      <div style={{ fontSize: 14, marginBottom: 2 }}>
+                        {transferInfo.bank.bankName} — <strong>{transferInfo.bank.accountNumber}</strong>
+                      </div>
+                      <div style={{ fontSize: 13, color: 'rgba(15,44,89,0.6)' }}>
+                        a.n. {transferInfo.bank.accountHolder}
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        background: '#F7F8FA',
+                        borderRadius: 10,
+                        padding: 16,
+                        textAlign: 'left',
+                        marginBottom: 20,
+                      }}
+                    >
+                      <div style={{ fontSize: 12, fontWeight: 700, color: 'rgba(15,44,89,0.5)', marginBottom: 6 }}>
+                        ATAU GOPAY
+                      </div>
+                      <div style={{ fontSize: 14 }}>{transferInfo.gopay.phoneNumber}</div>
+                    </div>
+                    <p style={{ fontSize: 12.5, color: 'rgba(15,44,89,0.6)', margin: '0 0 20px' }}>
+                      Transfer/kirim tepat sesuai nominal di atas, lalu klik tombol di bawah ini setelah selesai.
+                    </p>
+                    <button
+                      onClick={handleMarkPaid}
+                      disabled={markingPaid}
+                      style={{
+                        width: '100%',
+                        background: '#0F2C59',
+                        color: '#fff',
+                        fontSize: 15,
+                        fontWeight: 700,
+                        padding: 14,
+                        borderRadius: 10,
+                        border: 'none',
+                        cursor: markingPaid ? 'default' : 'pointer',
+                        opacity: markingPaid ? 0.7 : 1,
+                        marginBottom: 12,
+                      }}
+                    >
+                      {markingPaid ? 'Memproses…' : 'Saya Sudah Transfer'}
+                    </button>
+                    <div
+                      style={{
+                        display: 'inline-block',
+                        fontSize: 13,
+                        fontWeight: 700,
+                        fontVariantNumeric: 'tabular-nums',
+                        color: 'rgba(15,44,89,0.6)',
+                      }}
+                    >
+                      Batas waktu: {formatCountdown(secondsLeft)}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div
+                      style={{
+                        background: 'rgba(229,186,115,0.12)',
+                        color: '#8A6420',
+                        padding: '16px 18px',
+                        borderRadius: 10,
+                        fontSize: 14,
+                        fontWeight: 600,
+                        marginBottom: 16,
+                      }}
+                    >
+                      Terima kasih! Konfirmasi pembayaran Anda sedang diverifikasi admin (maksimal 1x24 jam).
+                    </div>
+                    <p style={{ fontSize: 12, color: 'rgba(15,44,89,0.45)', margin: 0 }}>
+                      Halaman ini akan otomatis memperbarui status setelah dikonfirmasi.
+                    </p>
+                  </>
+                )}
               </>
             )}
 
