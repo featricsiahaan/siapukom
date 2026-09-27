@@ -189,21 +189,21 @@ export function Upgrade() {
                     boxShadow: '0 10px 24px rgba(15,44,89,0.22)',
                   }}
                 >
-                  Bayar dengan QRIS
+                  Bayar Sekarang
                 </button>
               </>
             )}
 
             {screen === 'loading' && (
-              <p style={{ fontSize: 14.5, color: 'rgba(15,44,89,0.65)', margin: 0 }}>Menyiapkan QRIS…</p>
+              <p style={{ fontSize: 14.5, color: 'rgba(15,44,89,0.65)', margin: 0 }}>Menyiapkan pembayaran…</p>
             )}
 
             {screen === 'waiting' && (
               <>
                 <div style={{ fontSize: 20, fontWeight: 800, margin: '0 0 4px' }}>{formatRupiah(amount)}</div>
                 <p style={{ fontSize: 13, color: 'rgba(15,44,89,0.6)', margin: '0 0 20px' }}>
-                  Tab baru sudah terbuka untuk menyelesaikan pembayaran QRIS di halaman DOKU. Kalau tidak terbuka
-                  otomatis, klik tombol di bawah.
+                  Tab baru sudah terbuka untuk menyelesaikan pembayaran (Virtual Account) di halaman DOKU. Kalau
+                  tidak terbuka otomatis, klik tombol di bawah.
                 </p>
                 {paymentUrl && (
                   <a
@@ -282,7 +282,7 @@ export function Upgrade() {
                     marginBottom: 20,
                   }}
                 >
-                  {screen === 'expired' ? 'Kode QRIS sudah kedaluwarsa.' : errorMessage || 'Terjadi kesalahan.'}
+                  {screen === 'expired' ? 'Batas waktu pembayaran sudah habis.' : errorMessage || 'Terjadi kesalahan.'}
                 </div>
                 <button
                   onClick={startPayment}

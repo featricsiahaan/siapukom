@@ -27,7 +27,10 @@ export async function createQrisCheckout(params: {
   const timestamp = isoTimestamp();
   const body = JSON.stringify({
     order: { amount: params.amount, invoice_number: params.orderId },
-    payment: { payment_due_date: 30, payment_method_types: ['QRIS'] },
+    payment: {
+      payment_due_date: 30,
+      payment_method_types: ['VIRTUAL_ACCOUNT_BRI', 'VIRTUAL_ACCOUNT_BNI'],
+    },
   });
 
   const stringToSign = [
