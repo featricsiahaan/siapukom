@@ -161,3 +161,42 @@ Setelah itu, login seperti biasa lewat `POST /api/auth/login` — token JWT yang
 - Layar **Latihan Gratis**: soal & kunci jawaban **tidak** dikirim sekaligus ke client. Alur: `POST /sessions` (dapat daftar soal tanpa kunci) → per soal dijawab, panggil `POST /sessions/:id/answer` untuk dapat feedback instan (benar/salah + pembahasan) → `POST /sessions/:id/finish` untuk hasil akhir. Ini menutup gap keamanan yang disebut PRD (bank soal & kunci tidak boleh terekspos di client sebelum dijawab).
 - Layar **Dashboard**: skor & kategori sekarang berasal dari riwayat sesi latihan pengguna yang sudah login (5 sesi terakhir), bukan data dummy. Membership masih memakai default sederhana (`plan: "Gratis"`, `sessionsTotal: 0`) karena gerbang akses berbayar & payment gateway ada di luar cakupan MVP ini (lihat PRD §5.2, prioritas P1–P2).
 - Sesi latihan anonim (tanpa token) tetap berfungsi penuh, tapi hasilnya tidak memengaruhi dashboard kesiapan siapa pun (tidak terikat user) — sesuai perilaku "Latihan Gratis" di prototipe.
+
+## Telaah Taksonomi SKD 2026
+
+Lihat `prd.md` §6.1/§9 dan `Panduan_Induk_Kurikulum_dan_Bank_Soal_SiapUKOM_SKD2026_v1.0.md` untuk latar belakang. Ringkasnya: soal punya field taksonomi (`moduleId`, `primaryArea`, `secondaryAreas`, `sourceCategory`, `decisionType`, `sourceDocument`/`sourceTable`/`sourcePage`/`sourceVerificationStatus`, `reviewer`, `reviewDate`) yang kosong untuk soal lama dan wajib diisi lewat telaah manual sebelum diklaim sesuai SKD 2026 — tidak ada proses otomatis yang menebak nilai-nilai ini.
+
+**Nilai enum yang valid:**
+- `moduleId`: `M01_SISTEM_SARAF`, `M02_PSIKIATRI`, `M03_SISTEM_INDERA`, `M04_RESPIRASI`, `M05_KARDIOVASKULER`, `M06_GASTROINTESTINAL_HEPATOBILIER_PANKREAS`, `M07_GINJAL_SALURAN_KEMIH`, `M08_REPRODUKSI`, `M09_ENDOKRIN_METABOLIK_NUTRISI`, `M10_HEMATO_IMUNOLOGI`, `M11_MUSKULOSKELETAL`, `M12_KULIT_INTEGUMEN`, `M13_FORENSIK_MEDIKOLEGAL`, `M14_ANAK`.
+- `primaryArea`/`secondaryAreas`: `A1_KESELAMATAN_PASIEN`, `A2_PENATALAKSANAAN_KLINIS`, `A3_PROSEDUR_INTERVENSI_KLINIS`, `A4_PROMOTIF_PREVENTIF`, `A5_PROFESIONALISME`.
+- `sourceCategory`: `TUNTAS`, `AWAL_RUJUK`, `RUJUK_BALIK`, `BELUM_TERVERIFIKASI`, `PENGAYAAN`.
+- `decisionType`: `DIAGNOSIS`, `PEMERIKSAAN`, `INTERPRETASI`, `TERAPI`, `STABILISASI`, `RUJUKAN`, `PENCEGAHAN`, `KESELAMATAN`, `ETIK`.
+- `status`: `DRAFT`, `TELAAH_SUMBER`, `TELAAH_KLINIS`, `TELAAH_SOAL`, `SIAP_UJI_COBA`, `ACTIVE`, `DITAHAN`, `DIARSIPKAN`.
+
+### 1. Bulk-mapping `moduleId` per kategori lama (sudah dijalankan sekali)
+
+```bash
+npx ts-node scripts/mapModulesByCategory.ts            # dry-run, lihat rencana
+npx ts-node scripts/mapModulesByCategory.ts --apply     # tulis ke DB
+```
+
+Hanya kategori yang cocok jelas 1:1 dengan satu bagian klinis yang dipetakan otomatis. Kategori lintas-bagian (Bedah, Kegawatdaruratan, Onkologi, Toksikologi, Ilmu Kesehatan Masyarakat, Infeksi Tropis) sengaja dilewati — soalnya perlu ditelaah satu per satu lewat langkah berikut.
+
+### 2. Ekspor soal untuk ditelaah manual
+
+```bash
+npx ts-node scripts/exportTelaah.ts --out belum-ditelaah.csv --untelaah     # semua yang primaryArea masih kosong
+npx ts-node scripts/exportTelaah.ts --out bedah.csv --category Bedah        # per kategori
+npx ts-node scripts/exportTelaah.ts --out saraf.csv --moduleId M01_SISTEM_SARAF
+```
+
+Buka CSV-nya di Excel/Google Sheets. Kolom `id`, `kategori`, `pertanyaan`, `opsi`, `kunci`, `pembahasan`, `status_saat_ini` hanya konteks (jangan diedit). Isi kolom `primaryArea`, `secondaryAreas` (pisahkan `;` bila lebih dari satu), `sourceCategory`, `decisionType`, `sourceDocument`, `sourceTable`, `sourcePage`, `sourceVerificationStatus`, `reviewer`, dan `status_baru` (opsional, kosongkan bila belum mau mengubah status).
+
+### 3. Impor kembali hasil telaah
+
+```bash
+npx ts-node scripts/importTelaah.ts belum-ditelaah.csv            # dry-run, validasi saja
+npx ts-node scripts/importTelaah.ts belum-ditelaah.csv --apply     # tulis ke DB
+```
+
+Baris yang seluruh kolom editable-nya kosong dilewati (tidak dianggap error) — jadi boleh mengekspor batch besar dan hanya mengisi sebagian dulu. `reviewDate` diisi otomatis ke waktu impor setiap kali baris punya isian.
