@@ -23,9 +23,67 @@ enum SessionMode {
   KATEGORI
 }
 
+// Alur telaah 8-tahap sesuai Panduan Induk SKD2026 §11. DRAFT dan ACTIVE
+// dipertahankan (bukan diganti DRAF/AKTIF) supaya soal existing di produksi
+// tidak butuh migrasi data — hanya menambah tahap telaah di antaranya.
 enum QuestionStatus {
   DRAFT
+  TELAAH_SUMBER
+  TELAAH_KLINIS
+  TELAAH_SOAL
+  SIAP_UJI_COBA
   ACTIVE
+  DITAHAN
+  DIARSIPKAN
+}
+
+// Area kompetensi SKD 2026 (Keputusan KKI No. HK.01.02/KKI/1291/2026, BAB III bagian A).
+enum CompetencyArea {
+  A1_KESELAMATAN_PASIEN
+  A2_PENATALAKSANAAN_KLINIS
+  A3_PROSEDUR_INTERVENSI_KLINIS
+  A4_PROMOTIF_PREVENTIF
+  A5_PROFESIONALISME
+}
+
+// 14 bagian klinis dari Panduan Induk SiapUKOM SKD2026 §4.
+enum ClinicalModule {
+  M01_SISTEM_SARAF
+  M02_PSIKIATRI
+  M03_SISTEM_INDERA
+  M04_RESPIRASI
+  M05_KARDIOVASKULER
+  M06_GASTROINTESTINAL_HEPATOBILIER_PANKREAS
+  M07_GINJAL_SALURAN_KEMIH
+  M08_REPRODUKSI
+  M09_ENDOKRIN_METABOLIK_NUTRISI
+  M10_HEMATO_IMUNOLOGI
+  M11_MUSKULOSKELETAL
+  M12_KULIT_INTEGUMEN
+  M13_FORENSIK_MEDIKOLEGAL
+  M14_ANAK
+}
+
+// Kategori sumber per Panduan Induk §5 — kedalaman/batas skenario, bukan tingkat kesulitan.
+enum SourceCategory {
+  TUNTAS
+  AWAL_RUJUK
+  RUJUK_BALIK
+  BELUM_TERVERIFIKASI
+  PENGAYAAN
+}
+
+// Aspek keputusan yang diuji soal, per template soal Panduan Induk §8.
+enum DecisionType {
+  DIAGNOSIS
+  PEMERIKSAAN
+  INTERPRETASI
+  TERAPI
+  STABILISASI
+  RUJUKAN
+  PENCEGAHAN
+  KESELAMATAN
+  ETIK
 }
 
 enum PaymentStatus {
@@ -113,6 +171,21 @@ model Question {
   imageUrl         String?
   imageAttribution String?
   createdAt  DateTime       @default(now())
+
+  // Metadata taksonomi SKD 2026 (Panduan Induk §12 kamus data minimum). Semua
+  // opsional: soal existing belum terpetakan (lihat prd.md §5.2, §9 Fase 2) dan
+  // pengisiannya adalah pekerjaan inventarisasi terpisah, bukan hasil migrasi otomatis.
+  moduleId              ClinicalModule?
+  primaryArea           CompetencyArea?
+  secondaryAreas        CompetencyArea[] @default([])
+  sourceCategory        SourceCategory?
+  decisionType          DecisionType?
+  sourceDocument        String?
+  sourceTable           String?
+  sourcePage            String?
+  sourceVerificationStatus String?
+  reviewer              String?
+  reviewDate            DateTime?
 
   answers SessionAnswer[]
 

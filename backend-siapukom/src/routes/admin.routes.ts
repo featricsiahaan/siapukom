@@ -98,9 +98,19 @@ router.post(
 router.get(
   '/questions',
   asyncHandler(async (req, res) => {
-    const status = req.query.status === 'ACTIVE' ? 'ACTIVE' : req.query.status === 'DRAFT' ? 'DRAFT' : undefined;
+    const QUESTION_STATUSES = [
+      'DRAFT',
+      'TELAAH_SUMBER',
+      'TELAAH_KLINIS',
+      'TELAAH_SOAL',
+      'SIAP_UJI_COBA',
+      'ACTIVE',
+      'DITAHAN',
+      'DIARSIPKAN',
+    ] as const;
+    const status = QUESTION_STATUSES.includes(req.query.status as any) ? (req.query.status as string) : undefined;
     const questions = await prisma.question.findMany({
-      where: status ? { status } : undefined,
+      where: status ? { status: status as any } : undefined,
       include: { category: true },
       orderBy: { createdAt: 'desc' },
     });
@@ -118,6 +128,17 @@ router.get(
         imageUrl: q.imageUrl,
         imageAttribution: q.imageAttribution,
         createdAt: q.createdAt,
+        moduleId: q.moduleId,
+        primaryArea: q.primaryArea,
+        secondaryAreas: q.secondaryAreas,
+        sourceCategory: q.sourceCategory,
+        decisionType: q.decisionType,
+        sourceDocument: q.sourceDocument,
+        sourceTable: q.sourceTable,
+        sourcePage: q.sourcePage,
+        sourceVerificationStatus: q.sourceVerificationStatus,
+        reviewer: q.reviewer,
+        reviewDate: q.reviewDate,
       })),
     });
   })
@@ -129,9 +150,38 @@ const updateSchema = z.object({
   opsi: z.array(z.object({ letter: z.string(), text: z.string() })).min(2).optional(),
   kunci: z.string().trim().min(1).optional(),
   pembahasan: z.string().optional(),
-  status: z.enum(['DRAFT', 'ACTIVE']).optional(),
+  status: z
+    .enum(['DRAFT', 'TELAAH_SUMBER', 'TELAAH_KLINIS', 'TELAAH_SOAL', 'SIAP_UJI_COBA', 'ACTIVE', 'DITAHAN', 'DIARSIPKAN'])
+    .optional(),
   imageUrl: z.string().trim().url().nullable().optional(),
   imageAttribution: z.string().trim().nullable().optional(),
+  // Metadata taksonomi SKD 2026 — lihat prd.md §6.1 dan Panduan Induk §12.
+  moduleId: z
+    .enum([
+      'M01_SISTEM_SARAF', 'M02_PSIKIATRI', 'M03_SISTEM_INDERA', 'M04_RESPIRASI', 'M05_KARDIOVASKULER',
+      'M06_GASTROINTESTINAL_HEPATOBILIER_PANKREAS', 'M07_GINJAL_SALURAN_KEMIH', 'M08_REPRODUKSI',
+      'M09_ENDOKRIN_METABOLIK_NUTRISI', 'M10_HEMATO_IMUNOLOGI', 'M11_MUSKULOSKELETAL', 'M12_KULIT_INTEGUMEN',
+      'M13_FORENSIK_MEDIKOLEGAL', 'M14_ANAK',
+    ])
+    .nullable()
+    .optional(),
+  primaryArea: z
+    .enum(['A1_KESELAMATAN_PASIEN', 'A2_PENATALAKSANAAN_KLINIS', 'A3_PROSEDUR_INTERVENSI_KLINIS', 'A4_PROMOTIF_PREVENTIF', 'A5_PROFESIONALISME'])
+    .nullable()
+    .optional(),
+  secondaryAreas: z
+    .array(z.enum(['A1_KESELAMATAN_PASIEN', 'A2_PENATALAKSANAAN_KLINIS', 'A3_PROSEDUR_INTERVENSI_KLINIS', 'A4_PROMOTIF_PREVENTIF', 'A5_PROFESIONALISME']))
+    .optional(),
+  sourceCategory: z.enum(['TUNTAS', 'AWAL_RUJUK', 'RUJUK_BALIK', 'BELUM_TERVERIFIKASI', 'PENGAYAAN']).nullable().optional(),
+  decisionType: z
+    .enum(['DIAGNOSIS', 'PEMERIKSAAN', 'INTERPRETASI', 'TERAPI', 'STABILISASI', 'RUJUKAN', 'PENCEGAHAN', 'KESELAMATAN', 'ETIK'])
+    .nullable()
+    .optional(),
+  sourceDocument: z.string().trim().nullable().optional(),
+  sourceTable: z.string().trim().nullable().optional(),
+  sourcePage: z.string().trim().nullable().optional(),
+  sourceVerificationStatus: z.string().trim().nullable().optional(),
+  reviewer: z.string().trim().nullable().optional(),
 });
 
 router.patch(
@@ -153,6 +203,10 @@ router.patch(
       categoryId = category.id;
     }
 
+    // Menandai reviewer/status berarti sebuah tahap telaah baru saja terjadi
+    // (Panduan Induk §11) — catat tanggalnya otomatis, jangan andalkan input manual.
+    const isReviewAction = body.reviewer !== undefined || body.status !== undefined;
+
     const updated = await prisma.question.update({
       where: { id },
       data: {
@@ -164,6 +218,17 @@ router.patch(
         status: body.status,
         imageUrl: body.imageUrl,
         imageAttribution: body.imageAttribution,
+        moduleId: body.moduleId,
+        primaryArea: body.primaryArea,
+        secondaryAreas: body.secondaryAreas,
+        sourceCategory: body.sourceCategory,
+        decisionType: body.decisionType,
+        sourceDocument: body.sourceDocument,
+        sourceTable: body.sourceTable,
+        sourcePage: body.sourcePage,
+        sourceVerificationStatus: body.sourceVerificationStatus,
+        reviewer: body.reviewer,
+        reviewDate: isReviewAction ? new Date() : undefined,
       },
       include: { category: true },
     });
@@ -178,6 +243,17 @@ router.patch(
       status: updated.status,
       imageUrl: updated.imageUrl,
       imageAttribution: updated.imageAttribution,
+      moduleId: updated.moduleId,
+      primaryArea: updated.primaryArea,
+      secondaryAreas: updated.secondaryAreas,
+      sourceCategory: updated.sourceCategory,
+      decisionType: updated.decisionType,
+      sourceDocument: updated.sourceDocument,
+      sourceTable: updated.sourceTable,
+      sourcePage: updated.sourcePage,
+      sourceVerificationStatus: updated.sourceVerificationStatus,
+      reviewer: updated.reviewer,
+      reviewDate: updated.reviewDate,
     });
   })
 );
