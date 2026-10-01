@@ -10,6 +10,7 @@ import { Upgrade } from './pages/Upgrade';
 import { Materi } from './pages/Materi';
 import { Legal } from './pages/Legal';
 import { AdminPayments } from './pages/AdminPayments';
+import { Peringkat } from './pages/Peringkat';
 
 function App() {
   return (
@@ -49,6 +50,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Materi />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/peringkat"
+            element={
+              <ProtectedRoute>
+                <Peringkat />
               </ProtectedRoute>
             }
           />

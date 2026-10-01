@@ -74,6 +74,9 @@ export function Dashboard() {
             <Link to="/materi" className="link-hover">
               Materi
             </Link>
+            <Link to="/peringkat" className="link-hover">
+              Peringkat
+            </Link>
             {user?.role === 'ADMIN' && (
               <Link to="/admin/payments" className="link-hover">
                 Konfirmasi Pembayaran

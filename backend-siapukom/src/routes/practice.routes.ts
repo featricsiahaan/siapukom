@@ -281,4 +281,57 @@ router.get(
   })
 );
 
+router.get(
+  '/leaderboard',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const sessions = await prisma.practiceSession.findMany({
+      where: { mode: 'SIMULASI', status: 'FINISHED', userId: { not: null } },
+      select: {
+        userId: true,
+        correctCount: true,
+        totalQuestions: true,
+        finishedAt: true,
+        user: { select: { nama: true } },
+      },
+      orderBy: { finishedAt: 'asc' },
+    });
+
+    type Best = { nama: string; score: number; correctCount: number; totalQuestions: number; finishedAt: Date };
+    const bestByUser = new Map<string, Best>();
+    for (const s of sessions) {
+      if (!s.userId || !s.finishedAt) continue;
+      const score = percentage(s.correctCount, s.totalQuestions);
+      const existing = bestByUser.get(s.userId);
+      if (!existing || score > existing.score) {
+        bestByUser.set(s.userId, {
+          nama: s.user!.nama,
+          score,
+          correctCount: s.correctCount,
+          totalQuestions: s.totalQuestions,
+          finishedAt: s.finishedAt,
+        });
+      }
+    }
+
+    const ranked = Array.from(bestByUser.entries())
+      .map(([userId, v]) => ({ userId, ...v }))
+      .sort((a, b) => b.score - a.score || a.finishedAt.getTime() - b.finishedAt.getTime());
+
+    const toEntry = (r: (typeof ranked)[number], rank: number) => ({
+      rank,
+      nama: r.nama,
+      score: r.score,
+      correctCount: r.correctCount,
+      totalQuestions: r.totalQuestions,
+    });
+
+    const leaderboard = ranked.slice(0, 20).map((r, i) => toEntry(r, i + 1));
+    const myIndex = ranked.findIndex((r) => r.userId === req.user!.id);
+    const me = myIndex >= 0 ? toEntry(ranked[myIndex], myIndex + 1) : null;
+
+    res.json({ leaderboard, me });
+  })
+);
+
 export default router;

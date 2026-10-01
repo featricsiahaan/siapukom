@@ -142,6 +142,19 @@ export interface CreateManualPaymentResponse {
 
 export type PaymentStatusValue = 'PENDING' | 'WAITING_CONFIRMATION' | 'SETTLEMENT' | 'EXPIRE' | 'CANCEL' | 'DENY';
 
+export interface LeaderboardEntry {
+  rank: number;
+  nama: string;
+  score: number;
+  correctCount: number;
+  totalQuestions: number;
+}
+
+export interface LeaderboardResponse {
+  leaderboard: LeaderboardEntry[];
+  me: LeaderboardEntry | null;
+}
+
 export interface AdminPaymentItem {
   orderId: string;
   amount: number;

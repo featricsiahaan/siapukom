@@ -7,6 +7,7 @@ import type {
   DashboardResponse,
   FinishSessionResponse,
   FinishSimulasiResponse,
+  LeaderboardResponse,
   PackageType,
   PaymentStatusResponse,
   PublicUser,
@@ -79,6 +80,10 @@ export function startSimulasi(token: string) {
 
 export function getSimulasiStatus(token: string) {
   return request<SimulasiStatus>('/practice/simulasi/status', { token });
+}
+
+export function getLeaderboard(token: string) {
+  return request<LeaderboardResponse>('/practice/leaderboard', { token });
 }
 
 export function answerQuestion(
