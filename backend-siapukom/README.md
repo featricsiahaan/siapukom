@@ -58,7 +58,7 @@ Ini menjalankan PostgreSQL + API dalam satu perintah. Container API otomatis men
 1. Buat service PostgreSQL di platform pilihan, salin connection string-nya ke `DATABASE_URL`.
 2. Deploy folder ini sebagai service Node:
    - Build command: `npm install && npm run build`
-   - Start command: `npx prisma db push --skip-generate --accept-data-loss && npm start`
+   - Start command: `npx prisma db push --skip-generate && npm start`
 3. Set environment variables: `DATABASE_URL`, `JWT_SECRET` (wajib diganti, jangan pakai nilai contoh), `CORS_ORIGIN` (origin domain frontend produksi), `NODE_ENV=production`.
 4. Jalankan seed sekali (lewat shell/console platform): `npm run prisma:seed`.
 

@@ -24,4 +24,4 @@ EXPOSE 4000
 # perlu file migrasi tersimpan. Setelah skema stabil, beralih ke migration-based
 # workflow (`prisma migrate dev` saat development, `prisma migrate deploy` di sini) —
 # lihat README bagian "Migrasi database".
-CMD ["sh", "-c", "npx prisma db push --skip-generate --accept-data-loss && node dist/index.js"]
+CMD ["sh", "-c", "npx prisma db push --skip-generate && node dist/index.js"]
