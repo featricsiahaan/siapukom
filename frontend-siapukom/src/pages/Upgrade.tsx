@@ -32,7 +32,7 @@ export function Upgrade() {
   const [screen, setScreen] = useState<Screen>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [packageType, setPackageType] = useState<PackageType>('1_BULAN');
-  const [payMethod, setPayMethod] = useState<PayMethod>('DOKU');
+  const [payMethod, setPayMethod] = useState<PayMethod>('MANUAL');
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
   const [amount, setAmount] = useState(PACKAGES[1].amount);
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
@@ -241,8 +241,8 @@ export function Upgrade() {
                   }}
                 >
                   {payMethod === 'MANUAL'
-                    ? 'Kembali ke pembayaran Virtual Account'
-                    : 'Kesulitan bayar via Virtual Account? Transfer manual (BCA/GoPay)'}
+                    ? 'Coba pembayaran otomatis (DOKU)'
+                    : 'Kembali ke transfer manual (BCA/GoPay)'}
                 </button>
               </>
             )}
@@ -255,7 +255,7 @@ export function Upgrade() {
               <>
                 <div style={{ fontSize: 20, fontWeight: 800, margin: '0 0 4px' }}>{formatRupiah(amount)}</div>
                 <p style={{ fontSize: 13, color: 'rgba(15,44,89,0.6)', margin: '0 0 20px' }}>
-                  Tab baru sudah terbuka untuk menyelesaikan pembayaran (Virtual Account) di halaman DOKU. Kalau
+                  Tab baru sudah terbuka untuk menyelesaikan pembayaran di halaman DOKU. Kalau
                   tidak terbuka otomatis, klik tombol di bawah.
                 </p>
                 {paymentUrl && (
@@ -338,7 +338,7 @@ export function Upgrade() {
                       <div style={{ fontSize: 14 }}>{transferInfo.gopay.phoneNumber}</div>
                     </div>
                     <p style={{ fontSize: 12.5, color: 'rgba(15,44,89,0.6)', margin: '0 0 20px' }}>
-                      Transfer/kirim tepat sesuai nominal di atas, lalu klik tombol di bawah ini setelah selesai.
+                      Transfer/kirim <strong>tepat sesuai nominal di atas</strong> (termasuk 2 digit terakhir sebagai kode unik), lalu klik tombol di bawah ini setelah selesai.
                     </p>
                     <button
                       onClick={handleMarkPaid}

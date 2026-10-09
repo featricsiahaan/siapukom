@@ -92,7 +92,7 @@ router.post(
         method: 'MANUAL_TRANSFER',
         status: { in: ['PENDING', 'WAITING_CONFIRMATION'] },
         expiresAt: { gt: new Date() },
-        amount: pkg.amount,
+        durationDays: pkg.days,
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -106,12 +106,28 @@ router.post(
       });
     }
 
+    // Kode unik 1-99 rupiah supaya tiap transfer yang masih terbuka bisa dicocokkan dengan nominalnya.
+    const open = await prisma.payment.findMany({
+      where: {
+        method: 'MANUAL_TRANSFER',
+        status: { in: ['PENDING', 'WAITING_CONFIRMATION'] },
+        expiresAt: { gt: new Date() },
+      },
+      select: { amount: true },
+    });
+    const taken = new Set(open.map((p) => p.amount));
+    const free: number[] = [];
+    for (let code = 1; code <= 99; code++) {
+      if (!taken.has(pkg.amount + code)) free.push(code);
+    }
+    const uniqueCode = free.length > 0 ? free[Math.floor(Math.random() * free.length)] : 0;
+
     const orderId = `SIAPUKOM-MANUAL-${Date.now()}-${userId.slice(0, 6)}`;
     const payment = await prisma.payment.create({
       data: {
         userId,
         orderId,
-        amount: pkg.amount,
+        amount: pkg.amount + uniqueCode,
         durationDays: pkg.days,
         includesMateri: pkg.includesMateri,
         status: 'PENDING',
