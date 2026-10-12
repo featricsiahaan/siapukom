@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { env, isProduction } from './config/env';
+import { prisma } from './lib/prisma';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import authRoutes from './routes/auth.routes';
 import categoriesRoutes from './routes/categories.routes';
@@ -32,6 +33,16 @@ export function createApp() {
 
   app.get('/api/health', (_req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  });
+
+  // Untuk pemantau uptime: memastikan database ikut terjangkau, bukan hanya proses Node yang hidup.
+  app.get('/api/health/db', async (_req, res) => {
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      res.json({ status: 'ok', database: 'ok', timestamp: new Date().toISOString() });
+    } catch {
+      res.status(503).json({ status: 'error', database: 'unreachable', timestamp: new Date().toISOString() });
+    }
   });
 
   app.use('/api/auth', authRoutes);
