@@ -3,3 +3,6 @@ dist
 .env
 .env.*.local
 *.log
+
+# Backup database (berisi data pribadi, jangan di-commit)
+backups/
