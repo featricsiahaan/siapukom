@@ -53,6 +53,13 @@ export function login(email: string, password: string) {
   });
 }
 
+export function register(nama: string, email: string, password: string) {
+  return request<{ token: string; user: PublicUser }>('/auth/register', {
+    method: 'POST',
+    body: { nama, email, password },
+  });
+}
+
 export function getCategories() {
   return request<{ categories: Category[] }>('/categories');
 }

@@ -21,7 +21,7 @@ const authRateLimit = rateLimit({
 const registerSchema = z.object({
   nama: z.string().trim().min(1, 'Nama wajib diisi').max(120),
   email: z.string().trim().toLowerCase().email('Email tidak valid'),
-  password: z.string().min(4, 'Password minimal 4 karakter').max(200),
+  password: z.string().min(8, 'Password minimal 8 karakter').max(200),
 });
 
 const loginSchema = z.object({

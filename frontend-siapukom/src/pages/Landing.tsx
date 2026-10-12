@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export function Landing() {
+  const { isAuthenticated } = useAuth();
+  const beli = (paket: string) => (isAuthenticated ? `/upgrade?paket=${paket}` : `/daftar?paket=${paket}`);
   return (
     <div style={{ background: '#FFFFFF', color: '#0F2C59', overflow: 'hidden' }}>
       <div
@@ -31,7 +34,7 @@ export function Landing() {
             Masuk
           </Link>
           <Link
-            to="/latihan"
+            to="/daftar"
             className="btn-primary"
             style={{
               background: '#0F2C59',
@@ -360,7 +363,7 @@ export function Landing() {
                 Simulasi Ujian dan Latihan Kategori Khusus selama 2 minggu.
               </p>
               <Link
-                to="/upgrade"
+                to={beli('2_MINGGU')}
                 style={{
                   marginTop: 'auto',
                   textAlign: 'center',
@@ -393,7 +396,7 @@ export function Landing() {
                 Simulasi Ujian, Latihan Kategori Khusus, dan Materi Belajar.
               </p>
               <Link
-                to="/upgrade"
+                to={beli('1_BULAN')}
                 style={{
                   marginTop: 'auto',
                   textAlign: 'center',

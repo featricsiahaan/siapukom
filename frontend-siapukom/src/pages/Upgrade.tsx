@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import * as api from '../api/client';
 import { ApiError } from '../api/client';
@@ -28,13 +28,19 @@ function formatCountdown(totalSeconds: number): string {
 
 export function Upgrade() {
   const { token } = useAuth();
+  const [searchParams] = useSearchParams();
+  const paketAwal = searchParams.get('paket');
 
   const [screen, setScreen] = useState<Screen>('idle');
   const [errorMessage, setErrorMessage] = useState('');
-  const [packageType, setPackageType] = useState<PackageType>('1_BULAN');
+  const [packageType, setPackageType] = useState<PackageType>(
+    paketAwal === '2_MINGGU' || paketAwal === '1_BULAN' ? paketAwal : '1_BULAN'
+  );
   const [payMethod, setPayMethod] = useState<PayMethod>('MANUAL');
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
-  const [amount, setAmount] = useState(PACKAGES[1].amount);
+  const [amount, setAmount] = useState(
+    PACKAGES.find((p) => p.type === (paketAwal === '2_MINGGU' ? '2_MINGGU' : '1_BULAN'))!.amount
+  );
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
   const [secondsLeft, setSecondsLeft] = useState(0);
   const [manualOrderId, setManualOrderId] = useState<string | null>(null);
