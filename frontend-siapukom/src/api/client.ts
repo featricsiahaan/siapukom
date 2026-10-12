@@ -1,5 +1,6 @@
 import type {
   AdminPaymentItem,
+  AdminUserItem,
   AnswerResponse,
   Category,
   CreateManualPaymentResponse,
@@ -142,6 +143,21 @@ export function createManualPayment(token: string, packageType: PackageType) {
 
 export function markPaymentPaid(token: string, orderId: string) {
   return request<{ status: string }>(`/payments/${orderId}/mark-paid`, { method: 'POST', token });
+}
+
+export function searchAdminUsers(token: string, q: string) {
+  return request<{ users: AdminUserItem[] }>(`/admin/users?q=${encodeURIComponent(q)}`, { token });
+}
+
+export function resetUserPassword(token: string, userId: string) {
+  return request<{ email: string; nama: string; temporaryPassword: string }>(`/admin/users/${userId}/reset-password`, {
+    method: 'POST',
+    token,
+  });
+}
+
+export function changePassword(token: string, currentPassword: string, newPassword: string) {
+  return request<{ ok: boolean }>('/auth/change-password', { method: 'POST', body: { currentPassword, newPassword }, token });
 }
 
 export function listAdminPayments(token: string, status = 'WAITING_CONFIRMATION') {

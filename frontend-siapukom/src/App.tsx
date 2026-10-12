@@ -12,6 +12,8 @@ import { Legal } from './pages/Legal';
 import { AdminPayments } from './pages/AdminPayments';
 import { Peringkat } from './pages/Peringkat';
 import { Daftar } from './pages/Daftar';
+import { AdminUsers } from './pages/AdminUsers';
+import { Akun } from './pages/Akun';
 
 function App() {
   return (
@@ -60,6 +62,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <Peringkat />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/pengguna"
+            element={
+              <ProtectedRoute>
+                <AdminUsers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/akun"
+            element={
+              <ProtectedRoute>
+                <Akun />
               </ProtectedRoute>
             }
           />

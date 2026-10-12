@@ -87,6 +87,27 @@ router.post(
   })
 );
 
+const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, 'Password saat ini wajib diisi'),
+  newPassword: z.string().min(8, 'Password baru minimal 8 karakter').max(200),
+});
+
+router.post(
+  '/change-password',
+  authRateLimit,
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const { currentPassword, newPassword } = changePasswordSchema.parse(req.body);
+    const user = await prisma.user.findUnique({ where: { id: req.user!.id } });
+    if (!user) throw new HttpError(404, 'Pengguna tidak ditemukan');
+    if (!(await bcrypt.compare(currentPassword, user.password))) {
+      throw new HttpError(400, 'Password saat ini salah');
+    }
+    await prisma.user.update({ where: { id: user.id }, data: { password: await bcrypt.hash(newPassword, 10) } });
+    res.json({ ok: true });
+  })
+);
+
 router.get(
   '/me',
   requireAuth,

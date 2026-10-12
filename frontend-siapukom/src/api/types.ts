@@ -156,6 +156,16 @@ export interface LeaderboardResponse {
   me: LeaderboardEntry | null;
 }
 
+export interface AdminUserItem {
+  id: string;
+  nama: string;
+  email: string;
+  role: 'PESERTA' | 'ADMIN';
+  plan: string;
+  expiryDate: string | null;
+  createdAt: string;
+}
+
 export interface AdminPaymentItem {
   orderId: string;
   amount: number;

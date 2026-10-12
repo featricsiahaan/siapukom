@@ -9,6 +9,8 @@ import { extractTextFromDocument } from '../services/documentText';
 import { parseQuestionsFromText } from '../services/ruleBasedParser';
 import { parseQuestionsFromCsv } from '../services/csvParser';
 import { applySettlement } from '../services/membershipSettlement';
+import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 
 function isCsv(mimetype: string, filename: string): boolean {
   return mimetype === 'text/csv' || mimetype === 'application/vnd.ms-excel' || filename.toLowerCase().endsWith('.csv');
@@ -326,6 +328,46 @@ router.post(
     if (!payment) throw new HttpError(404, 'Pembayaran tidak ditemukan');
     const updated = await prisma.payment.update({ where: { id: payment.id }, data: { status: 'DENY' } });
     res.json({ status: updated.status });
+  })
+);
+
+router.get(
+  '/users',
+  asyncHandler(async (req, res) => {
+    const q = typeof req.query.q === 'string' ? req.query.q.trim() : '';
+    if (q.length < 3) return res.json({ users: [] });
+    const users = await prisma.user.findMany({
+      where: { OR: [{ email: { contains: q, mode: 'insensitive' } }, { nama: { contains: q, mode: 'insensitive' } }] },
+      include: { membership: { select: { plan: true, expiryDate: true } } },
+      orderBy: { createdAt: 'desc' },
+      take: 20,
+    });
+    res.json({
+      users: users.map((u) => ({
+        id: u.id,
+        nama: u.nama,
+        email: u.email,
+        role: u.role,
+        plan: u.membership?.plan ?? 'Trial',
+        expiryDate: u.membership?.expiryDate ?? null,
+        createdAt: u.createdAt,
+      })),
+    });
+  })
+);
+
+// Tanpa pengiriman email: admin membuat kata sandi sementara, lalu menyampaikannya ke peserta (mis. lewat WhatsApp).
+router.post(
+  '/users/:id/reset-password',
+  asyncHandler(async (req, res) => {
+    const user = await prisma.user.findUnique({ where: { id: req.params.id } });
+    if (!user) throw new HttpError(404, 'Pengguna tidak ditemukan');
+    if (user.role !== 'PESERTA') throw new HttpError(403, 'Hanya akun peserta yang dapat diatur ulang dari sini');
+
+    const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';
+    const temporaryPassword = Array.from(crypto.randomBytes(10), (b) => alphabet[b % alphabet.length]).join('');
+    await prisma.user.update({ where: { id: user.id }, data: { password: await bcrypt.hash(temporaryPassword, 10) } });
+    res.json({ email: user.email, nama: user.nama, temporaryPassword });
   })
 );
 

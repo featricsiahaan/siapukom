@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { ApiError } from '../api/client';
 
+const ADMIN_WA = '6281254147614';
+
 export function Masuk() {
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -111,8 +113,14 @@ export function Masuk() {
           )}
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '22px 0 22px' }}>
-            <a href="#lupa" className="link-hover-brown" style={{ fontSize: 12.5, fontWeight: 600, color: '#C9962E' }}>
-              Lupa password?
+            <a
+              href={`https://wa.me/${ADMIN_WA}?text=${encodeURIComponent('Halo admin SiapUKOM, saya lupa password. Email akun saya: ')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="link-hover-brown"
+              style={{ fontSize: 12.5, fontWeight: 600, color: '#C9962E' }}
+            >
+              Lupa password? Hubungi admin
             </a>
           </div>
 
