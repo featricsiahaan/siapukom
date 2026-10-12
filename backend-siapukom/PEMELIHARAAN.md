@@ -4,6 +4,7 @@ Jendela pemeliharaan mingguan yang disarankan: **Minggu malam, 21.00-23.00 WITA*
 
 ## Harian (5-10 menit)
 - Cek peringatan UptimeRobot (monitor `/api/health/db` dan frontend).
+- Buka **Laporan Soal** (Dashboard, akun admin): proses laporan baru dari peserta. Soal dengan banyak laporan *kunci salah* atau *pembahasan salah* ditahan dulu (Tahan Soal), lalu diperiksa; tutup laporan lain dengan Selesai atau Tolak.
 - Buka halaman **Konfirmasi Pembayaran** di aplikasi (akun admin) minimal 2x sehari; cocokkan nominal dengan mutasi BCA/GoPay lalu Konfirmasi atau Tolak.
 
 ## Mingguan (60-90 menit)
@@ -11,7 +12,8 @@ Jendela pemeliharaan mingguan yang disarankan: **Minggu malam, 21.00-23.00 WITA*
 2. **Backup:** `npx ts-node scripts/backupDb.ts`, lalu **salin file `backups/*.json.gz` ke penyimpanan lain** (mis. Google Drive pribadi). Jangan di-commit; berisi data pribadi.
 3. **Log:** buka log aplikasi di hPanel (Node.js > Logs); cari `ERROR`, "Cek status DOKU gagal", dan error 5xx berulang.
 4. **Pembayaran:** cari pembayaran `PENDING` atau `WAITING_CONFIRMATION` yang menggantung; cocokkan dengan dashboard DOKU dan mutasi bank.
-5. **Laporan peserta:** tinjau laporan soal salah; tahan soal bermasalah (status `DITAHAN`) sampai diperiksa.
+5. **Laporan peserta:** pastikan **tidak ada laporan lama yang menggantung** di Laporan Soal; soal yang ditahan diperiksa (perbaiki, lalu aktifkan kembali, atau arsipkan).
+5b. **Permintaan atur ulang kata sandi:** layani lewat menu Pengguna (kata sandi sementara hanya tampil sekali).
 6. **Konten (soal):** impor sebagai DRAFT -> telaah dokter (lembar telaah xlsx) -> `scripts/applyLembarTelaah.ts` -> aktif. Jangan mengaktifkan soal tanpa telaah.
 7. **Fitur/perbaikan:** kembangkan dan uji lokal -> `git push` ke `main` (Vercel dan Hostinger membangun otomatis) -> jalankan lagi `node scripts/smokeTest.js` -> uji satu alur nyata (login, mulai latihan).
 8. **Dependensi:** `npm audit` (jangan `--force` tanpa menguji). Terapkan pembaruan patch saja di jendela ini.
