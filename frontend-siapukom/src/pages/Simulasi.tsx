@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import * as api from '../api/client';
 import { ApiError } from '../api/client';
+import { ReportQuestion } from '../components/ReportQuestion';
 import type { FinishSimulasiResponse, SessionQuestion, SimulasiStatus } from '../api/types';
 
 type Screen = 'menu' | 'exam' | 'result';
@@ -570,6 +571,7 @@ function SimulasiResult({ result }: { result: FinishSimulasiResponse }) {
                 {w.pembahasan}
               </p>
             )}
+            <ReportQuestion questionId={w.questionId} />
           </div>
         ))}
       </div>

@@ -88,6 +88,9 @@ export function Dashboard() {
                 <Link to="/admin/pengguna" className="link-hover">
                   Pengguna
                 </Link>
+                <Link to="/admin/laporan" className="link-hover">
+                  Laporan Soal
+                </Link>
               </>
             )}
           </div>

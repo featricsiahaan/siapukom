@@ -1,5 +1,7 @@
 import type {
   AdminPaymentItem,
+  AdminReportGroup,
+  ReportReason,
   AdminUserItem,
   AnswerResponse,
   Category,
@@ -158,6 +160,18 @@ export function resetUserPassword(token: string, userId: string) {
 
 export function changePassword(token: string, currentPassword: string, newPassword: string) {
   return request<{ ok: boolean }>('/auth/change-password', { method: 'POST', body: { currentPassword, newPassword }, token });
+}
+
+export function reportQuestion(token: string | null, questionId: string, reason: ReportReason, note?: string) {
+  return request<{ ok: boolean }>(`/practice/questions/${questionId}/report`, { method: 'POST', body: { reason, note }, token });
+}
+
+export function listAdminReports(token: string) {
+  return request<{ groups: AdminReportGroup[] }>('/admin/reports', { token });
+}
+
+export function resolveReports(token: string, questionId: string, action: 'TAHAN_SOAL' | 'SELESAI' | 'TOLAK') {
+  return request<{ closed: number; held: boolean }>(`/admin/reports/question/${questionId}/resolve`, { method: 'POST', body: { action }, token });
 }
 
 export function listAdminPayments(token: string, status = 'WAITING_CONFIRMATION') {

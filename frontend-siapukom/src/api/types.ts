@@ -62,8 +62,30 @@ export interface AnalisaKategori {
   badgeText: string;
 }
 
+export type ReportReason = 'KUNCI_SALAH' | 'PEMBAHASAN_SALAH' | 'SOAL_TIDAK_JELAS' | 'GAMBAR_BERMASALAH' | 'LAINNYA';
+
+export interface AdminReportItem {
+  id: string;
+  reason: ReportReason;
+  note: string | null;
+  createdAt: string;
+  anonim: boolean;
+}
+
+export interface AdminReportGroup {
+  questionId: string;
+  kategori: string;
+  pertanyaan: string;
+  opsi: Opsi[];
+  kunci: string;
+  pembahasan: string;
+  statusSoal: string;
+  reports: AdminReportItem[];
+}
+
 export interface WrongAnswer {
   order: number;
+  questionId: string;
   kategori: string;
   pertanyaan: string;
   opsi: Opsi[];

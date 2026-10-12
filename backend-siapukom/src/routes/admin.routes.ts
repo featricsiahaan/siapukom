@@ -371,4 +371,56 @@ router.post(
   })
 );
 
+router.get(
+  '/reports',
+  asyncHandler(async (req, res) => {
+    const status = req.query.status === 'SELESAI' || req.query.status === 'DITOLAK' ? req.query.status : 'BARU';
+    const reports = await prisma.questionReport.findMany({
+      where: { status },
+      include: { question: { select: { id: true, pertanyaan: true, opsi: true, kunci: true, pembahasan: true, status: true, category: { select: { name: true } } } } },
+      orderBy: { createdAt: 'desc' },
+      take: 200,
+    });
+    // Kelompokkan per soal supaya soal yang dilaporkan banyak orang terlihat sekaligus.
+    const groups = new Map<string, any>();
+    for (const r of reports) {
+      const g = groups.get(r.questionId) ?? {
+        questionId: r.questionId,
+        kategori: r.question.category.name,
+        pertanyaan: r.question.pertanyaan,
+        opsi: r.question.opsi,
+        kunci: r.question.kunci,
+        pembahasan: r.question.pembahasan,
+        statusSoal: r.question.status,
+        reports: [] as any[],
+      };
+      g.reports.push({ id: r.id, reason: r.reason, note: r.note, createdAt: r.createdAt, anonim: !r.userId });
+      groups.set(r.questionId, g);
+    }
+    res.json({ groups: Array.from(groups.values()).sort((x, y) => y.reports.length - x.reports.length) });
+  })
+);
+
+const resolveReportsSchema = z.object({
+  action: z.enum(['TAHAN_SOAL', 'SELESAI', 'TOLAK']),
+});
+
+// Menutup SEMUA laporan terbuka untuk satu soal; TAHAN_SOAL juga menarik soal dari peserta.
+router.post(
+  '/reports/question/:questionId/resolve',
+  asyncHandler(async (req, res) => {
+    const { action } = resolveReportsSchema.parse(req.body);
+    const question = await prisma.question.findUnique({ where: { id: req.params.questionId }, select: { id: true } });
+    if (!question) throw new HttpError(404, 'Soal tidak ditemukan');
+    if (action === 'TAHAN_SOAL') {
+      await prisma.question.update({ where: { id: question.id }, data: { status: 'DITAHAN' } });
+    }
+    const result = await prisma.questionReport.updateMany({
+      where: { questionId: question.id, status: 'BARU' },
+      data: { status: action === 'TOLAK' ? 'DITOLAK' : 'SELESAI', resolvedAt: new Date() },
+    });
+    res.json({ closed: result.count, held: action === 'TAHAN_SOAL' });
+  })
+);
+
 export default router;

@@ -14,6 +14,7 @@ import { Peringkat } from './pages/Peringkat';
 import { Daftar } from './pages/Daftar';
 import { AdminUsers } from './pages/AdminUsers';
 import { Akun } from './pages/Akun';
+import { AdminReports } from './pages/AdminReports';
 
 function App() {
   return (
@@ -70,6 +71,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <AdminUsers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/laporan"
+            element={
+              <ProtectedRoute>
+                <AdminReports />
               </ProtectedRoute>
             }
           />

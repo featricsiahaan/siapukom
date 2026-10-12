@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import rateLimit from 'express-rate-limit';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma';
 import { asyncHandler } from '../middleware/asyncHandler';
@@ -9,6 +10,19 @@ import { levelFor, percentage } from '../utils/scoring';
 import { isAksesPenuhActive, isMateriAccessActive } from '../utils/membership';
 
 const router = Router();
+
+const reportRateLimit = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Terlalu banyak laporan dalam satu jam, coba lagi nanti' },
+});
+
+const reportSchema = z.object({
+  reason: z.enum(['KUNCI_SALAH', 'PEMBAHASAN_SALAH', 'SOAL_TIDAK_JELAS', 'GAMBAR_BERMASALAH', 'LAINNYA']),
+  note: z.string().trim().max(500, 'Catatan maksimal 500 karakter').optional(),
+});
 
 const SIMULASI_JUMLAH_SOAL = 150;
 const SIMULASI_DURASI_MENIT = 200;
@@ -257,6 +271,7 @@ router.post(
       .filter((a) => a.isCorrect !== true)
       .map((a) => ({
         order: a.order,
+        questionId: a.questionId,
         kategori: a.question.category.name,
         pertanyaan: a.question.pertanyaan,
         opsi: a.question.opsi as Opsi[],
@@ -291,6 +306,31 @@ router.get(
       durasiMenit: SIMULASI_DURASI_MENIT,
       jumlahSoalKategori: KATEGORI_JUMLAH_SOAL,
     });
+  })
+);
+
+router.post(
+  '/questions/:id/report',
+  reportRateLimit,
+  attachUserIfPresent,
+  asyncHandler(async (req, res) => {
+    const { reason, note } = reportSchema.parse(req.body);
+    const question = await prisma.question.findUnique({ where: { id: req.params.id }, select: { id: true } });
+    if (!question) throw new HttpError(404, 'Soal tidak ditemukan');
+
+    // Satu pengguna tidak perlu melapor soal yang sama berulang kali selagi laporannya masih terbuka.
+    if (req.user) {
+      const dup = await prisma.questionReport.findFirst({
+        where: { questionId: question.id, userId: req.user.id, reason, status: 'BARU' },
+        select: { id: true },
+      });
+      if (dup) return res.status(200).json({ ok: true, duplicate: true });
+    }
+
+    await prisma.questionReport.create({
+      data: { questionId: question.id, userId: req.user?.id ?? null, reason, note: note || null },
+    });
+    res.status(201).json({ ok: true });
   })
 );
 

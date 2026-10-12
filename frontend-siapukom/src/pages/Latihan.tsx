@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import * as api from '../api/client';
 import { ApiError } from '../api/client';
+import { ReportQuestion } from '../components/ReportQuestion';
 import type { Category, FinishSessionResponse, SessionQuestion, SimulasiStatus } from '../api/types';
 
 type Screen = 'menu' | 'session' | 'result';
@@ -430,6 +431,7 @@ export function Latihan() {
                     <p style={{ margin: 0, fontSize: 14, color: 'rgba(15,44,89,0.75)' }}>{currentFeedback.pembahasan}</p>
                   </div>
                 )}
+                {currentFeedback && <ReportQuestion key={currentQ.questionId} questionId={currentQ.questionId} />}
               </div>
 
               <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>

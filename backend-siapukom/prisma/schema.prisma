@@ -195,8 +195,38 @@ model Question {
   reviewDate            DateTime?
 
   answers SessionAnswer[]
+  reports QuestionReport[]
 
   @@index([status])
+}
+
+enum ReportReason {
+  KUNCI_SALAH
+  PEMBAHASAN_SALAH
+  SOAL_TIDAK_JELAS
+  GAMBAR_BERMASALAH
+  LAINNYA
+}
+
+enum ReportStatus {
+  BARU
+  SELESAI
+  DITOLAK
+}
+
+model QuestionReport {
+  id         String       @id @default(cuid())
+  questionId String
+  question   Question     @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  userId     String?
+  reason     ReportReason
+  note       String?
+  status     ReportStatus @default(BARU)
+  createdAt  DateTime     @default(now())
+  resolvedAt DateTime?
+
+  @@index([status, createdAt])
+  @@index([questionId])
 }
 
 model PracticeSession {
