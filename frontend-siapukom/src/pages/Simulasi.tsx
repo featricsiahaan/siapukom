@@ -564,6 +564,12 @@ function SimulasiResult({ result }: { result: FinishSimulasiResponse }) {
               {'  '}
               <span style={{ color: '#2E8B57', fontWeight: 700 }}>Kunci: {w.kunci}</span>
             </div>
+            {w.pembahasan && (
+              <p style={{ fontSize: 13, lineHeight: 1.6, margin: '12px 0 0', padding: '12px 14px', background: '#F6F8FC', borderRadius: 8, color: 'rgba(15,44,89,0.8)' }}>
+                <strong>Pembahasan: </strong>
+                {w.pembahasan}
+              </p>
+            )}
           </div>
         ))}
       </div>

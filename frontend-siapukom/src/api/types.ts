@@ -69,6 +69,7 @@ export interface WrongAnswer {
   opsi: Opsi[];
   answerLetter: string | null;
   kunci: string;
+  pembahasan: string;
 }
 
 export interface FinishSimulasiResponse extends FinishSessionResponse {

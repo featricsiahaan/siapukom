@@ -250,6 +250,7 @@ router.post(
         opsi: a.question.opsi as Opsi[],
         answerLetter: a.answerLetter,
         kunci: a.question.kunci,
+        pembahasan: a.question.pembahasan,
       }));
 
     res.json({
