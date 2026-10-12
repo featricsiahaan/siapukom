@@ -157,7 +157,7 @@ export function Masuk() {
           <p style={{ textAlign: 'center', fontSize: 13, color: 'rgba(15,44,89,0.55)', margin: '24px 0 0' }}>
             Belum punya akun?{' '}
             <Link to="/daftar" className="link-hover" style={{ fontWeight: 700, color: '#0F2C59' }}>
-              Daftar
+              Daftar dengan paket
             </Link>
           </p>
         </form>

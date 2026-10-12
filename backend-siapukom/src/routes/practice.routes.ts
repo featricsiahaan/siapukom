@@ -13,6 +13,7 @@ const router = Router();
 const SIMULASI_JUMLAH_SOAL = 150;
 const SIMULASI_DURASI_MENIT = 200;
 const KATEGORI_JUMLAH_SOAL = 30;
+const GRATIS_MAKS_SOAL = 20;
 
 const startSessionSchema = z.object({
   categoryId: z.string().trim().min(1).optional(),
@@ -72,11 +73,22 @@ router.post(
 
     // Simulasi selalu mengambil dari seluruh bank soal (tidak difilter kategori) agar merepresentasikan format CBT penuh.
     const effectiveCategoryId = mode === 'SIMULASI' ? undefined : categoryId;
-    const effectiveJumlah = mode === 'SIMULASI' ? SIMULASI_JUMLAH_SOAL : mode === 'KATEGORI' ? KATEGORI_JUMLAH_SOAL : (jumlah ?? 10);
+    // Latihan gratis hanya untuk tamu. Akun tanpa paket aktif diperlakukan sama seperti tamu:
+    // urutan soal tetap (tidak diacak) dan maksimal GRATIS_MAKS_SOAL, supaya mengulang-ulang latihan
+    // tidak memunculkan soal baru untuk "menghabiskan" bank soal gratis.
+    let isGuestLatihan = mode === 'LATIHAN' && !req.user;
+    if (mode === 'LATIHAN' && req.user && !isAdmin) {
+      const membership = await prisma.membership.findUnique({ where: { userId: req.user.id } });
+      isGuestLatihan = !isAksesPenuhActive(membership);
+    }
+    const isAnonymousLatihan = isGuestLatihan;
 
-    // Latihan gratis untuk tamu (anonim) memakai urutan soal tetap (tidak diacak) per kategori,
-    // supaya mengulang-ulang latihan tidak memunculkan soal baru untuk "menghabiskan" bank soal gratis.
-    const isAnonymousLatihan = mode === 'LATIHAN' && !req.user;
+    const effectiveJumlah =
+      mode === 'SIMULASI'
+        ? SIMULASI_JUMLAH_SOAL
+        : mode === 'KATEGORI'
+          ? KATEGORI_JUMLAH_SOAL
+          : Math.min(jumlah ?? 10, isGuestLatihan ? GRATIS_MAKS_SOAL : 150);
 
     const pool = await prisma.question.findMany({
       where: effectiveCategoryId ? { categoryId: effectiveCategoryId, status: 'ACTIVE' } : { status: 'ACTIVE' },

@@ -34,7 +34,7 @@ export function Landing() {
             Masuk
           </Link>
           <Link
-            to="/daftar"
+            to="/latihan"
             className="btn-primary"
             style={{
               background: '#0F2C59',

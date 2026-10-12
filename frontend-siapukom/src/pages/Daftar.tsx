@@ -4,10 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { ApiError } from '../api/client';
 import type { PackageType } from '../api/types';
 
-type Pilihan = 'GRATIS' | PackageType;
-
-const PILIHAN: { value: Pilihan; label: string; harga: string; ket: string }[] = [
-  { value: 'GRATIS', label: 'Gratis', harga: 'Rp 0', ket: 'Latihan terbatas' },
+const PILIHAN: { value: PackageType; label: string; harga: string; ket: string }[] = [
   { value: '2_MINGGU', label: '2 Minggu', harga: 'Rp 17.000', ket: 'Simulasi + Kategori Khusus' },
   { value: '1_BULAN', label: '1 Bulan', harga: 'Rp 30.000', ket: 'Plus Materi Belajar' },
 ];
@@ -19,8 +16,8 @@ export function Daftar() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const paketParam = params.get('paket');
-  const [pilihan, setPilihan] = useState<Pilihan>(
-    paketParam === '2_MINGGU' || paketParam === '1_BULAN' ? paketParam : 'GRATIS'
+  const [pilihan, setPilihan] = useState<PackageType>(
+    paketParam === '2_MINGGU' || paketParam === '1_BULAN' ? paketParam : '1_BULAN'
   );
 
   const [nama, setNama] = useState('');
@@ -50,7 +47,7 @@ export function Daftar() {
     setSubmitting(true);
     try {
       await register(nama.trim(), email.trim(), password);
-      navigate(pilihan === 'GRATIS' ? '/dashboard' : `/upgrade?paket=${pilihan}`);
+      navigate(`/upgrade?paket=${pilihan}`);
     } catch (err) {
       setErrorGeneral(err instanceof ApiError ? err.message : 'Gagal menghubungi server.');
       setSubmitting(false);
@@ -91,7 +88,7 @@ export function Daftar() {
         <form style={{ width: '100%', maxWidth: 440 }} onSubmit={onSubmit} noValidate>
           <h1 style={{ fontSize: 28, fontWeight: 800, letterSpacing: '-0.01em', margin: '0 0 8px' }}>Daftar</h1>
           <p style={{ fontSize: 14.5, color: 'rgba(15,44,89,0.65)', margin: '0 0 24px' }}>
-            Buat akun, lalu langsung pilih paket bila ingin Akses Penuh.
+            Akun khusus untuk peserta berbayar. Pilih paket, buat akun, lalu lanjut ke pembayaran.
           </p>
 
           <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>Pilih paket</div>
@@ -146,7 +143,7 @@ export function Daftar() {
               boxShadow: '0 10px 24px rgba(15,44,89,0.22)',
             }}
           >
-            {submitting ? 'Memproses…' : pilihan === 'GRATIS' ? 'Daftar' : 'Daftar dan Lanjut Bayar'}
+            {submitting ? 'Memproses…' : 'Daftar dan Lanjut Bayar'}
           </button>
 
           <p style={{ textAlign: 'center', fontSize: 12, color: 'rgba(15,44,89,0.5)', margin: '16px 0 0' }}>
@@ -157,6 +154,12 @@ export function Daftar() {
             .
           </p>
           <p style={{ textAlign: 'center', fontSize: 13, color: 'rgba(15,44,89,0.55)', margin: '16px 0 0' }}>
+            Ingin mencoba dulu?{' '}
+            <Link to="/latihan" className="link-hover" style={{ fontWeight: 700, color: '#0F2C59' }}>
+              Latihan gratis tanpa daftar
+            </Link>
+          </p>
+          <p style={{ textAlign: 'center', fontSize: 13, color: 'rgba(15,44,89,0.55)', margin: '8px 0 0' }}>
             Sudah punya akun?{' '}
             <Link to="/masuk" className="link-hover" style={{ fontWeight: 700, color: '#0F2C59' }}>
               Masuk
