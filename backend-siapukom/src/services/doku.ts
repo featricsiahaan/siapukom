@@ -96,3 +96,29 @@ export function verifyNotificationSignature(params: {
   const expected = `HMACSHA256=${signString(env.dokuSecretKey, stringToSign)}`;
   return expected === params.signatureHeader;
 }
+
+export async function getInvoiceStatus(invoiceNumber: string): Promise<string | null> {
+  const target = `/orders/v1/status/${invoiceNumber}`;
+  const requestId = crypto.randomUUID();
+  const timestamp = isoTimestamp();
+  const stringToSign = [
+    `Client-Id:${env.dokuClientId}`,
+    `Request-Id:${requestId}`,
+    `Request-Timestamp:${timestamp}`,
+    `Request-Target:${target}`,
+  ].join('\n');
+  const signature = `HMACSHA256=${signString(env.dokuSecretKey, stringToSign)}`;
+
+  const res = await fetch(`${BASE_URL}${target}`, {
+    headers: {
+      'Client-Id': env.dokuClientId,
+      'Request-Id': requestId,
+      'Request-Timestamp': timestamp,
+      Signature: signature,
+    },
+  });
+  if (!res.ok) return null;
+  const body: any = await res.json().catch(() => ({}));
+  const status = body?.transaction?.status;
+  return typeof status === 'string' ? status.toUpperCase() : null;
+}

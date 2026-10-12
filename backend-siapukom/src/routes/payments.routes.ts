@@ -4,7 +4,7 @@ import { prisma } from '../lib/prisma';
 import { asyncHandler } from '../middleware/asyncHandler';
 import { HttpError } from '../middleware/errorHandler';
 import { requireAuth } from '../middleware/auth';
-import { createQrisCheckout, verifyNotificationSignature } from '../services/doku';
+import { createQrisCheckout, getInvoiceStatus, verifyNotificationSignature } from '../services/doku';
 import { applySettlement } from '../services/membershipSettlement';
 
 export const MANUAL_TRANSFER_INFO = {
@@ -174,6 +174,19 @@ router.get(
     const payment = await prisma.payment.findUnique({ where: { orderId: req.params.orderId } });
     if (!payment) throw new HttpError(404, 'Pembayaran tidak ditemukan');
     if (payment.userId !== req.user!.id) throw new HttpError(403, 'Pembayaran ini bukan milik Anda');
+
+    // Jaring pengaman bila webhook DOKU tidak sampai: tanya status langsung ke DOKU.
+    if (payment.status === 'PENDING' && payment.method === 'DOKU') {
+      try {
+        const dokuStatus = await getInvoiceStatus(payment.orderId);
+        if (dokuStatus === 'SUCCESS') {
+          await applySettlement(payment);
+          return res.json({ status: 'SETTLEMENT' });
+        }
+      } catch (err) {
+        console.error('Cek status DOKU gagal:', err);
+      }
+    }
 
     if (payment.status === 'PENDING' && payment.expiresAt < new Date()) {
       const updated = await prisma.payment.update({ where: { id: payment.id }, data: { status: 'EXPIRE' } });
