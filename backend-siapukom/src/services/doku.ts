@@ -21,6 +21,7 @@ function digestOf(body: string): string {
 export async function createQrisCheckout(params: {
   orderId: string;
   amount: number;
+  notificationUrl?: string;
 }): Promise<{ paymentUrl: string; expiredDate: string | undefined }> {
   const target = '/checkout/v1/payment';
   const requestId = crypto.randomUUID();
@@ -36,6 +37,9 @@ export async function createQrisCheckout(params: {
         'VIRTUAL_ACCOUNT_DOKU',
       ],
     },
+    ...(params.notificationUrl
+      ? { additional_info: { override_notification_url: params.notificationUrl } }
+      : {}),
   });
 
   const stringToSign = [

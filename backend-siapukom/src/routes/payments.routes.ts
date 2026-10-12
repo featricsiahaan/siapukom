@@ -51,7 +51,10 @@ router.post(
     }
 
     const orderId = `SIAPUKOM-${Date.now()}-${userId.slice(0, 6)}`;
-    const checkout = await createQrisCheckout({ orderId, amount: pkg.amount });
+    const host = req.get('x-forwarded-host') ?? req.get('host');
+    const apiBase = process.env.PUBLIC_API_URL ?? (host ? `https://${host}` : '');
+    const notificationUrl = apiBase ? `${apiBase.replace(/\/$/, '')}/api/payments/notification` : undefined;
+    const checkout = await createQrisCheckout({ orderId, amount: pkg.amount, notificationUrl });
     const parsedExpiry = checkout.expiredDate ? new Date(checkout.expiredDate) : null;
     const expiresAt =
       parsedExpiry && !Number.isNaN(parsedExpiry.getTime()) ? parsedExpiry : new Date(Date.now() + 30 * 60 * 1000);
