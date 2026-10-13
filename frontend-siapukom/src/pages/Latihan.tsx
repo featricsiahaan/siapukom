@@ -178,7 +178,7 @@ export function Latihan() {
                 <>
                   <h1 style={{ fontSize: 36, fontWeight: 800, letterSpacing: '-0.01em', margin: '0 0 10px' }}>Latihan Gratis</h1>
                   <p style={{ fontSize: 15.5, color: 'rgba(15,44,89,0.65)', margin: '0 0 32px', maxWidth: '52ch' }}>
-                    Coba beberapa soal vignette klinis contoh dengan pembahasan langsung. Pilih jumlah soal untuk mulai.
+                    Coba beberapa soal contoh dengan pembahasan langsung. Pilih jumlah soal untuk mulai.
                   </p>
 
                   <div style={{ marginBottom: 36 }}>
@@ -228,14 +228,14 @@ export function Latihan() {
                     {loading ? 'Memuat…' : 'Mulai Latihan'}
                   </button>
                   <p style={{ fontSize: 12, color: 'rgba(15,44,89,0.45)', marginTop: 14 }}>
-                    Soal diambil dari bank soal server secara acak setiap sesi.
+                    Soal contoh dari bank soal SiapUKOM.
                   </p>
                   <p style={{ fontSize: 13, color: 'rgba(15,44,89,0.55)', marginTop: 24 }}>
                     Sudah punya akun?{' '}
                     <Link to="/masuk" className="link-hover" style={{ fontWeight: 700, color: '#0F2C59' }}>
                       Masuk
                     </Link>{' '}
-                    untuk latihan kategori khusus dengan kuota Akses Penuh.
+                    untuk Simulasi dan Latihan Kategori Khusus.
                   </p>
                 </>
               )}
