@@ -247,7 +247,7 @@ export function Upgrade() {
                   }}
                 >
                   {payMethod === 'MANUAL'
-                    ? 'Coba pembayaran otomatis (DOKU)'
+                    ? 'Bayar otomatis (QRIS atau Virtual Account)'
                     : 'Kembali ke transfer manual (BCA/GoPay)'}
                 </button>
               </>

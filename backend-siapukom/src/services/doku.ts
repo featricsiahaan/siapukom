@@ -35,6 +35,7 @@ export async function createQrisCheckout(params: {
         'VIRTUAL_ACCOUNT_BNI',
         'VIRTUAL_ACCOUNT_MAYBANK',
         'VIRTUAL_ACCOUNT_DOKU',
+        'QRIS',
       ],
     },
     ...(params.notificationUrl
