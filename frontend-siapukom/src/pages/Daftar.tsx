@@ -120,7 +120,7 @@ export function Daftar() {
             })}
           </div>
 
-          {field('nama', 'Nama lengkap', 'text', nama, setNama, 'Nama sesuai yang ingin ditampilkan', 'name')}
+          {field('nama', 'Nama', 'text', nama, setNama, 'Nama panggilan Anda', 'nickname')}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 16 }}>
             <label style={{ fontSize: 13, fontWeight: 700 }}>Jenis kelamin</label>
             <div style={{ display: 'flex', gap: 10 }}>
