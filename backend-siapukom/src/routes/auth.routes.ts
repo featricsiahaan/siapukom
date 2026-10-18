@@ -22,6 +22,7 @@ const registerSchema = z.object({
   nama: z.string().trim().min(1, 'Nama wajib diisi').max(120),
   email: z.string().trim().toLowerCase().email('Email tidak valid'),
   password: z.string().min(8, 'Password minimal 8 karakter').max(200),
+  jenisKelamin: z.enum(['LAKI_LAKI', 'PEREMPUAN'], { errorMap: () => ({ message: 'Jenis kelamin wajib dipilih' }) }),
 });
 
 const loginSchema = z.object({
@@ -37,7 +38,7 @@ router.post(
   '/register',
   authRateLimit,
   asyncHandler(async (req, res) => {
-    const { nama, email, password } = registerSchema.parse(req.body);
+    const { nama, email, password, jenisKelamin } = registerSchema.parse(req.body);
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
@@ -51,6 +52,7 @@ router.post(
         nama,
         email,
         password: passwordHash,
+        jenisKelamin,
         membership: {
           create: {
             plan: 'Trial',

@@ -106,6 +106,7 @@ model User {
   email     String   @unique
   password  String
   role      Role     @default(PESERTA)
+  jenisKelamin String?
   createdAt DateTime @default(now())
 
   membership Membership?

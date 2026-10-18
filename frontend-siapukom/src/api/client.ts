@@ -56,10 +56,10 @@ export function login(email: string, password: string) {
   });
 }
 
-export function register(nama: string, email: string, password: string) {
+export function register(nama: string, email: string, password: string, jenisKelamin: JenisKelamin) {
   return request<{ token: string; user: PublicUser }>('/auth/register', {
     method: 'POST',
-    body: { nama, email, password },
+    body: { nama, email, password, jenisKelamin },
   });
 }
 
@@ -161,6 +161,8 @@ export function resetUserPassword(token: string, userId: string) {
 export function changePassword(token: string, currentPassword: string, newPassword: string) {
   return request<{ ok: boolean }>('/auth/change-password', { method: 'POST', body: { currentPassword, newPassword }, token });
 }
+
+export type JenisKelamin = 'LAKI_LAKI' | 'PEREMPUAN';
 
 export function reportQuestion(token: string | null, questionId: string, reason: ReportReason, note?: string) {
   return request<{ ok: boolean }>(`/practice/questions/${questionId}/report`, { method: 'POST', body: { reason, note }, token });

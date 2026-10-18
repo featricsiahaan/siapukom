@@ -1,7 +1,7 @@
 import { useState, type CSSProperties, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { ApiError } from '../api/client';
+import { ApiError, type JenisKelamin } from '../api/client';
 import type { PackageType } from '../api/types';
 
 const PILIHAN: { value: PackageType; label: string; harga: string; ket: string }[] = [
@@ -21,6 +21,7 @@ export function Daftar() {
   );
 
   const [nama, setNama] = useState('');
+  const [jk, setJk] = useState<JenisKelamin | ''>('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [konfirmasi, setKonfirmasi] = useState('');
@@ -35,6 +36,7 @@ export function Daftar() {
     e.preventDefault();
     const next: Record<string, string> = {};
     if (!nama.trim()) next.nama = 'Nama wajib diisi';
+    if (!jk) next.jk = 'Pilih jenis kelamin';
     if (!email.trim()) next.email = 'Email wajib diisi';
     else if (!EMAIL_RE.test(email.trim())) next.email = 'Format email tidak valid';
     if (!password) next.password = 'Password wajib diisi';
@@ -46,7 +48,7 @@ export function Daftar() {
 
     setSubmitting(true);
     try {
-      await register(nama.trim(), email.trim(), password);
+      await register(nama.trim(), email.trim(), password, jk as JenisKelamin);
       navigate(`/upgrade?paket=${pilihan}`);
     } catch (err) {
       setErrorGeneral(err instanceof ApiError ? err.message : 'Gagal menghubungi server.');
@@ -119,6 +121,35 @@ export function Daftar() {
           </div>
 
           {field('nama', 'Nama lengkap', 'text', nama, setNama, 'Nama sesuai yang ingin ditampilkan', 'name')}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 16 }}>
+            <label style={{ fontSize: 13, fontWeight: 700 }}>Jenis kelamin</label>
+            <div style={{ display: 'flex', gap: 10 }}>
+              {([['LAKI_LAKI', 'Laki-laki'], ['PEREMPUAN', 'Perempuan']] as const).map(([v, l]) => (
+                <button
+                  type="button"
+                  key={v}
+                  onClick={() => {
+                    setJk(v);
+                    setErrors((p) => ({ ...p, jk: '' }));
+                  }}
+                  style={{
+                    flex: 1,
+                    padding: '12px 14px',
+                    fontSize: 14.5,
+                    fontWeight: 700,
+                    borderRadius: 10,
+                    cursor: 'pointer',
+                    color: '#0F2C59',
+                    border: jk === v ? '2px solid #C9962E' : `1px solid ${border('jk')}`,
+                    background: jk === v ? 'rgba(201,150,46,0.1)' : '#fff',
+                  }}
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
+            {errors.jk && <span style={{ fontSize: 12, color: '#C0392B' }}>{errors.jk}</span>}
+          </div>
           {field('email', 'Email', 'email', email, setEmail, 'Alamat email', 'email')}
           {field('password', 'Password', 'password', password, setPassword, 'Minimal 8 karakter', 'new-password')}
           {field('konfirmasi', 'Ulangi password', 'password', konfirmasi, setKonfirmasi, 'Ketik ulang password', 'new-password')}

@@ -14,7 +14,7 @@ interface AuthContextValue {
   user: PublicUser | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (nama: string, email: string, password: string) => Promise<void>;
+  register: (nama: string, email: string, password: string, jenisKelamin: api.JenisKelamin) => Promise<void>;
   logout: () => void;
 }
 
@@ -49,8 +49,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const result = await api.login(email, password);
         setAuth(result);
       },
-      register: async (nama: string, email: string, password: string) => {
-        const result = await api.register(nama, email, password);
+      register: async (nama: string, email: string, password: string, jenisKelamin: api.JenisKelamin) => {
+        const result = await api.register(nama, email, password, jenisKelamin);
         setAuth(result);
       },
       logout: () => setAuth(null),
