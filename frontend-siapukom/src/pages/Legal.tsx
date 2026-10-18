@@ -33,6 +33,14 @@ export function Legal() {
             dari institusi pendidikan Anda.
           </p>
           <p style={sty.p}>
+            Soal dan pembahasan di SiapUKOM dikembangkan dengan bantuan <strong>teknologi kecerdasan
+            buatan (AI)</strong>, kemudian disusun dan ditinjau dengan mengacu pada standar kompetensi
+            dokter (SKDI), kurikulum pendidikan dokter, serta pedoman klinis terbaru yang kami rujuk.
+            Karena dibuat dengan bantuan AI, sebagian isi bisa saja belum sempurna. Kami menyarankan
+            Anda tetap mencocokkan dengan buku ajar dan pedoman resmi, dan melaporkan lewat tombol
+            laporan bila menemukan yang kurang tepat.
+          </p>
+          <p style={sty.p}>
             Skor dan analitik kesiapan pada dashboard bersifat estimasi berdasarkan riwayat latihan Anda
             di aplikasi ini, dan <strong>tidak menjamin</strong> maupun memprediksi secara pasti hasil UKMPPD
             sesungguhnya. Gunakan sebagai salah satu alat bantu belajar, bukan satu-satunya acuan kesiapan.
