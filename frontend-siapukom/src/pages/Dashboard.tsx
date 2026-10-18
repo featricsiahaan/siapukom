@@ -1,4 +1,3 @@
-import { AjakTeman } from '../components/AjakTeman';
 import { ikonKategori, ikonSkor } from '../utils/ikonKategori';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -79,6 +78,9 @@ export function Dashboard() {
             </Link>
             <Link to="/materi" className="link-hover">
               Materi
+            </Link>
+            <Link to="/promo" className="link-hover">
+              Promo
             </Link>
             <Link to="/peringkat" className="link-hover">
               Peringkat
@@ -291,8 +293,6 @@ export function Dashboard() {
             </div>
           );
         })()}
-
-        <AjakTeman />
 
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 16 }}>
           <h2 style={{ fontSize: 19, fontWeight: 800, margin: 0 }}>Evaluasi Kesiapan per Kategori</h2>

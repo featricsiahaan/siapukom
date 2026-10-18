@@ -44,7 +44,14 @@ export function AjakTeman() {
   };
   useEffect(load, [token]);
 
-  if (!st || !st.eligible) return null;
+  if (!st) return null;
+  if (!st.eligible) {
+    return (
+      <div style={{ background: '#fff', borderRadius: 14, padding: 22, fontSize: 14, color: 'rgba(15,44,89,0.7)', boxShadow: '0 4px 14px rgba(15,44,89,0.05)' }}>
+        Promo ini khusus peserta Akses Penuh. Aktifkan paketmu dulu di menu Upgrade untuk ikut serta.
+      </div>
+    );
+  }
   const perlu = st.jumlahTeman;
 
   const salin = async () => {

@@ -16,6 +16,7 @@ import { AdminUsers } from './pages/AdminUsers';
 import { Akun } from './pages/Akun';
 import { AdminReports } from './pages/AdminReports';
 import { AdminShare } from './pages/AdminShare';
+import { Promo } from './pages/Promo';
 
 function App() {
   return (
@@ -56,6 +57,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Materi />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/promo"
+            element={
+              <ProtectedRoute>
+                <Promo />
               </ProtectedRoute>
             }
           />
