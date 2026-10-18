@@ -139,7 +139,7 @@ export function AdminShare() {
                 ) : (
                   '-'
                 )}
-                <span style={{ color: 'rgba(15,44,89,0.55)' }}> · cek apakah sudah follow @siapukom</span>
+                <span style={{ color: 'rgba(15,44,89,0.55)' }}> · cek apakah sudah follow @siap_ukom</span>
               </div>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
                 {c.screenshots.map((s, i) => (

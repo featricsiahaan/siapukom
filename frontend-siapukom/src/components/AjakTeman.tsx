@@ -4,7 +4,7 @@ import * as api from '../api/client';
 import { ApiError } from '../api/client';
 import type { ShareStatusResponse } from '../api/types';
 
-export const IG_AKUN = 'siapukom';
+export const IG_AKUN = 'siap_ukom';
 const SITE = 'https://siapukom.vercel.app';
 const PESAN = `Aku latihan soal UKMPPD di SiapUKOM, bisa lihat skor kesiapan per kategori. Coba 20 soal gratis tanpa daftar: ${SITE}`;
 
