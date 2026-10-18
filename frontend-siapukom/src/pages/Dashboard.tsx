@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import * as api from '../api/client';
 import { ApiError } from '../api/client';
-import type { DashboardResponse, SimulasiStatus } from '../api/types';
+import type { DashboardResponse, SimulasiRiwayat, SimulasiStatus } from '../api/types';
 
 export function Dashboard() {
   const { token, user, logout } = useAuth();
@@ -12,6 +12,7 @@ export function Dashboard() {
 
   const [data, setData] = useState<DashboardResponse | null>(null);
   const [status, setStatus] = useState<SimulasiStatus | null>(null);
+  const [riwayat, setRiwayat] = useState<SimulasiRiwayat | null>(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -21,6 +22,7 @@ export function Dashboard() {
       .then(setData)
       .catch((err) => setError(err instanceof ApiError ? err.message : 'Gagal memuat dashboard.'));
     api.getSimulasiStatus(token).then(setStatus).catch(() => {});
+    api.getSimulasiRiwayat(token).then(setRiwayat).catch(() => {});
   }, [token]);
 
   const onLogout = () => {
@@ -74,6 +76,9 @@ export function Dashboard() {
             </Link>
             <Link to="/materi" className="link-hover">
               Materi
+            </Link>
+            <Link to="/riwayat" className="link-hover">
+              Riwayat
             </Link>
             <Link to="/peringkat" className="link-hover">
               Peringkat
@@ -249,6 +254,34 @@ export function Dashboard() {
             />
           </div>
         </div>
+
+        {(() => {
+          const terlemah = [...data.categories].sort((a, b) => a.score - b.score)[0];
+          const terakhir = riwayat?.sessions[riwayat.sessions.length - 1];
+          if (!terlemah && !riwayat?.best) return null;
+          const chip = { background: '#fff', borderRadius: 12, padding: '12px 16px', fontSize: 13, boxShadow: '0 4px 14px rgba(15,44,89,0.05)' } as const;
+          return (
+            <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', margin: '-8px 0 28px' }}>
+              {terlemah && (
+                <Link to="/latihan" style={{ ...chip, flex: 1, minWidth: 220, border: '1px solid rgba(192,57,43,0.25)' }}>
+                  <div style={{ fontSize: 11, fontWeight: 800, color: '#C0392B', letterSpacing: '0.04em' }}>FOKUS LATIHAN</div>
+                  <div style={{ fontWeight: 700, marginTop: 2 }}>
+                    {terlemah.name} <span style={{ color: 'rgba(15,44,89,0.55)', fontWeight: 600 }}>· skor {terlemah.score}</span>
+                  </div>
+                </Link>
+              )}
+              {riwayat?.best && (
+                <Link to="/riwayat" style={{ ...chip, flex: 1, minWidth: 220 }}>
+                  <div style={{ fontSize: 11, fontWeight: 800, color: '#C9962E', letterSpacing: '0.04em' }}>REKOR SIMULASI</div>
+                  <div style={{ fontWeight: 700, marginTop: 2 }}>
+                    {riwayat.best.score}
+                    {terakhir && <span style={{ color: 'rgba(15,44,89,0.55)', fontWeight: 600 }}> · terakhir {terakhir.score}</span>}
+                  </div>
+                </Link>
+              )}
+            </div>
+          );
+        })()}
 
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 16 }}>
           <h2 style={{ fontSize: 19, fontWeight: 800, margin: 0 }}>Evaluasi Kesiapan per Kategori</h2>

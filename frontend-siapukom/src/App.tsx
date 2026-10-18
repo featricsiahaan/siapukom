@@ -11,6 +11,7 @@ import { Materi } from './pages/Materi';
 import { Legal } from './pages/Legal';
 import { AdminPayments } from './pages/AdminPayments';
 import { Peringkat } from './pages/Peringkat';
+import { Riwayat } from './pages/Riwayat';
 import { Daftar } from './pages/Daftar';
 import { AdminUsers } from './pages/AdminUsers';
 import { Akun } from './pages/Akun';
@@ -55,6 +56,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Materi />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/riwayat"
+            element={
+              <ProtectedRoute>
+                <Riwayat />
               </ProtectedRoute>
             }
           />

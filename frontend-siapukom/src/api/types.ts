@@ -113,6 +113,24 @@ export interface SimulasiStatus {
 
 export type PackageType = '2_MINGGU' | '1_BULAN';
 
+export interface SimulasiRiwayatItem {
+  id: string;
+  score: number;
+  level: string;
+  correctCount: number;
+  totalQuestions: number;
+  finishedAt: string;
+  durationMinutes: number;
+}
+
+export interface SimulasiRiwayat {
+  jenisKelamin: 'LAKI_LAKI' | 'PEREMPUAN' | null;
+  total: number;
+  average: number;
+  best: { id: string; score: number; level: string; finishedAt: string } | null;
+  sessions: SimulasiRiwayatItem[];
+}
+
 export interface DashboardCategory {
   name: string;
   score: number;

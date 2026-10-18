@@ -14,6 +14,7 @@ import type {
   PackageType,
   PaymentStatusResponse,
   PublicUser,
+  SimulasiRiwayat,
   SimulasiStatus,
   SlideItem,
   StartSessionResponse,
@@ -90,6 +91,10 @@ export function startSimulasi(token: string) {
 
 export function getSimulasiStatus(token: string) {
   return request<SimulasiStatus>('/practice/simulasi/status', { token });
+}
+
+export function getSimulasiRiwayat(token: string) {
+  return request<SimulasiRiwayat>('/practice/riwayat-simulasi', { token });
 }
 
 export function getLeaderboard(token: string) {

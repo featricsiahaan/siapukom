@@ -335,6 +335,46 @@ router.post(
 );
 
 router.get(
+  '/riwayat-simulasi',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const [user, sessions] = await Promise.all([
+      prisma.user.findUnique({ where: { id: req.user!.id }, select: { jenisKelamin: true } }),
+      prisma.practiceSession.findMany({
+        where: { userId: req.user!.id, mode: 'SIMULASI', status: 'FINISHED', finishedAt: { not: null } },
+        orderBy: { finishedAt: 'asc' },
+        select: { id: true, correctCount: true, totalQuestions: true, createdAt: true, finishedAt: true },
+      }),
+    ]);
+
+    const items = sessions.map((s) => {
+      const score = percentage(s.correctCount, s.totalQuestions);
+      return {
+        id: s.id,
+        score,
+        level: levelFor(score).level,
+        correctCount: s.correctCount,
+        totalQuestions: s.totalQuestions,
+        finishedAt: s.finishedAt!,
+        durationMinutes: Math.max(1, Math.round((s.finishedAt!.getTime() - s.createdAt.getTime()) / 60000)),
+      };
+    });
+
+    let best: (typeof items)[number] | null = null;
+    for (const it of items) if (!best || it.score > best.score) best = it;
+    const average = items.length ? Math.round(items.reduce((a, b) => a + b.score, 0) / items.length) : 0;
+
+    res.json({
+      jenisKelamin: user?.jenisKelamin ?? null,
+      total: items.length,
+      average,
+      best: best ? { id: best.id, score: best.score, level: best.level, finishedAt: best.finishedAt } : null,
+      sessions: items.slice(-10),
+    });
+  })
+);
+
+router.get(
   '/leaderboard',
   requireAuth,
   asyncHandler(async (req, res) => {
