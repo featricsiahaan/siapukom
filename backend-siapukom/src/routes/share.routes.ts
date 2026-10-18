@@ -7,7 +7,7 @@ import { requireAuth } from '../middleware/auth';
 
 const router = Router();
 
-export const SHARE_BONUS_DAYS = 2;
+export const SHARE_BONUS_DAYS = 3;
 export const SHARE_MAX_APPROVED = 1;
 
 router.get(
