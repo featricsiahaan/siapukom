@@ -493,6 +493,8 @@ export function Simulasi() {
 }
 
 function SimulasiResult({ result }: { result: FinishSimulasiResponse }) {
+  const [cari, setCari] = useState('');
+  const [kategoriPilih, setKategoriPilih] = useState('');
   const circumference = 2 * Math.PI * 60;
   const offset = circumference * (1 - result.resultScore / 100);
 
@@ -549,9 +551,55 @@ function SimulasiResult({ result }: { result: FinishSimulasiResponse }) {
         ))}
       </div>
 
-      <h3 style={{ fontSize: 16, fontWeight: 800, margin: '0 0 16px' }}>Soal Salah & Kunci Jawaban ({result.wrongAnswers.length})</h3>
+      <h3 style={{ fontSize: 16, fontWeight: 800, margin: '0 0 12px' }}>Soal Salah & Kunci Jawaban ({result.wrongAnswers.length})</h3>
+      <input
+        type="search"
+        value={cari}
+        onChange={(e) => setCari(e.target.value)}
+        placeholder="Cari soal, pembahasan, atau kategori…"
+        style={{ width: '100%', boxSizing: 'border-box', padding: '12px 14px', fontSize: 14, borderRadius: 10, border: '1px solid rgba(15,44,89,0.2)', marginBottom: 10 }}
+      />
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 14 }}>
+        {['', ...Array.from(new Set(result.wrongAnswers.map((w) => w.kategori)))].map((k) => (
+          <button
+            key={k || 'semua'}
+            type="button"
+            onClick={() => setKategoriPilih(k)}
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              padding: '6px 12px',
+              borderRadius: 999,
+              cursor: 'pointer',
+              border: '1px solid rgba(15,44,89,0.2)',
+              background: kategoriPilih === k ? '#0F2C59' : '#fff',
+              color: kategoriPilih === k ? '#fff' : '#0F2C59',
+            }}
+          >
+            {k || 'Semua'}
+          </button>
+        ))}
+      </div>
+      {(() => {
+        const q = cari.trim().toLowerCase();
+        const cocok = result.wrongAnswers.filter(
+          (w) =>
+            (!kategoriPilih || w.kategori === kategoriPilih) &&
+            (!q || `${w.pertanyaan} ${w.pembahasan} ${w.kategori}`.toLowerCase().includes(q))
+        );
+        return (
+          <div style={{ fontSize: 12.5, color: 'rgba(15,44,89,0.55)', marginBottom: 12 }}>
+            {cocok.length === result.wrongAnswers.length ? `${cocok.length} soal` : `${cocok.length} dari ${result.wrongAnswers.length} soal cocok`}
+          </div>
+        );
+      })()}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 32 }}>
-        {result.wrongAnswers.map((w) => (
+        {result.wrongAnswers
+          .filter((w) => {
+            const q = cari.trim().toLowerCase();
+            return (!kategoriPilih || w.kategori === kategoriPilih) && (!q || `${w.pertanyaan} ${w.pembahasan} ${w.kategori}`.toLowerCase().includes(q));
+          })
+          .map((w) => (
           <div key={w.order} style={{ background: '#fff', border: '1px solid rgba(15,44,89,0.1)', borderRadius: 12, padding: 20 }}>
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
               <span style={{ fontSize: 11, fontWeight: 700, color: '#8A6A2E', background: 'rgba(229,186,115,0.18)', padding: '3px 9px', borderRadius: 999 }}>
