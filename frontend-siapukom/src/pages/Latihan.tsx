@@ -398,13 +398,13 @@ export function Latihan() {
                     }
                     return (
                       <label
-                        key={opt.letter}
+                        key={`${currentQ.questionId}-${opt.letter}`}
                         className="option-row"
                         style={{ background: bg, borderColor: border, textDecoration, opacity }}
                       >
                         <input
                           type="radio"
-                          name="opt-current"
+                          name={`opt-${currentQ.questionId}`}
                           checked={selected}
                           disabled={!!currentFeedback}
                           onChange={() => selectAnswer(opt.letter)}

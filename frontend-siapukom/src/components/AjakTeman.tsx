@@ -6,7 +6,7 @@ import type { ShareStatusResponse } from '../api/types';
 
 export const IG_AKUN = 'siap_ukom';
 const SITE = 'https://siapukom.vercel.app';
-const PESAN = `Aku latihan soal UKMPPD di SiapUKOM, bisa lihat skor kesiapan per kategori. Coba 20 soal gratis tanpa daftar: ${SITE}`;
+const PESAN = `Aku latihan soal UKNPDPD di SiapUKOM, bisa lihat skor kesiapan per kategori. Coba 20 soal gratis tanpa daftar: ${SITE}`;
 
 // Perkecil gambar di peramban agar ringan dikirim dan disimpan.
 function perkecil(file: File): Promise<string> {

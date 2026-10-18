@@ -223,7 +223,7 @@ export function Simulasi() {
             <>
               <h1 style={{ fontSize: 32, fontWeight: 800, letterSpacing: '-0.01em', margin: '0 0 10px' }}>Simulasi Ujian CBT</h1>
               <p style={{ fontSize: 15.5, color: 'rgba(15,44,89,0.65)', margin: '0 0 28px', maxWidth: '56ch' }}>
-                Format dibuat semirip mungkin dengan UKMPPD sungguhan: {status?.jumlahSoal ?? 150} soal dalam{' '}
+                Format dibuat semirip mungkin dengan UKNPDPD sungguhan: {status?.jumlahSoal ?? 150} soal dalam{' '}
                 {status?.durasiMenit ?? 200} menit, tanpa pembahasan langsung. Kunci jawaban dan pembahasan baru terbuka
                 setelah ujian selesai.
               </p>
@@ -313,14 +313,14 @@ export function Simulasi() {
                       const selected = answers[current] === opt.letter;
                       return (
                         <label
-                          key={opt.letter}
+                          key={`${currentQ.questionId}-${opt.letter}`}
                           className="option-row"
                           style={{
                             background: selected ? 'rgba(15,44,89,0.06)' : '#fff',
                             borderColor: selected ? '#0F2C59' : 'rgba(15,44,89,0.15)',
                           }}
                         >
-                          <input type="radio" name="opt-current" checked={selected} onChange={() => selectAnswer(opt.letter)} />
+                          <input type="radio" name={`opt-${currentQ.questionId}`} checked={selected} onChange={() => selectAnswer(opt.letter)} />
                           <span>
                             <strong>{opt.letter}.</strong> {opt.text}
                           </span>

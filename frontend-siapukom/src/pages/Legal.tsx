@@ -42,7 +42,7 @@ export function Legal() {
           </p>
           <p style={sty.p}>
             Skor dan analitik kesiapan pada dashboard bersifat estimasi berdasarkan riwayat latihan Anda
-            di aplikasi ini, dan <strong>tidak menjamin</strong> maupun memprediksi secara pasti hasil UKMPPD
+            di aplikasi ini, dan <strong>tidak menjamin</strong> maupun memprediksi secara pasti hasil UKNPDPD
             sesungguhnya. Gunakan sebagai salah satu alat bantu belajar, bukan satu-satunya acuan kesiapan.
           </p>
           <p style={sty.p}>
