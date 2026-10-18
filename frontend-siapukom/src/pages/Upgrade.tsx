@@ -36,7 +36,7 @@ export function Upgrade() {
   const [packageType, setPackageType] = useState<PackageType>(
     paketAwal === '2_MINGGU' || paketAwal === '1_BULAN' ? paketAwal : '1_BULAN'
   );
-  const [payMethod, setPayMethod] = useState<PayMethod>('MANUAL');
+  const [payMethod, setPayMethod] = useState<PayMethod>('DOKU');
   const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
   const [amount, setAmount] = useState(
     PACKAGES.find((p) => p.type === (paketAwal === '2_MINGGU' ? '2_MINGGU' : '1_BULAN'))!.amount
@@ -216,6 +216,41 @@ export function Upgrade() {
                     ? 'Termasuk Simulasi, Latihan Kategori Khusus, dan Materi Belajar tanpa batas.'
                     : 'Termasuk Simulasi dan Latihan Kategori Khusus tanpa batas (tanpa akses Materi Belajar).'}
                 </p>
+                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>Cara pembayaran</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 18 }}>
+                  {([
+                    ['DOKU', 'Bayar otomatis', 'QRIS atau Virtual Account. Aktif langsung setelah bayar.', true],
+                    ['MANUAL', 'Transfer manual', 'BCA atau GoPay. Aktif setelah dikonfirmasi admin.', false],
+                  ] as const).map(([v, judul, ket, rekom]) => {
+                    const aktif = payMethod === v;
+                    return (
+                      <button
+                        key={v}
+                        type="button"
+                        onClick={() => setPayMethod(v)}
+                        style={{
+                          textAlign: 'left',
+                          padding: '12px 14px',
+                          borderRadius: 12,
+                          cursor: 'pointer',
+                          border: `2px solid ${aktif ? '#C9962E' : 'rgba(15,44,89,0.15)'}`,
+                          background: aktif ? 'rgba(201,150,46,0.08)' : '#fff',
+                          color: '#0F2C59',
+                        }}
+                      >
+                        <div style={{ fontSize: 14.5, fontWeight: 800 }}>
+                          {judul}
+                          {rekom && (
+                            <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 800, background: '#C9962E', color: '#fff', padding: '2px 8px', borderRadius: 99 }}>
+                              Disarankan
+                            </span>
+                          )}
+                        </div>
+                        <div style={{ fontSize: 12.5, color: 'rgba(15,44,89,0.6)', marginTop: 2 }}>{ket}</div>
+                      </button>
+                    );
+                  })}
+                </div>
                 <button
                   onClick={startPayment}
                   className="btn-primary"
@@ -233,22 +268,6 @@ export function Upgrade() {
                   }}
                 >
                   {payMethod === 'MANUAL' ? 'Buat Pesanan' : 'Bayar Sekarang'}
-                </button>
-                <button
-                  onClick={() => setPayMethod(payMethod === 'MANUAL' ? 'DOKU' : 'MANUAL')}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: 'rgba(15,44,89,0.55)',
-                    fontSize: 12.5,
-                    textDecoration: 'underline',
-                    cursor: 'pointer',
-                    marginTop: 14,
-                  }}
-                >
-                  {payMethod === 'MANUAL'
-                    ? 'Bayar otomatis (QRIS atau Virtual Account)'
-                    : 'Kembali ke transfer manual (BCA/GoPay)'}
                 </button>
               </>
             )}
