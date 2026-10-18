@@ -15,6 +15,8 @@ import type {
   PaymentStatusResponse,
   PublicUser,
   SimulasiRiwayat,
+  ShareStatusResponse,
+  AdminShareClaim,
   SimulasiStatus,
   SlideItem,
   StartSessionResponse,
@@ -91,6 +93,22 @@ export function startSimulasi(token: string) {
 
 export function getSimulasiStatus(token: string) {
   return request<SimulasiStatus>('/practice/simulasi/status', { token });
+}
+
+export function getShareStatus(token: string) {
+  return request<ShareStatusResponse>('/share/status', { token });
+}
+
+export function submitShareClaim(token: string, instagram: string, screenshots: string[]) {
+  return request<{ ok: boolean }>('/share/claim', { method: 'POST', body: { instagram, screenshots }, token });
+}
+
+export function listShareClaims(token: string) {
+  return request<{ claims: AdminShareClaim[] }>('/admin/share-claims', { token });
+}
+
+export function decideShareClaim(token: string, id: string, action: 'approve' | 'reject') {
+  return request<{ ok: boolean }>(`/admin/share-claims/${id}/${action}`, { method: 'POST', token });
 }
 
 export function getSimulasiRiwayat(token: string) {

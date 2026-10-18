@@ -12,6 +12,7 @@ import dashboardRoutes from './routes/dashboard.routes';
 import adminRoutes from './routes/admin.routes';
 import paymentsRoutes from './routes/payments.routes';
 import materiRoutes from './routes/materi.routes';
+import shareRoutes from './routes/share.routes';
 
 export function createApp() {
   const app = express();
@@ -28,6 +29,7 @@ export function createApp() {
   // DOKU menandatangani body notifikasi dari byte mentahnya, jadi jangan biarkan
   // express.json() mem-parse ulang (re-serialize) rute ini sebelum verifikasi signature.
   app.use('/api/payments/notification', express.raw({ type: '*/*', limit: '1mb' }));
+  app.use('/api/share/claim', express.json({ limit: '4mb' }));
   app.use(express.json({ limit: '1mb' }));
   app.use(morgan(isProduction ? 'combined' : 'dev'));
 
@@ -52,6 +54,7 @@ export function createApp() {
   app.use('/api/admin', adminRoutes);
   app.use('/api/payments', paymentsRoutes);
   app.use('/api/materi', materiRoutes);
+  app.use('/api/share', shareRoutes);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

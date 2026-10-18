@@ -131,6 +131,30 @@ export interface SimulasiRiwayat {
   sessions: SimulasiRiwayatItem[];
 }
 
+export interface ShareStatusResponse {
+  bonusDays: number;
+  jumlahTeman: number;
+  maxApproved: number;
+  approved: number;
+  pending: boolean;
+  canClaim: boolean;
+  eligible: boolean;
+  claims: { id: string; platform: string; status: 'MENUNGGU' | 'DISETUJUI' | 'DITOLAK'; createdAt: string }[];
+}
+
+export interface AdminShareClaim {
+  id: string;
+  nama: string;
+  email: string;
+  platform: string;
+  bukti: string | null;
+  instagram: string | null;
+  screenshots: string[];
+  bonusDays: number;
+  expiryDate: string | null;
+  createdAt: string;
+}
+
 export interface DashboardCategory {
   name: string;
   score: number;

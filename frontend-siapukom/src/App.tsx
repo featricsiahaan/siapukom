@@ -15,6 +15,7 @@ import { Daftar } from './pages/Daftar';
 import { AdminUsers } from './pages/AdminUsers';
 import { Akun } from './pages/Akun';
 import { AdminReports } from './pages/AdminReports';
+import { AdminShare } from './pages/AdminShare';
 
 function App() {
   return (
@@ -71,6 +72,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <AdminUsers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/share"
+            element={
+              <ProtectedRoute>
+                <AdminShare />
               </ProtectedRoute>
             }
           />

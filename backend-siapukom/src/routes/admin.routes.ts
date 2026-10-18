@@ -423,4 +423,66 @@ router.post(
   })
 );
 
+router.get(
+  '/share-claims',
+  asyncHandler(async (_req, res) => {
+    const claims = await prisma.shareClaim.findMany({
+      where: { status: 'MENUNGGU' },
+      orderBy: { createdAt: 'asc' },
+      include: { user: { select: { nama: true, email: true, membership: { select: { expiryDate: true } } } } },
+    });
+    res.json({
+      claims: claims.map((c) => ({
+        id: c.id,
+        nama: c.user.nama,
+        email: c.user.email,
+        platform: c.platform,
+        bukti: c.bukti,
+        instagram: c.instagram,
+        screenshots: c.screenshots,
+        bonusDays: c.bonusDays,
+        expiryDate: c.user.membership?.expiryDate ?? null,
+        createdAt: c.createdAt,
+      })),
+    });
+  })
+);
+
+router.post(
+  '/share-claims/:id/approve',
+  asyncHandler(async (req, res) => {
+    const claim = await prisma.shareClaim.findUnique({ where: { id: String(req.params.id) } });
+    if (!claim) throw new HttpError(404, 'Klaim tidak ditemukan');
+    if (claim.status !== 'MENUNGGU') throw new HttpError(409, 'Klaim sudah diproses');
+    const membership = await prisma.membership.findUnique({ where: { userId: claim.userId } });
+    const now = new Date();
+    const ms = claim.bonusDays * 24 * 60 * 60 * 1000;
+    const base = membership?.expiryDate && membership.expiryDate > now ? membership.expiryDate : now;
+    const materiAktif = !!membership?.materiExpiryDate && membership.materiExpiryDate > now;
+    await prisma.$transaction([
+      prisma.shareClaim.update({ where: { id: claim.id }, data: { status: 'DISETUJUI', reviewedAt: now } }),
+      prisma.membership.update({
+        where: { userId: claim.userId },
+        data: {
+          plan: 'Akses Penuh',
+          expiryDate: new Date(base.getTime() + ms),
+          ...(materiAktif ? { materiExpiryDate: new Date(membership!.materiExpiryDate!.getTime() + ms) } : {}),
+        },
+      }),
+    ]);
+    res.json({ ok: true });
+  })
+);
+
+router.post(
+  '/share-claims/:id/reject',
+  asyncHandler(async (req, res) => {
+    const claim = await prisma.shareClaim.findUnique({ where: { id: String(req.params.id) } });
+    if (!claim) throw new HttpError(404, 'Klaim tidak ditemukan');
+    if (claim.status !== 'MENUNGGU') throw new HttpError(409, 'Klaim sudah diproses');
+    await prisma.shareClaim.update({ where: { id: claim.id }, data: { status: 'DITOLAK', reviewedAt: new Date() } });
+    res.json({ ok: true });
+  })
+);
+
 export default router;

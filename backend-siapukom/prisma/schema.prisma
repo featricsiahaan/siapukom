@@ -112,6 +112,7 @@ model User {
   membership Membership?
   sessions   PracticeSession[]
   payments   Payment[]
+  shareClaims ShareClaim[]
 }
 
 model Membership {
@@ -260,4 +261,27 @@ model SessionAnswer {
   answeredAt   DateTime?
 
   @@unique([sessionId, order])
+}
+
+enum ShareStatus {
+  MENUNGGU
+  DISETUJUI
+  DITOLAK
+}
+
+model ShareClaim {
+  id         String      @id @default(cuid())
+  userId     String
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  platform   String
+  bukti      String?
+  instagram  String?
+  screenshots String[] @default([])
+  status     ShareStatus @default(MENUNGGU)
+  bonusDays  Int         @default(3)
+  createdAt  DateTime    @default(now())
+  reviewedAt DateTime?
+
+  @@index([status, createdAt])
+  @@index([userId])
 }

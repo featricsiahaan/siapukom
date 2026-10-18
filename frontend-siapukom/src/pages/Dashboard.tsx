@@ -1,3 +1,4 @@
+import { AjakTeman } from '../components/AjakTeman';
 import { ikonKategori, ikonSkor } from '../utils/ikonKategori';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -12,6 +13,7 @@ export function Dashboard() {
 
   const [data, setData] = useState<DashboardResponse | null>(null);
   const [status, setStatus] = useState<SimulasiStatus | null>(null);
+  const [klaimBaru, setKlaimBaru] = useState(0);
   const [riwayat, setRiwayat] = useState<SimulasiRiwayat | null>(null);
   const [error, setError] = useState('');
 
@@ -22,6 +24,7 @@ export function Dashboard() {
       .then(setData)
       .catch((err) => setError(err instanceof ApiError ? err.message : 'Gagal memuat dashboard.'));
     api.getSimulasiStatus(token).then(setStatus).catch(() => {});
+    if (user?.role === 'ADMIN') api.listShareClaims(token).then((r) => setKlaimBaru(r.claims.length)).catch(() => {});
     api.getSimulasiRiwayat(token).then(setRiwayat).catch(() => {});
   }, [token]);
 
@@ -90,6 +93,9 @@ export function Dashboard() {
                 </Link>
                 <Link to="/admin/pengguna" className="link-hover">
                   Pengguna
+                </Link>
+                <Link to="/admin/share" className="link-hover">
+                  Verifikasi Share{klaimBaru > 0 ? ` (${klaimBaru})` : ''}
                 </Link>
                 <Link to="/admin/laporan" className="link-hover">
                   Laporan Soal
@@ -285,6 +291,8 @@ export function Dashboard() {
             </div>
           );
         })()}
+
+        <AjakTeman />
 
         <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 16 }}>
           <h2 style={{ fontSize: 19, fontWeight: 800, margin: 0 }}>Evaluasi Kesiapan per Kategori</h2>
