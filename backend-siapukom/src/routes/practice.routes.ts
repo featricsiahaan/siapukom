@@ -369,7 +369,7 @@ router.get(
       total: items.length,
       average,
       best: best ? { id: best.id, score: best.score, level: best.level, finishedAt: best.finishedAt } : null,
-      sessions: items.slice(-10),
+      sessions: [...items].sort((a, b) => b.score - a.score || a.finishedAt.getTime() - b.finishedAt.getTime()).slice(0, 5),
     });
   })
 );

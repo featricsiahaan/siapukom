@@ -254,7 +254,6 @@ export function Dashboard() {
 
         {(() => {
           const terlemah = [...data.categories].sort((a, b) => a.score - b.score)[0];
-          const terakhir = riwayat?.sessions[riwayat.sessions.length - 1];
           if (!terlemah && !riwayat?.best) return null;
           const chip = { background: '#fff', borderRadius: 12, padding: '12px 16px', fontSize: 13, boxShadow: '0 4px 14px rgba(15,44,89,0.05)' } as const;
           return (
@@ -271,29 +270,16 @@ export function Dashboard() {
               )}
               {riwayat?.best && (
                 <div style={{ ...chip, flex: 2, minWidth: 320 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                    <div style={{ fontSize: 11, fontWeight: 800, color: '#C9962E', letterSpacing: '0.04em' }}>REKOR SIMULASI</div>
-                    <div style={{ fontSize: 12, color: 'rgba(15,44,89,0.55)' }}>{riwayat.total} simulasi · rata-rata {riwayat.average}</div>
-                  </div>
-                  <div style={{ fontSize: 24, fontWeight: 800, margin: '2px 0 8px' }}>
-                    {riwayat.best.score}
-                    <span style={{ fontSize: 12, fontWeight: 600, color: 'rgba(15,44,89,0.5)' }}> terbaik</span>
-                  </div>
-                  <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end', height: 44 }}>
-                    {riwayat.sessions.slice(-8).map((x) => (
-                      <div
-                        key={x.id}
-                        title={`${x.score} · ${new Date(x.finishedAt).toLocaleDateString('id-ID')}`}
-                        style={{
-                          flex: 1,
-                          height: `${Math.max(8, x.score * 0.44)}px`,
-                          borderRadius: 4,
-                          background: x.id === riwayat.best!.id ? '#C9962E' : x.score >= 80 ? '#2E8B57' : x.score >= 60 ? '#E5BA73' : '#C0392B',
-                        }}
-                      />
-                    ))}
-                  </div>
-                  {terakhir && <div style={{ fontSize: 12, color: 'rgba(15,44,89,0.55)', marginTop: 6 }}>Terakhir: {terakhir.score}</div>}
+                  <div style={{ fontSize: 11, fontWeight: 800, color: '#C9962E', letterSpacing: '0.04em', marginBottom: 6 }}>REKOR SIMULASI</div>
+                  {riwayat.sessions.map((x, i) => (
+                    <div key={x.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '5px 0', borderTop: i ? '1px solid rgba(15,44,89,0.07)' : 'none' }}>
+                      <div style={{ width: 22, fontWeight: 800, color: i === 0 ? '#C9962E' : 'rgba(15,44,89,0.45)' }}>{i + 1}</div>
+                      <div style={{ width: 40, fontSize: 18, fontWeight: 800, color: x.score >= 80 ? '#2E8B57' : x.score >= 60 ? '#B8860B' : '#C0392B' }}>{x.score}</div>
+                      <div style={{ color: 'rgba(15,44,89,0.6)' }}>
+                        {new Date(x.finishedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
