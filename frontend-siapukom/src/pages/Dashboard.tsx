@@ -1,3 +1,4 @@
+import { ikonKategori } from '../utils/ikonKategori';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -280,7 +281,19 @@ export function Dashboard() {
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
-                  <div style={{ fontSize: 14.5, fontWeight: 700 }}>{cat.name}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    {ikonKategori(cat.name) && (
+                      <img
+                        src={ikonKategori(cat.name)!}
+                        alt=""
+                        width={44}
+                        height={44}
+                        loading="lazy"
+                        style={{ flexShrink: 0, objectFit: 'contain' }}
+                      />
+                    )}
+                    <div style={{ fontSize: 14.5, fontWeight: 700 }}>{cat.name}</div>
+                  </div>
                   <div
                     style={{
                       fontSize: 11,
