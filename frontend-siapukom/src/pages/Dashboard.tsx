@@ -1,4 +1,4 @@
-import { ikonKategori } from '../utils/ikonKategori';
+import { ikonKategori, ikonSkor } from '../utils/ikonKategori';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -240,6 +240,13 @@ export function Dashboard() {
                   : 'Belum ada riwayat latihan. Selesaikan sesi latihan untuk melihat skor kesiapanmu di sini.'}
               </p>
             </div>
+            <img
+              src={ikonSkor(data.readiness.hasData ? data.readiness.label : 'Perlu Latihan', data.jenisKelamin)}
+              alt={data.readiness.label}
+              width={130}
+              height={130}
+              style={{ flexShrink: 0, objectFit: 'contain' }}
+            />
           </div>
         </div>
 

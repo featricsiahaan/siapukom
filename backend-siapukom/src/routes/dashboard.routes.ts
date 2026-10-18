@@ -54,6 +54,7 @@ router.get(
 
     res.json({
       nama: user.nama,
+      jenisKelamin: user.jenisKelamin,
       initial: user.nama.trim()[0]?.toUpperCase() ?? 'P',
       membership: membership
         ? {

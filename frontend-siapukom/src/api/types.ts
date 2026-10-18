@@ -131,6 +131,7 @@ export interface DashboardMembership {
 
 export interface DashboardResponse {
   nama: string;
+  jenisKelamin: 'LAKI_LAKI' | 'PEREMPUAN' | null;
   initial: string;
   membership: DashboardMembership | null;
   readiness: {

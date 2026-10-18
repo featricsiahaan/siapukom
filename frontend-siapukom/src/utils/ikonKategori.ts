@@ -25,6 +25,11 @@ const DAFTAR: [RegExp, string][] = [
   [/nefro|ginjal/i, 'nefrologi'],
 ];
 
+export function ikonSkor(label: string, jenisKelamin: string | null): string {
+  const tingkat = label === 'Siap' ? 'siap' : label === 'Cukup' ? 'cukup' : 'perlu';
+  return `/ikon-skor/${tingkat}-${jenisKelamin === 'PEREMPUAN' ? 'pr' : 'lk'}.png`;
+}
+
 export function ikonKategori(nama: string): string | null {
   const hit = DAFTAR.find(([re]) => re.test(nama));
   return hit ? `/ikon-kategori/${hit[1]}.png` : null;
