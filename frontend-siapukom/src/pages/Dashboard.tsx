@@ -77,9 +77,6 @@ export function Dashboard() {
             <Link to="/materi" className="link-hover">
               Materi
             </Link>
-            <Link to="/riwayat" className="link-hover">
-              Riwayat
-            </Link>
             <Link to="/peringkat" className="link-hover">
               Peringkat
             </Link>
@@ -268,16 +265,36 @@ export function Dashboard() {
                   <div style={{ fontWeight: 700, marginTop: 2 }}>
                     {terlemah.name} <span style={{ color: 'rgba(15,44,89,0.55)', fontWeight: 600 }}>· skor {terlemah.score}</span>
                   </div>
+                  <div style={{ fontSize: 12.5, color: 'rgba(15,44,89,0.6)', margin: '6px 0 10px' }}>Kategori dengan skor terendah. Latih dulu bagian ini.</div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: '#C0392B' }}>Latihan sekarang →</div>
                 </Link>
               )}
               {riwayat?.best && (
-                <Link to="/riwayat" style={{ ...chip, flex: 1, minWidth: 220 }}>
-                  <div style={{ fontSize: 11, fontWeight: 800, color: '#C9962E', letterSpacing: '0.04em' }}>REKOR SIMULASI</div>
-                  <div style={{ fontWeight: 700, marginTop: 2 }}>
-                    {riwayat.best.score}
-                    {terakhir && <span style={{ color: 'rgba(15,44,89,0.55)', fontWeight: 600 }}> · terakhir {terakhir.score}</span>}
+                <div style={{ ...chip, flex: 2, minWidth: 320 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: '#C9962E', letterSpacing: '0.04em' }}>REKOR SIMULASI</div>
+                    <div style={{ fontSize: 12, color: 'rgba(15,44,89,0.55)' }}>{riwayat.total} simulasi · rata-rata {riwayat.average}</div>
                   </div>
-                </Link>
+                  <div style={{ fontSize: 24, fontWeight: 800, margin: '2px 0 8px' }}>
+                    {riwayat.best.score}
+                    <span style={{ fontSize: 12, fontWeight: 600, color: 'rgba(15,44,89,0.5)' }}> terbaik</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end', height: 44 }}>
+                    {riwayat.sessions.slice(-8).map((x) => (
+                      <div
+                        key={x.id}
+                        title={`${x.score} · ${new Date(x.finishedAt).toLocaleDateString('id-ID')}`}
+                        style={{
+                          flex: 1,
+                          height: `${Math.max(8, x.score * 0.44)}px`,
+                          borderRadius: 4,
+                          background: x.id === riwayat.best!.id ? '#C9962E' : x.score >= 80 ? '#2E8B57' : x.score >= 60 ? '#E5BA73' : '#C0392B',
+                        }}
+                      />
+                    ))}
+                  </div>
+                  {terakhir && <div style={{ fontSize: 12, color: 'rgba(15,44,89,0.55)', marginTop: 6 }}>Terakhir: {terakhir.score}</div>}
+                </div>
               )}
             </div>
           );
