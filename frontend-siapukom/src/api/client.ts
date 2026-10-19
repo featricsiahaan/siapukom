@@ -15,6 +15,8 @@ import type {
   PaymentStatusResponse,
   PublicUser,
   SimulasiRiwayat,
+  SimulasiAktif,
+  ResumeSimulasiResponse,
   ShareStatusResponse,
   AdminShareClaim,
   SimulasiStatus,
@@ -89,6 +91,18 @@ export function startSimulasi(token: string) {
     body: { mode: 'SIMULASI' },
     token,
   });
+}
+
+export function getSimulasiAktif(token: string) {
+  return request<{ aktif: SimulasiAktif | null }>('/practice/simulasi/aktif', { token });
+}
+
+export function pauseSimulasi(token: string, sessionId: string) {
+  return request<{ ok: boolean; remainingSeconds: number }>(`/practice/sessions/${sessionId}/pause`, { method: 'POST', token });
+}
+
+export function resumeSimulasi(token: string, sessionId: string) {
+  return request<ResumeSimulasiResponse>(`/practice/sessions/${sessionId}/resume`, { method: 'POST', token });
 }
 
 export function getSimulasiStatus(token: string) {

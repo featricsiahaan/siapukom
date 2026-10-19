@@ -34,6 +34,18 @@ export interface StartSessionResponse {
   questions: SessionQuestion[];
 }
 
+export interface SimulasiAktif {
+  sessionId: string;
+  paused: boolean;
+  remainingSeconds: number;
+  answered: number;
+  total: number;
+}
+
+export interface ResumeSimulasiResponse extends StartSessionResponse {
+  answers: Record<number, string>;
+}
+
 export interface AnswerResponse {
   correct?: boolean;
   kunci?: string;

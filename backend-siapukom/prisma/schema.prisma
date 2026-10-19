@@ -241,6 +241,8 @@ model PracticeSession {
   status         SessionStatus @default(IN_PROGRESS)
   mode           SessionMode   @default(LATIHAN)
   expiresAt      DateTime?
+  pausedAt       DateTime?
+  remainingMs    Int?
   createdAt      DateTime      @default(now())
   finishedAt     DateTime?
 

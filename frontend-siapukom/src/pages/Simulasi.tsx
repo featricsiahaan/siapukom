@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import * as api from '../api/client';
 import { ApiError } from '../api/client';
 import { ReportQuestion } from '../components/ReportQuestion';
-import type { FinishSimulasiResponse, SessionQuestion, SimulasiStatus } from '../api/types';
+import type { FinishSimulasiResponse, SessionQuestion, SimulasiAktif, SimulasiStatus } from '../api/types';
 
 type Screen = 'menu' | 'exam' | 'result';
 
@@ -34,12 +34,21 @@ export function Simulasi() {
   const [showConfirmFinish, setShowConfirmFinish] = useState(false);
 
   const [result, setResult] = useState<FinishSimulasiResponse | null>(null);
+  const [aktif, setAktif] = useState<SimulasiAktif | null>(null);
+  const [pesanJeda, setPesanJeda] = useState('');
 
   const finishingRef = useRef(false);
+
+  const muatAktif = () => {
+    if (!token) return;
+    api.getSimulasiAktif(token).then((r) => setAktif(r.aktif)).catch(() => {});
+  };
 
   useEffect(() => {
     if (!token) return;
     api.getSimulasiStatus(token).then(setStatus).catch(() => {});
+    muatAktif();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   useEffect(() => {
@@ -58,8 +67,51 @@ export function Simulasi() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [screen, expiresAt]);
 
+  const jedaSimulasi = async () => {
+    if (!token || !sessionId) return;
+    setError('');
+    setLoading(true);
+    try {
+      await api.pauseSimulasi(token, sessionId);
+      setPesanJeda('Simulasi dijeda dan waktu berhenti. Silakan berlatih dulu, lalu kembali ke halaman ini untuk melanjutkan.');
+      setScreen('menu');
+      muatAktif();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Gagal menjeda simulasi.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const lanjutkanSimulasi = async () => {
+    if (!token || !aktif) return;
+    setError('');
+    setPesanJeda('');
+    setLoading(true);
+    try {
+      const res = await api.resumeSimulasi(token, aktif.sessionId);
+      const terjawab = res.answers ?? {};
+      const belum = res.questions.findIndex((q) => !terjawab[q.order]);
+      finishingRef.current = false;
+      setSessionId(res.sessionId);
+      setQuestions(res.questions);
+      setExpiresAt(res.expiresAt ?? null);
+      setAnswers(terjawab);
+      setRaguRagu(new Set());
+      setCurrent(belum >= 0 ? belum : 0);
+      setResult(null);
+      setAktif(null);
+      setScreen('exam');
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Gagal melanjutkan simulasi.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const startSimulasi = async () => {
     if (!token) return;
+    if (aktif && !window.confirm('Ada simulasi yang belum selesai. Memulai simulasi baru akan meninggalkannya. Lanjutkan?')) return;
     setError('');
     setLoading(true);
     try {
@@ -194,6 +246,22 @@ export function Simulasi() {
             ⏱ {formatDuration(secondsLeft)}
           </div>
           <button
+            onClick={jedaSimulasi}
+            disabled={loading}
+            style={{
+              background: '#fff',
+              color: '#0F2C59',
+              border: '1px solid rgba(15,44,89,0.25)',
+              fontSize: 13,
+              fontWeight: 700,
+              padding: '10px 16px',
+              borderRadius: 8,
+              cursor: 'pointer',
+            }}
+          >
+            ⏸ Jeda
+          </button>
+          <button
             onClick={() => setShowConfirmFinish(true)}
             style={{
               background: '#0F2C59',
@@ -241,6 +309,30 @@ export function Simulasi() {
                 )}
               </div>
 
+              {pesanJeda && (
+                <div style={{ marginBottom: 16, padding: '14px 16px', borderRadius: 10, background: 'rgba(46,139,87,0.1)', color: '#2E8B57', fontSize: 13.5, fontWeight: 600 }}>
+                  {pesanJeda}
+                </div>
+              )}
+              {aktif && status?.isAksesPenuhActive && (
+                <div style={{ marginBottom: 20, padding: 20, borderRadius: 14, border: '2px solid #C9962E', background: 'rgba(201,150,46,0.07)' }}>
+                  <div style={{ fontSize: 12, fontWeight: 800, color: '#C9962E', letterSpacing: '0.04em' }}>
+                    {aktif.paused ? 'SIMULASI DIJEDA' : 'SIMULASI BELUM SELESAI'}
+                  </div>
+                  <div style={{ fontSize: 15, margin: '6px 0 12px' }}>
+                    {aktif.answered} dari {aktif.total} soal terjawab · sisa waktu {formatDuration(aktif.remainingSeconds)}
+                    {aktif.paused ? ' (waktu berhenti)' : ' (waktu masih berjalan)'}
+                  </div>
+                  <button
+                    onClick={lanjutkanSimulasi}
+                    disabled={loading}
+                    style={{ background: '#C9962E', color: '#fff', border: 'none', fontSize: 15, fontWeight: 800, padding: '12px 24px', borderRadius: 10, cursor: 'pointer' }}
+                  >
+                    {loading ? 'Memuat…' : 'Lanjutkan Simulasi'}
+                  </button>
+                </div>
+              )}
+
               {!status?.isAksesPenuhActive ? (
                 <div>
                   <div
@@ -285,8 +377,8 @@ export function Simulasi() {
                 </button>
               )}
               <p style={{ fontSize: 12, color: 'rgba(15,44,89,0.45)', marginTop: 16 }}>
-                Setelah dimulai, timer berjalan otomatis dan tidak bisa dijeda. Pastikan Anda punya waktu luang sebelum
-                memulai.
+                Setelah dimulai, timer berjalan otomatis. Kamu bisa menjeda lewat tombol Jeda, dan melanjutkannya dari halaman ini.
+                Kalau ditutup tanpa dijeda, waktu tetap berjalan.
               </p>
             </>
           )}

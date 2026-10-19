@@ -173,6 +173,10 @@ router.post(
     if (session.status === 'FINISHED') throw new HttpError(409, 'Sesi ini sudah selesai');
     ensureSessionAccess(session, req.user?.id);
 
+    if (session.pausedAt) {
+      throw new HttpError(409, 'Simulasi sedang dijeda. Lanjutkan dulu untuk menjawab.');
+    }
+
     if (session.mode === 'SIMULASI' && session.expiresAt && new Date() > session.expiresAt) {
       throw new HttpError(409, 'Waktu ujian sudah habis. Silakan selesaikan sesi untuk melihat hasil.');
     }
@@ -370,6 +374,98 @@ router.get(
       average,
       best: best ? { id: best.id, score: best.score, level: best.level, finishedAt: best.finishedAt } : null,
       sessions: [...items].sort((a, b) => b.score - a.score || a.finishedAt.getTime() - b.finishedAt.getTime()).slice(0, 5),
+    });
+  })
+);
+
+router.get(
+  '/simulasi/aktif',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const session = await prisma.practiceSession.findFirst({
+      where: { userId: req.user!.id, mode: 'SIMULASI', status: 'IN_PROGRESS' },
+      orderBy: { createdAt: 'desc' },
+      include: { _count: { select: { answers: { where: { answerLetter: { not: null } } } } } },
+    });
+    if (!session) return res.json({ aktif: null });
+
+    const remainingMs = session.pausedAt
+      ? (session.remainingMs ?? 0)
+      : Math.max(0, (session.expiresAt?.getTime() ?? 0) - Date.now());
+    res.json({
+      aktif: {
+        sessionId: session.id,
+        paused: !!session.pausedAt,
+        remainingSeconds: Math.round(remainingMs / 1000),
+        answered: session._count.answers,
+        total: session.totalQuestions,
+      },
+    });
+  })
+);
+
+router.post(
+  '/sessions/:id/pause',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const session = await prisma.practiceSession.findUnique({ where: { id: String(req.params.id) } });
+    if (!session) throw new HttpError(404, 'Sesi tidak ditemukan');
+    ensureSessionAccess(session, req.user?.id);
+    if (session.mode !== 'SIMULASI') throw new HttpError(400, 'Hanya simulasi yang bisa dijeda');
+    if (session.status === 'FINISHED') throw new HttpError(409, 'Sesi ini sudah selesai');
+    if (session.pausedAt) return res.json({ ok: true, remainingSeconds: Math.round((session.remainingMs ?? 0) / 1000) });
+    if (!session.expiresAt || session.expiresAt.getTime() <= Date.now()) {
+      throw new HttpError(409, 'Waktu ujian sudah habis, selesaikan sesi untuk melihat hasil');
+    }
+    const remainingMs = session.expiresAt.getTime() - Date.now();
+    await prisma.practiceSession.update({
+      where: { id: session.id },
+      data: { pausedAt: new Date(), remainingMs, expiresAt: null },
+    });
+    res.json({ ok: true, remainingSeconds: Math.round(remainingMs / 1000) });
+  })
+);
+
+router.post(
+  '/sessions/:id/resume',
+  requireAuth,
+  asyncHandler(async (req, res) => {
+    const session = await prisma.practiceSession.findUnique({
+      where: { id: String(req.params.id) },
+      include: { answers: { orderBy: { order: 'asc' }, include: { question: { include: { category: true } } } } },
+    });
+    if (!session) throw new HttpError(404, 'Sesi tidak ditemukan');
+    ensureSessionAccess(session, req.user?.id);
+    if (session.mode !== 'SIMULASI') throw new HttpError(400, 'Hanya simulasi yang bisa dilanjutkan');
+    if (session.status === 'FINISHED') throw new HttpError(409, 'Sesi ini sudah selesai');
+
+    let expiresAt = session.expiresAt;
+    if (session.pausedAt) {
+      expiresAt = new Date(Date.now() + (session.remainingMs ?? 0));
+      await prisma.practiceSession.update({
+        where: { id: session.id },
+        data: { pausedAt: null, remainingMs: null, expiresAt },
+      });
+    }
+
+    const answers: Record<number, string> = {};
+    for (const a of session.answers) if (a.answerLetter) answers[a.order] = a.answerLetter;
+
+    res.json({
+      sessionId: session.id,
+      mode: session.mode,
+      expiresAt,
+      durasiMenit: SIMULASI_DURASI_MENIT,
+      answers,
+      questions: session.answers.map((a) => ({
+        order: a.order,
+        questionId: a.questionId,
+        kategori: a.question.category.name,
+        pertanyaan: a.question.pertanyaan,
+        opsi: a.question.opsi as Opsi[],
+        imageUrl: a.question.imageUrl,
+        imageAttribution: a.question.imageAttribution,
+      })),
     });
   })
 );
